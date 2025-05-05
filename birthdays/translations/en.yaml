@@ -26,10 +26,10 @@ configuration:
   messages:
     name: messages
     description: >
-      "an list of language and messages.
+      A list of language and messages.\n
         Example
         - languague: EN
-          message: Happy Birthday"
+          message: Happy Birthday
 
   signal_numbers:
     name: signal_numbers
@@ -37,7 +37,7 @@ configuration:
 
   signal_groups:
     name: signal_groups
-    description: A list of groups to post a message in. Specify Signal group_id, Google Label Id and Languague code
+    description: A list of groups to post a message in. Specify Signal group_id, Google label_id and languague
 
   whatsapp_groups:
     name: whatsapp_groups
