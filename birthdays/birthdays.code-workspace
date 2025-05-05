@@ -1,8 +1,11 @@
 {
 	"folders": [
 		{
-			"path": "\\\\192.168.0.200\\addons\\birthdays"
+			"path": "C:\\Users\\ewald\\OneDrive\\Software\\Home Assistant\\ha-addons\\birthdays"
 		},
+		{
+			"path": ".."
+		}
 	],
 	"settings": {}
 }

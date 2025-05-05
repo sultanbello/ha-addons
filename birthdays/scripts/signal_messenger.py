@@ -4,8 +4,11 @@ import requests
 class Signal:
     def __init__(self, Messenger):
         try:
-            self.url    = "http://1315902c-signal-messenger:8080"
-            self.number = '+2349045252526'
+            self.url    = f"http://homeassistant.local{self.parent.signal_port}"
+            self.number = self.parent.signal_numbers 
+
+            print(self.number)
+
             self.parent = Messenger
 
             self.headers = {

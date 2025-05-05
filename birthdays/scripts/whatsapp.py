@@ -3,19 +3,18 @@ import sys
 from time import sleep
 import os
 
-whatsapp_server_url = "http://192.168.0.200:3000/api/"
-
 class Whatsapp:
     def __init__(self, Messenger):
         try:
             self.parent         = Messenger
-            self.chats          = {
-                "Fam v.d. Wart":            "31610742567-1407596543@g.us",
-                "Fam Harmsen":              "31610742567-1401264746@g.us",
-                "Thuisfront Team Harmsen":  "31610742567-1563642823@g.us"
-            }
+            self.chats          = self.parent.whatsapp_groups
+
+            print(self.chats)
+
             self.connected      = False
             self.api_running    = True
+
+            self.whatsapp_server_url = f"http://homeassistant.local:{self.parent.whatsapp_port}/api/"
 
             self.check_connected()
         except Exception as e:
@@ -23,7 +22,7 @@ class Whatsapp:
 
     def check_connected(self):
         try:
-            status              = requests.get(f'{whatsapp_server_url}status').json()['status']
+            status              = requests.get(f'{self.whatsapp_server_url}status').json()['status']
             self.api_running    = True
             self.parent.logger.log_message("Whatsapp Api is Up and Running")
 
@@ -36,14 +35,14 @@ class Whatsapp:
         except requests.exceptions.RequestException as e:
             self.api_running  = False
 
-            self.parent.logger.log_message(f"The Whatsapp api is not running on {whatsapp_server_url}", "Error") 
+            self.parent.logger.log_message(f"The Whatsapp api is not running on {self.whatsapp_server_url}", "Error") 
         except Exception as e:
             self.parent.logger.log_message(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}", "Error")
 
     def make_request(self, url, post='', return_json=False):
         try:
             self.api_running  = True
-            url     = f"{whatsapp_server_url}{url}"
+            url     = f"{self.whatsapp_server_url}{url}"
 
             if post == '':
                 result = requests.get(url)
@@ -71,7 +70,7 @@ class Whatsapp:
         except requests.exceptions.RequestException as e:
             self.api_running  = False
 
-            self.parent.logger.log_message(f"The Whatsapp api is not running on {whatsapp_server_url}", "Error") 
+            self.parent.logger.log_message(f"The Whatsapp api is not running on {self.whatsapp_server_url}", "Error") 
         except Exception as e:
             self.parent.logger.log_message(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}", "Error")
     

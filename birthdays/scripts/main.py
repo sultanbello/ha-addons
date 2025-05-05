@@ -34,7 +34,7 @@ class Messenger:
         self.whatsapp_port      = config.get('whatsapp_port')
         self.signal_numbers     = config.get('signal_numbers')
         self.whatsapp_groups    = config.get('whatsapp_groups')
-        self.log_level          = config.get('log_level')
+        self.log_level          = config.get('log_level')  
 
         self.logger = logger.Logger(self.log_level)
         self.logger.log_message("")
