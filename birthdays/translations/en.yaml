@@ -55,5 +55,10 @@ configuration:
     name: whatsapp_port
     description: The port the WhatsApp integration is listening
 
+  port:
+    name: port
+    description: The port this addon is listening. Should be the same as the port under network settings
+
+
 network:
   80/TCP: The webserver port (Not used for Ingress)

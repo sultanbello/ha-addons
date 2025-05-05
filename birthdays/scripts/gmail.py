@@ -67,7 +67,7 @@ class Gmail:
                     print('')
                     print('########################')
                     flow    = InstalledAppFlow.from_client_secrets_file(credentials_file, SCOPES)
-                    creds   = flow.run_local_server(bind_addr="0.0.0.0", open_browser=False, port=9090)
+                    creds   = flow.run_local_server(bind_addr="0.0.0.0", open_browser=False, port=self.parent.port)
                     print('########################')
                     print('')
 

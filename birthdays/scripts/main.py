@@ -29,6 +29,7 @@ class Messenger:
         self.project_id         = config.get('project_id')
         self.signal_port        = config.get('signal_port')
         self.whatsapp_port      = config.get('whatsapp_port')
+        self.port               = config.get('port')
         self.signal_numbers     = config.get('signal_numbers')
         self.signal_groups      = config.get('signal_groups')
         self.whatsapp_groups    = config.get('whatsapp_groups')
@@ -141,10 +142,10 @@ if not creds.is_file():
 
 if config.get('debug'):
     daily()
-else:
-    print(f"Will run at {config.get('hour')}:{config.get('minutes')} daily")
-    schedule.every().day.at("{:02d}:{:02d}:00".format(config.get('hour'), config.get('minutes'))).do(daily)
 
-    while True:
-        schedule.run_pending()
-        sleep(1)
+print(f"Will run at {config.get('hour')}:{config.get('minutes')} daily")
+schedule.every().day.at("{:02d}:{:02d}:00".format(config.get('hour'), config.get('minutes'))).do(daily)
+
+while True:
+    schedule.run_pending()
+    sleep(1)

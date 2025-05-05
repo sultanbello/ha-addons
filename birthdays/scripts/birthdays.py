@@ -21,10 +21,10 @@ class CelebrationMessages():
 
         self.messages   = {}
         for message in self.parent.messages:
-            if not message['languague'] in self.messages:
-                self.messages[message['languague']] = []
+            if not message['languague'].lower() in self.messages:
+                self.messages[message['languague'].lower()] = []
 
-            self.messages[message['languague']].append(message['message'])
+            self.messages[message['languague'].lower()].append(message['message'])
 
         self.group_ids  = {}
         self.group_ids['signal']    = {}
@@ -34,10 +34,6 @@ class CelebrationMessages():
         self.group_ids['whatsapp']    = {}
         for group in self.parent.whatsapp_groups:
             self.group_ids['whatsapp'][group['label_id']] = group
-        
-        print(self.messages)
-
-        print(self.group_ids)
 
         # build number -> name dict
         self.numbers    = {}
@@ -68,11 +64,11 @@ class CelebrationMessages():
                     details['age']          = self.now.year - details['birthyear']
 
             if addresses:
-                details['languague'] = addresses[0].get("countryCode")
+                details['languague'] = addresses[0].get("countryCode").lower()
             else:
                 # this person has a birthday but no country set
                 if 'name' in details and 'birthday' in details:
-                    self.parent.logger.log_message(f"Please set a country for {details['name']} at https://contacts.google.com/search/Zefanja", "Warning")
+                    self.parent.logger.log_message(f"Please set a country for {details['name']} at https://contacts.google.com/search/{details['name']}", "Warning")
 
             # E-mail address
             email = person.get('emailAddresses')
@@ -117,7 +113,7 @@ class CelebrationMessages():
             if 'id' in details:
                 #if we have a duplicate name
                 if details['name'] in self.names:
-                    self.parent.logger.log_message(f"I found another person with the name {details['name']}")
+                    self.parent.logger.log_message(f"I found another person with the name {details['name']}", 'warning')
                     self.names[details['name'] + '_1'] = details
                 else:
                     self.names[details['name']] = details
