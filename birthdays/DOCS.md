@@ -1,10 +1,9 @@
-# Home Assistant Add-on: Example add-on
+# Birthdays Addons
 
-## How to use
-
-This add-on really does nothing. It is just an example.
-
-When started it will print the configured message or "Hello world" in the log.
-
-It will also print "All done!" in `/share/example_addon_output.txt` to show
-simple example of the usage of `map` in addon config.
+## Initial Installation
+Start the addon and watch the log.
+Copy the url displayed and paste it in your browser.
+Give permission to the app
+You will be redirected to a localhost page.
+Replace "localhost" with "homeassistant.local" and press enter.
+You should be good to go now
