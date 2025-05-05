@@ -1,6 +1,6 @@
 name: "Birthdays"
 description: "Imports Google Contacts into Home Assistant and sends automated birthday messages"
-version: "1.0.77"
+version: "1.0.78"
 slug: "birthdays"
 init: false
 arch:
@@ -9,10 +9,8 @@ arch:
   - armhf
   - armv7
   - i386
-startup: services
 
-hassio_api: true
-homeassistant_api: true
+startup: application
 
 ports:
   9090/tcp: 9090

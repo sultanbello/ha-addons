@@ -7,6 +7,7 @@ from time import sleep
 import json
 import schedule
 import time
+from pathlib import Path
 
 #pip3 install --upgrade google-api-python-client google-auth-httplib2 google-auth-oauthlib lxml requests num2words --break-system-packages
 
@@ -43,7 +44,7 @@ class Messenger:
 
         x = 60
         while not self.is_connected():
-            #Wrtie to log every minute
+            #Write to log every minute
             if x == 60:
                 x   = 0
                 self.logger.log_message("No internet connection")
@@ -121,6 +122,7 @@ class Messenger:
             self.logger.log_message(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}", "Error")
 
 def daily():
+    print(f"Starting the sender script")
     messenger   = Messenger()
 
     messenger.send()
@@ -128,6 +130,12 @@ def daily():
 # Get Options
 with open("/data/options.json", mode="r") as data_file:
     config = json.load(data_file)
+
+creds = Path("/data/credentials.json")
+if not creds.is_file():
+    print(f"Initiating first run")
+    # First run
+    messenger   = Messenger()
 
 print(f"Will run at {config.get('hour')}:{config.get('minutes')} daily")
 schedule.every().day.at("{:02d}:{:02d}".format(config.get('hour'), config.get('minutes'))).do(daily)

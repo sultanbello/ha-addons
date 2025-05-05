@@ -3,11 +3,15 @@ from datetime import datetime
 import os
 import sys
 
+print('Loading Logger')
+
 class Logger:
     def __init__(self, level='info'):
         self.log_level  = level
 
     def log_message(self, msg='', type = 'Info'):
+        print(msg)
+        
         msg     = str(msg)
         type    = str(type).lower()
 

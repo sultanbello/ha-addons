@@ -7,7 +7,10 @@ class Whatsapp:
     def __init__(self, Messenger):
         try:
             self.parent         = Messenger
-            self.chats          = self.parent.whatsapp_groups
+            self.chats          = {}
+            
+            for group in self.parent.whatsapp_groups:
+                self.chats[group['group_name']]    = group['group_id']
 
             print(self.chats)
 

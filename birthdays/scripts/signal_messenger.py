@@ -4,12 +4,13 @@ import requests
 class Signal:
     def __init__(self, Messenger):
         try:
+            self.parent = Messenger
+
             self.url    = f"http://homeassistant.local{self.parent.signal_port}"
+            
             self.number = self.parent.signal_numbers 
 
             print(self.number)
-
-            self.parent = Messenger
 
             self.headers = {
                 'Content-Type': 'application/json',
