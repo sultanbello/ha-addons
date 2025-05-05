@@ -1,6 +1,6 @@
 name: "Birthdays"
 description: "Imports Google Contacts into Home Assistant and sends automated birthday messages"
-version: "1.1.9"
+version: "1.1.10"
 slug: "birthdays"
 init: false
 arch:
@@ -49,7 +49,7 @@ schema:
       group_id: str
       label_id: str
       languague: str
-  log_level: list('info'|'warning'|'error')
+  log_level: list(info|warning|error)
   signal_port: int(2,99999)?
   whatsapp_port: int(2,99999)?
 

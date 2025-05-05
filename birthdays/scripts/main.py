@@ -139,9 +139,12 @@ if not creds.is_file():
     # First run
     messenger   = Messenger()
 
-print(f"Will run at {config.get('hour')}:{config.get('minutes')} daily")
-schedule.every().day.at("{:02d}:{:02d}".format(config.get('hour'), config.get('minutes'))).do(daily)
+if config.get('debug'):
+    daily()
+else:
+    print(f"Will run at {config.get('hour')}:{config.get('minutes')} daily")
+    schedule.every().day.at("{:02d}:{:02d}:00".format(config.get('hour'), config.get('minutes'))).do(daily)
 
-while True:
-    schedule.run_pending()
-    sleep(60)
+    while True:
+        schedule.run_pending()
+        sleep(1)
