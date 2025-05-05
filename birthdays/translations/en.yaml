@@ -37,11 +37,11 @@ configuration:
 
   signal_groups:
     name: signal_groups
-    description: a list of groups to post a message in. The group_name should be the label of the contact in Google Contacts, the group_id the id of the WhatsApp group
+    description: A list of groups to post a message in. Specify Signal group_id, Google Label Id and Languague code
 
   whatsapp_groups:
     name: whatsapp_groups
-    description: a list of groups to post a message in. The group_name the name of the contact in WhatsApp, the group_id the id of the WhatsApp group, the label_id the id of the label in [Google Contaccts](https://contacts.google.com/) and the languague the langugue (like EN)
+    description: a list of groups to post a message in. The group_name the name of the group in WhatsApp, the group_id the id of the WhatsApp group, the label_id the id of the label in [Google Contacts](https://contacts.google.com/) and the languague the langugue (like EN)
 
   log_level:
     name: log_level

@@ -1,6 +1,6 @@
 name: "Birthdays"
 description: "Imports Google Contacts into Home Assistant and sends automated birthday messages"
-version: "1.1.0"
+version: "1.1.1"
 slug: "birthdays"
 init: false
 arch:
@@ -20,6 +20,7 @@ options:
   project_id: null
   hour: 10
   minutes: 00
+  messages: []
   signal_numbers: []
   signal_groups: []
   whatsapp_groups: []
@@ -32,26 +33,25 @@ schema:
   client_id: str
   client_secret: str
   project_id: str
-  hour: int(0,23)
-  minutes: int(0,59)
+  hour: int
+  minutes: int
   messages:
-    - languague: str(2,2)
+    - languague: str
       message: str
   signal_numbers:
-    - str(10,15)
+    - str
   signal_groups:
-    - group_name: str
-      group_id: str
-      label_id: str
-      languague: str(2,2)
+    - group_id: str?
+      label_id: str?
+      languague: str
   whatsapp_groups:
-    - group_name: str
-      group_id: str
-      label_id: str
-      languague: str(2,2)
+    - group_name: str?
+      group_id: str?
+      label_id: str?
+      languague: str
   log_level: list('info'|'warning'|'error')
-  signal_port: int(2,5)
-  whatsapp_port: int(2,5)
+  signal_port: int
+  whatsapp_port: int
 
 map:
   - share:rw
