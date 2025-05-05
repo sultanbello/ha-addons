@@ -31,6 +31,7 @@ class CelebrationMessages():
         for group in self.parent.signal_groups:
             self.group_ids['signal'][group['label_id']] = group
 
+        self.group_ids['whatsapp']    = {}
         for group in self.parent.whatsapp_groups:
             self.group_ids['whatsapp'][group['label_id']] = group
         
