@@ -91,7 +91,7 @@ class Gmail:
             self.parent.logger.log_message(f"I would have sent {msg} via e-mail to {to} if debug was disabled")
             return True
         
-        message = self.create_email(to,'Gefeliciteerd!', msg)
+        message = self.create_email(to, 'Gefeliciteerd!', msg)
 
         return (self.gmail_service.users().messages().send(userId="me", body=message).execute())
 
