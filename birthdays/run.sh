@@ -16,7 +16,7 @@ if [ ! -f /data/pip ]; then
     echo "pip done" > /data/pip
 fi
 
-echo "Starting Script..."
+echo "Starting Script"
 
 python3 -u scripts/main.py
 

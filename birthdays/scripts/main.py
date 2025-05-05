@@ -129,6 +129,7 @@ def daily():
 with open("/data/options.json", mode="r") as data_file:
     config = json.load(data_file)
 
+print(f"Will run at {config.get('hour')}:{config.get('minutes')} daily")
 schedule.every().day.at(f"{config.get('hour')}:{config.get('minutes')}").do(daily)
 
 while True:
