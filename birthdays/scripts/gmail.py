@@ -3,14 +3,11 @@ from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from google.auth.transport.requests import Request
 from google_auth_oauthlib.flow import Flow
-import google_auth_oauthlib
 from email.mime.text import MIMEText
 import os
 import pickle
 import base64
 import sys
-import logger
-from datetime import timezone
 import json
 
 class Gmail:

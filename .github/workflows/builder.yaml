@@ -5,6 +5,8 @@ env:
   MONITORED_FILES: "build.yaml config.yaml Dockerfile rootfs"
 
 on:
+  release:
+    types: [released]
   push:
     branches:
       - main

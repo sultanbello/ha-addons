@@ -1,15 +1,5 @@
 #!/usr/bin/with-contenv bashio
 
-# nginx -g "daemon off;error_log /dev/stdout debug;" &
-
-response=$(curl -sSL -H "Authorization: Bearer $SUPERVISOR_TOKEN" http://supervisor/network/info)
-
-http_code=$(tail -n1 <<< "$response")  # get the last line
-content=$(sed '$ d' <<< "$response")   # get all but the last line which contains the status code
-
-echo "$http_code"
-echo "$content"
-
 echo "Starting Python"
 
 python3 -m venv /data/venv
