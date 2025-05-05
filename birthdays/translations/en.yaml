@@ -26,7 +26,7 @@ configuration:
   messages:
     name: messages
     description: >
-      A list of language and messages.\n
+      A list of language and messages. The message to be sent will be picked randomly\n
         Example
         - languague: EN
           message: Happy Birthday
