@@ -22,21 +22,19 @@ import logger
 
 class Messenger:
     def __init__(self):
-        # Get Options
-        with open("/data/options.json", mode="r") as data_file:
-            config = json.load(data_file)
-
         self.debug              = config.get('debug')
         self.client_id          = config.get('client_id')
         self.client_secret      = config.get('client_secret')
-        self.project_id        = config.get('project_id')
+        self.project_id         = config.get('project_id')
         self.signal_port        = config.get('signal_port')
         self.whatsapp_port      = config.get('whatsapp_port')
         self.signal_numbers     = config.get('signal_numbers')
         self.whatsapp_groups    = config.get('whatsapp_groups')
-        self.log_level          = config.get('log_level')  
+        self.log_level          = config.get('log_level')
+        self.hour               = config.get('hour')
+        self.minutes            = config.get('minutes')
 
-        self.logger = logger.Logger(self.log_level)
+        self.logger             = logger.Logger(self.log_level)
         self.logger.log_message("")
         if self.debug:
             self.logger.log_message("Debug is Enabled")
@@ -127,7 +125,11 @@ def daily():
 
     messenger.send()
 
-schedule.every().day.at("11:02").do(daily)
+# Get Options
+with open("/data/options.json", mode="r") as data_file:
+    config = json.load(data_file)
+
+schedule.every().day.at(f"{config.get('hour')}:{config.get('minutes')}").do(daily)
 
 while True:
     schedule.run_pending()
