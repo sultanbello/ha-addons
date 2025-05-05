@@ -32,7 +32,16 @@ class Logger:
             else:
                 log_msg     = f'{date} - {location}' + type.ljust(7) + ' - ' + msg
 
-            print(log_msg)
+            warning     = '\033[93m'
+            error       = '\033[91m'
+            endc        = '\033[0m'
+
+            if type == 'error':
+                print(f"{error}{log_msg}{endc}")
+            elif type == 'warning':
+                print(f"{warning}{log_msg}{endc}")
+            else:
+                print(log_msg)
 
             f   = open('/share/birthdays_debug.log', "a", encoding="utf-8")
             f.write(log_msg + "\n")

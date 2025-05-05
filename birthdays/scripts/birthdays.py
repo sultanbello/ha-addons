@@ -68,7 +68,7 @@ class CelebrationMessages():
             else:
                 # this person has a birthday but no country set
                 if 'name' in details and 'birthday' in details:
-                    self.parent.logger.log_message(f"Please set a country for {details['name']} at https://contacts.google.com/search/{details['name']}", "Warning")
+                    self.parent.logger.log_message(f"Please set a country for {details['name']} at https://contacts.google.com/{person.get('resourceName', '').replace('people', 'person')}", "Warning")
 
             # E-mail address
             email = person.get('emailAddresses')
