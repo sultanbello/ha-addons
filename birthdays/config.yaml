@@ -49,3 +49,4 @@ schema:
 map:
   - share:rw
   
+image: "ghcr.io/home-assistant/{arch}-birthdays"
