@@ -1,0 +1,51 @@
+name: "Birthdays"
+description: "Imports Google Contacts into Home Assistant and sends automated birthday messages"
+version: "1.0.70"
+slug: "birthdays"
+init: false
+arch:
+  - aarch64
+  - amd64
+  - armhf
+  - armv7
+  - i386
+startup: services
+
+hassio_api: true
+homeassistant_api: true
+
+ports:
+  9090/tcp: 9090
+
+options:
+  debug: true
+  client_id: null
+  client_secret: null
+  project_id: null
+  hour: 10
+  minutes: 00
+  signal_numbers: []
+  whatsapp_groups: []
+  log_level: null
+  signal_port: 8080
+  whatsapp_port: 3000
+
+schema:
+  debug: bool
+  client_id: str
+  client_secret: str
+  project_id: str
+  hour: int(0,12)
+  minutes: int(0,60)
+  signal_numbers:
+    - str
+  whatsapp_groups:
+    - group_name: str
+      group_id: str
+  log_level: list('info'|'warning'|'error')
+  signal_port: int
+  whatsapp_port: int
+
+map:
+  - share:rw
+  

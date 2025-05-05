@@ -1,0 +1,4 @@
+# https://developers.home-assistant.io/docs/add-ons/repository#repository-configuration
+name: My add-on repository
+url: 'https://github.com/tsjippy/ha-addons'
+maintainer: Ewald Harmsen <ewaldha@hotmail.com>
