@@ -28,10 +28,10 @@ class CelebrationMessages():
 
         self.group_ids  = {}
         self.group_ids['signal']    = {}
-        for group in self.signal_groups:
+        for group in self.parent.signal_groups:
             self.group_ids['signal'][group['label_id']] = group
 
-        for group in self.whatsapp_groups:
+        for group in self.parent.whatsapp_groups:
             self.group_ids['whatsapp'][group['label_id']] = group
         
         print(self.messages)
