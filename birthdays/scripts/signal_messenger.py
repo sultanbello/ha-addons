@@ -6,11 +6,9 @@ class Signal:
         try:
             self.parent = Messenger
 
-            self.url    = f"http://homeassistant.local{self.parent.signal_port}"
+            self.url    = f"http://homeassistant.local:{self.parent.signal_port}"
             
-            self.number = self.parent.signal_numbers 
-
-            print(self.number)
+            self.number = self.parent.signal_numbers[0]
 
             self.headers = {
                 'Content-Type': 'application/json',

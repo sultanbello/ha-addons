@@ -19,94 +19,24 @@ class CelebrationMessages():
 
         self.now        = datetime.datetime.now()
 
-        self.group_ids  = {
-            "169b51d90910e33d": {
-                "name":         "Fam Harmsen", 
-                "languague":    "NL", 
-                "platform":     "whatsapp"
-            },
-            "59e818140f151ed8": {
-                "name":         "Fam v.d. Wart", 
-                "languague":    "NL", 
-                "platform":     "whatsapp"
-            },
-            "12fce5118f53a6e8": {
-                "name":         "Thuisfront Team Harmsen", 
-                "languague":    "NL", 
-                "platform":     "whatsapp"
-            },
-        } 
+        self.messages   = {}
+        for message in self.parent.messages:
+            if not message['languague'] in self.messages:
+                self.messages[message['languague']] = []
 
-        self.NTgroupId   = 'FTrLH0chjLDIzNHeAMMGmHMTwEjx6p/XJ97/IRDgSE0='
+            self.messages[message['languague']].append(message['message'])
 
-        self.teamMembers   = [
-            #Kano
-            "Martin Barley",
-            "Lid Barley",
-            "Elias Barley",
-            "Simeon Barley",
-            "Arabella Barley",
-            "John Hunt",
-            "Abigail Hunt",
-            "Mesele Koroto",
-            "Buzunesh Shanga",
-            "Markos Kalore",
-            "Tibarek Markos",
-            "Sebele Markos",
-            "Feven Markos",
-            "David Markos",
-            "Legesse Hailemariam",
-            "Tarikua Gode",
-            "Mikiyas Hailemariam",
-            "Abigiya Hailemariam",
-            "Nahum Hailemariam"
-            
-            #Retired
-            "Randy Wildman",
-            "Adena Wildman",
-            
-            #Potiskum
-            "Amanuel Atta",
-            "Meselech Godaro",
-            "Betselot Amanuel",
-            "Eyael Amanuel",
-            "Assefa Darebo",
-            "Etfwork Debalke",
-            "Hailelule Assefa",
-            "Alazar Assefa",
-            "Saron Assefa",
-            "Biruk Assefa",
-            "Sherry Thomas",
-            "Yakubu Balewa",
-            "Agnes Balewa",
-            "Jabes Yakubu",
-            "David Yakubu",
-            "Joshua Yakubu",
-        ]
+        self.group_ids  = {}
+        self.group_ids['signal']    = {}
+        for group in self.signal_groups:
+            self.group_ids['signal'][group['label_id']] = group
 
-        # English Messages
-        self.messages    = [
-            "Happy birthday %firstname%!\n\nMay this new year be full of blessings\n\nEwald&Lianne",
-            "Happy birthday %firstname%!\n\nHave a wonderfull day\n\nEwald & Lianne",
-            "Happy birthday %firstname%!🎂 🎉🎈\n\nEwald&Lianne",
-            "Happy birthday %firstname%!🎊🎂🥳\n\nEwald&Lianne",
-            "Happy birthday %firstname%!\n\nMay this new year be full of blessings\n\nLianne & Ewald",
-            "Happy birthday %firstname%!\n\nHave a wonderfull day\n\nLianne & Ewald",
-            "Happy birthday %firstname%!🎂 🎉🎈\n\nLianne & Ewald",
-            "Happy birthday %firstname%!🎊🎂🥳\n\nLianne & Ewald",
-            "Happy birthday %firstname%!\n\nMay this new year be full of blessings\n\nFrom the Harmsens",
-            "Happy birthday %firstname%!\n\nHave a wonderfull day\n\nFrom the Harmsens",
-            "Happy birthday %firstname%!🎂 🎉🎈\n\nFrom the Harmsens",
-            "Happy birthday %firstname%!🎊🎂🥳\n\nFrom the Harmsens",
-        ]
+        for group in self.whatsapp_groups:
+            self.group_ids['whatsapp'][group['label_id']] = group
+        
+        print(self.messages)
 
-        self.dutchMessages   = [
-            "Gefeliciteerd met je verjaardag %firstname%!🎂 🎉🎈",
-            "Gefeliciteerd met je verjaardag %firstname%!🎊🎂🥳",
-            "Gefeliciteerd met je verjaardag %firstname%!\n\nFijne dag!",
-            "Gefeliciteerd met je verjaardag %firstname%!\n\nEen hele fijne dag toegewenst\n\nEwald & Lianne",
-            "Gefeliciteerd met je verjaardag %firstname%!\n\nEen hele fijne dag toegewenst\n\nLianne & Ewald",
-        ]
+        print(self.group_ids)
 
         # build number -> name dict
         self.numbers    = {}
@@ -138,8 +68,6 @@ class CelebrationMessages():
 
             if addresses:
                 details['languague'] = addresses[0].get("countryCode")
-                if details['languague'] != "NL":
-                    details['languague'] = "EN"
             else:
                 # this person has a birthday but no country set
                 if 'name' in details and 'birthday' in details:
@@ -218,10 +146,7 @@ class CelebrationMessages():
 
                             if year != None:
                                 age = self.now.year - year
-                                if details['languague'] == "NL":
-                                    age_in_words    = num2words(age, to = 'ordinal',  lang ='nl')
-                                else:
-                                    age_in_words    = num2words(age, to = 'ordinal')
+                                age_in_words    = num2words(age, to = 'ordinal',  lang = details['languague'])
                                 
                                 msg += f" {age_in_words}"
 
@@ -237,65 +162,34 @@ class CelebrationMessages():
 
     def send_personal_message(self, details):
         try:
-            # Personall message
-            if details['languague'] == "NL":
-                msg         = random.choice(self.dutchMessages)
+            if details['languague'] in self.messages:
+                # Personall message
+                msg         = random.choice(self.messages[details['languague']])
+                self.parent.send_message(msg.replace("%firstname%", details['firstname']), details) 
             else:
-                msg         = random.choice(self.messages)
+                self.parent.logger.log_message(f"No message set for languague { details['languague']}", "Error")
             
-            self.parent.send_message(msg.replace("%firstname%", details['firstname']), details) 
+            
         except Exception as e:
             self.parent.logger.log_message(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}", "Error")
     
     def send_group_message(self, details):
-        try:
-
-            # Send Northern Team Message if needed
-            if details['name'] in self.teamMembers and self.parent.signal.up:
-                msg     = random.choice(self.messages).replace("%firstname%", details['firstname'])
-                self.parent.logger.log_message(f"Sending {msg} to {self.NTgroupId}")
-                self.parent.signal.send_group_message(msg, self.NTgroupId)
-                self.parent.logger.log_message(f"Finished sending {msg} to {self.NTgroupId}")
-                    
+        try:                    
             # check the groups in Google this person is a member of
             if 'memberships' in details:
                 for membership in details['memberships']:
-                    group_id = membership.get('contactGroupMembership').get('contactGroupId')
-                    if group_id in self.group_ids:
-                        group_name = self.group_ids[group_id]['name']
+                    label_id = membership.get('contactGroupMembership').get('contactGroupId')
+
+                    if label_id in self.group_ids['signal']:
+                        msg         = random.choice(self.messages[self.group_ids['signal'][label_id]['languague']])
+
+                        self.parent.signal.send_message(self.group_ids['whatsapp'][label_id]['group_id'], msg.replace("%firstname%", details['firstname']))
+
+                    if label_id in self.group_ids['whatsapp']:
+                        msg         = random.choice(self.messages[self.group_ids['whatsapp'][label_id]['languague']])
+
+                        self.parent.whatsapp.send_message(self.group_ids['whatsapp'][label_id]['group_id'], msg.replace("%firstname%", details['firstname']))
                         
-                        if self.group_ids[group_id]['languague'] == "NL":
-                            msg         = random.choice(self.dutchMessages)
-                        else:
-                            msg         = random.choice(self.messages)
-
-                        self.parent.whatsapp.send_message(group_name, msg.replace("%firstname%", details['firstname']))
-        except Exception as e:
-            self.parent.logger.log_message(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}", "Error")
-
-    def congratulate_relatives(self, details):
-        try:
-            # Do not send messages to relatives of adults
-            if not 'relations' in details or not 'birthyear' in details or details['age'] > 18:
-                self.parent.logger.log_message(f"Not sending message to relative, age:{details['age']}")
-                return
-            
-            #Loop over all the relations the birthday user has.
-            for relation in details['relations']:
-                relation_type    = relation.get('type')
-
-                self.parent.logger.log_message(f"Type is {relation_type}")
-                if relation_type == 'father' or relation_type == 'mother' or relation_type == 'vader' or relation_type == 'moeder':
-                    #Get the name of this relative
-                    relation_name = relation.get('person')
-                    self.parent.logger.log_message(f"Preparing a message to {relation_name}")
-
-                    relation_object = self.names[relation_name]
-
-                    # make sure this is the correct person, by check the relation has also a relation with the other person
-                    for r in relation_object['relations']:
-                        if r['person'] == details['name']:
-                            self.parent.send_message(f"Gefeliciteerd met de verjaardag van {details['firstname']}!", relation_object) 
         except Exception as e:
             self.parent.logger.log_message(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}", "Error")
 
@@ -330,8 +224,6 @@ class CelebrationMessages():
                             self.send_personal_message(details)
 
                             self.send_group_message(details)
-
-                            self.congratulate_relatives(details)
                                         
                     except Exception as e:
                         self.parent.logger.log_message(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}", "Error")

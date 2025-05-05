@@ -30,10 +30,12 @@ class Messenger:
         self.signal_port        = config.get('signal_port')
         self.whatsapp_port      = config.get('whatsapp_port')
         self.signal_numbers     = config.get('signal_numbers')
+        self.signal_groups      = config.get('signal_groups')
         self.whatsapp_groups    = config.get('whatsapp_groups')
         self.log_level          = config.get('log_level')
         self.hour               = config.get('hour')
         self.minutes            = config.get('minutes')
+        self.messages           = config.get('messages')
 
         self.logger             = logger.Logger(self.log_level)
         self.logger.log_message("")

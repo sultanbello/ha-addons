@@ -1,0 +1,59 @@
+configuration:
+  debug:
+    name: debug
+    description: If enabled will not actually send messages but tells you what would have been sent
+
+  client_id:
+    name: client_id
+    description: The client id from [google console](https://console.cloud.google.com/)
+
+  client_secret:
+    name: client_secret
+    description: The client secret from [google console](https://console.cloud.google.com/)
+
+  project_id:
+    name: project_id
+    description: The project id from [google console](https://console.cloud.google.com/)
+
+  hour:
+    name: hour
+    description: The hour on which we should send birthday messages (0-23)
+
+  minutes:
+    name: minutes
+    description: The minute on which we should send birthday messages (0-59)
+
+  messages:
+    name: messages
+    description: >
+      "an list of language and messages.
+        Example
+        - languague: EN
+          message: Happy Birthday"
+
+  signal_numbers:
+    name: signal_numbers
+    description: All registered signal numbers if any
+
+  signal_groups:
+    name: signal_groups
+    description: a list of groups to post a message in. The group_name should be the label of the contact in Google Contacts, the group_id the id of the WhatsApp group
+
+  whatsapp_groups:
+    name: whatsapp_groups
+    description: a list of groups to post a message in. The group_name the name of the contact in WhatsApp, the group_id the id of the WhatsApp group, the label_id the id of the label in [Google Contaccts](https://contacts.google.com/) and the languague the langugue (like EN)
+
+  log_level:
+    name: log_level
+    description: How much to log 'info'|'warning'|'error'
+
+  signal_port:
+    name: signal_port
+    description: The port the signal integration is listening
+
+  whatsapp_port:
+    name: whatsapp_port
+    description: The port the WhatsApp integration is listening
+
+network:
+  80/TCP: The webserver port (Not used for Ingress)

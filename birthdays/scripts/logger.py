@@ -10,8 +10,6 @@ class Logger:
         self.log_level  = level
 
     def log_message(self, msg='', type = 'Info'):
-        print(msg)
-        
         msg     = str(msg)
         type    = str(type).lower()
 

@@ -12,8 +12,6 @@ class Whatsapp:
             for group in self.parent.whatsapp_groups:
                 self.chats[group['group_name']]    = group['group_id']
 
-            print(self.chats)
-
             self.connected      = False
             self.api_running    = True
 
