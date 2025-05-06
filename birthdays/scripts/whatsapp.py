@@ -112,7 +112,7 @@ class Whatsapp:
         
             result  = self.make_request(f"contacts/{chat_id}")
 
-            if 'error' in result:
+            if not result or 'error' in result:
                 return False
         
             return result
