@@ -18,10 +18,18 @@ class Gmail:
         except Exception as e:
             self.parent.logger.log_message(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}", "Error")
 
+        self.auth_running = False
+
     def connect(self):
         self.gmail_service  = build('gmail', 'v1', credentials=self.auth())
 
     def auth(self):
+        if self.auth_running:
+            self.parent.logger.log_message(f"Authentication already running", "debug")
+
+            return 
+        
+        self.auth_running = True
         try:
             # If modifying these scopes, delete the file token.json.
             SCOPES      = [
@@ -83,6 +91,7 @@ class Gmail:
                     print(' ')
                     print('########################')
                     flow    = InstalledAppFlow.from_client_secrets_file(credentials_file, SCOPES)
+
                     try:
                         creds   = flow.run_local_server(bind_addr="0.0.0.0", open_browser=False, port=self.parent.port, timeout_seconds=600)
                     except Exception as e:
@@ -100,7 +109,10 @@ class Gmail:
 
             return creds
         except Exception as e:
+            self.auth_running = False
             self.parent.logger.log_message(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}", "Error")
+
+        self.auth_running = False
 
     def create_email(self, to, subject, message_text):
         message             = MIMEText(message_text)

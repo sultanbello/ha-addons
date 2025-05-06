@@ -20,6 +20,7 @@ import whatsapp
 import signal_messenger
 import gmail
 import logger
+import pidfile
 
 class Messenger:
     def __init__(self):
@@ -129,22 +130,30 @@ def daily():
 
     messenger.send()
 
-# Get Options
-with open("/data/options.json", mode="r") as data_file:
-    config = json.load(data_file)
+try:
+    with pidfile.PIDFile("/datamain.pid"):
+        print("Started")
 
-creds = Path("/data/credentials.json")
-if not creds.is_file():
-    print(f"Initiating first run")
-    # First run
-    messenger   = Messenger()
+        # Get Options
+        with open("/data/options.json", mode="r") as data_file:
+            config = json.load(data_file)
 
-if config.get('debug'):
-    daily()
+        creds = Path("/data/credentials.json")
+        if not creds.is_file():
+            print(f"Initiating first run")
+            # First run
+            messenger   = Messenger()
 
-print(f"Will run at {config.get('hour')}:{config.get('minutes')} daily")
-schedule.every().day.at("{:02d}:{:02d}:00".format(config.get('hour'), config.get('minutes'))).do(daily)
+        if config.get('debug'):
+            daily()
 
-while True:
-    schedule.run_pending()
-    sleep(1)
+        print(f"Will run at {config.get('hour')}:{config.get('minutes')} daily")
+        schedule.every().day.at("{:02d}:{:02d}:00".format(config.get('hour'), config.get('minutes'))).do(daily)
+
+        while True:
+            schedule.run_pending()
+            sleep(1)
+except pidfile.AlreadyRunningError:
+    print("Already running")
+
+print("exit")

@@ -6,12 +6,13 @@ python3 -m venv /data/venv
 source /data/venv/bin/activate
 
 echo "Checking prerequisites"
+pip install --upgrade python-pidfile
 if [ ! -f /data/pip ]; then
     echo "Installing prerequisites"
 
     python3 -m ensurepip --upgrade >/dev/null
 
-    pip install --upgrade google-api-python-client google-auth-httplib2 google-auth-oauthlib lxml requests num2words schedule colorlog >/dev/null
+    pip install --upgrade google-api-python-client google-auth-httplib2 google-auth-oauthlib lxml requests num2words schedule python-pidfile >/dev/null
 
     echo "pip done" > /data/pip
 fi
