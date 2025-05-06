@@ -97,6 +97,8 @@ class Messenger:
             # Check all phone numbers
             if 'numbers' in details:
                 for number in details['numbers']:
+                    print(f"Processing {number}"
+                          
                     if self.signal.up:
                         if self.signal.is_registered(number):
                             result = self.signal.send_message(number, msg)
@@ -105,6 +107,7 @@ class Messenger:
                                 self.logger.log_message(f"Signal Message Sent To {number}")
                                 return result
 
+                    print(self.whatsapp.is_registered(number))
                     if self.whatsapp.is_registered(number):
                         result = self.whatsapp.send_message(number, msg)
 
