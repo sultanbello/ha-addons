@@ -106,9 +106,7 @@ class Messenger:
                             if result:
                                 self.logger.log_message(f"Signal Message Sent To {number}")
                                 return result
-                    print(self.whatsapp)
-                    print(self.whatsapp.is_registered)
-                    print(self.whatsapp.is_registered(number))
+
                     if self.whatsapp.is_registered(number):
                         result = self.whatsapp.send_message(number, msg)
 

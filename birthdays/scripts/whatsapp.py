@@ -54,7 +54,7 @@ class Whatsapp:
                 self.connected      = False
                 self.check_connected()
 
-                self.parent.logger.log_message(f"Command with url {url} and post {post} failed with status code {result.status_code} {result.text}")
+                self.parent.logger.log_message(f"Command with url {url} and post {post} failed with status code {result.status_code} {result.text}", "error")
                 
                 return False
 
@@ -112,7 +112,7 @@ class Whatsapp:
         
             result  = self.make_request(f"contacts/{chat_id}")
 
-            if not result or 'error' in result:
+            if type(result) is dict and 'error' in result:
                 return False
         
             return result

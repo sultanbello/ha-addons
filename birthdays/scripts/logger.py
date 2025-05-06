@@ -10,15 +10,15 @@ class Logger:
         self.log_level  = parent.log_level
         self.parent     = parent
 
-    def log_message(self, msg='', type = 'Info'):
-        msg     = str(msg)
-        type    = str(type).lower()
+    def log_message(self, msg='', log_type = 'info'):
+        msg         = str(msg)
+        log_type    = str(log_type).lower()
 
         if(
             self.log_level == 'debug' and not self.parent.debug or
-            self.log_level != 'info' and type == 'info' or
-            self.log_level == 'warning' and type == 'info' or
-            self.log_level == 'error' and type != 'error'
+            self.log_level != 'info' and log_type == 'info' or
+            self.log_level == 'warning' and log_type == 'info' or
+            self.log_level == 'error' and log_type != 'error'
         ):
             return
 
@@ -30,15 +30,15 @@ class Logger:
             if msg == '':
                 log_msg = "\n\n"
             else:
-                log_msg     = f'{date} - {location}' + type.ljust(7) + ' - ' + msg
+                log_msg     = f'{date} - {location}' + log_type.ljust(7) + ' - ' + msg
 
             warning     = '\033[93m'
             error       = '\033[91m'
             endc        = '\033[0m'
 
-            if type == 'error':
+            if log_type == 'error':
                 print(f"{error}{log_msg}{endc}")
-            elif type == 'warning':
+            elif log_type == 'warning':
                 print(f"{warning}{log_msg}{endc}")
             else:
                 print(log_msg)
