@@ -16,7 +16,6 @@ class Logger:
 
         if(
             self.log_level == 'debug' and not self.parent.debug or
-            self.log_level != 'info' and log_type == 'info' or
             self.log_level == 'warning' and log_type == 'info' or
             self.log_level == 'error' and log_type != 'error'
         ):
