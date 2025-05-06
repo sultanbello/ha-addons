@@ -101,20 +101,23 @@ class Whatsapp:
         return chat_id
     
     def is_registered(self, number):
-        if number.startswith("+3115"):
-            return False
+        try:
+            if number.startswith("+3115"):
+                return False
         
-        chat_id = self.get_chat_id(number)  
+            chat_id = self.get_chat_id(number)  
 
-        if not chat_id:
-            return False
+            if not chat_id:
+                return False
         
-        result  = self.make_request(f"contacts/{chat_id}")
+            result  = self.make_request(f"contacts/{chat_id}")
 
-        if 'error' in result:
-            return False
+            if 'error' in result:
+                return False
         
-        return result
+            return result
+        except Exception as e:
+            self.parent.logger.log_message(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}", "Error") 
     
     def send_message(self, name, msg, contentType='string'):       
         try:
