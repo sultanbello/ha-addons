@@ -9,6 +9,7 @@ import pickle
 import base64
 import sys
 import json
+from pathlib import Path
 
 class Gmail:
     def __init__(self, Messenger):
@@ -32,36 +33,49 @@ class Gmail:
             token_file          = '/data/token.pickle'
             credentials_file    = '/data/credentials.json'
 
-            content = {
-                "installed":
-                    {
-                        "client_id":                    self.parent.client_id,
-                        "project_id":                   self.parent.project_id,
-                        "auth_uri":                     "https://accounts.google.com/o/oauth2/auth",
-                        "token_uri":                    "https://oauth2.googleapis.com/token",
-                        "auth_provider_x509_cert_url":  "https://www.googleapis.com/oauth2/v1/certs",
-                        "client_secret":                self.parent.client_secret,
-                        "redirect_uris":
-                                                        [
-                                                            "http://localhost",
-                                                            "http://localhost:9090/"
-                                                        ]
-                    }
-            }
+            # credentials do not exist yet
+            file = Path(credentials_file)
+            if not file.is_file():
+                self.parent.logger.log_message(f"credeting {credentials_file}", "debug")
+                content = {
+                    "installed":
+                        {
+                            "client_id":                    self.parent.client_id,
+                            "project_id":                   self.parent.project_id,
+                            "auth_uri":                     "https://accounts.google.com/o/oauth2/auth",
+                            "token_uri":                    "https://oauth2.googleapis.com/token",
+                            "auth_provider_x509_cert_url":  "https://www.googleapis.com/oauth2/v1/certs",
+                            "client_secret":                self.parent.client_secret,
+                            "redirect_uris":
+                                                            [
+                                                                "http://localhost",
+                                                                "http://localhost:9090/"
+                                                            ]
+                        }
+                }
 
-            with open(credentials_file, "w") as f:
-                json.dump(content, f)
+                with open(credentials_file, "w") as f:
+                    json.dump(content, f)
 
             # The file token.pickle stores the user's access and refresh tokens, and is
             # created automatically when the authorization flow completes for the first
             # time.
             if os.path.exists(token_file):
+                self.parent.logger.log_message(f"Tokenfile {token_file} does exist", "debug")
                 with open(token_file, 'rb') as token:
                     creds = pickle.load(token)
 
+                self.parent.logger.log_message(f"Creds: {creds}", "debug")
+            else:
+                self.parent.logger.log_message(f"Token file {token_file} does not exist", "debug")
+
             # If there are no (valid) credentials available, let the user log in.
             if not creds or not creds.valid:
+                self.parent.logger.log_message(f"Creds are not valid", "debug")
+
                 if creds and creds.expired and creds.refresh_token:
+                    self.parent.logger.log_message(f"Refreshing token", "debug")
+                    
                     creds.refresh(Request())
                 else:
                     print('')
@@ -88,7 +102,7 @@ class Gmail:
 
     def send_email(self, to, msg):
         if self.parent.debug:
-            self.parent.logger.log_message(f"I would have sent {msg} via e-mail to {to} if debug was disabled")
+            self.parent.logger.log_message(f"I would have sent {msg} via e-mail to {to} if debug was disabled", 'debug')
             return True
         
         message = self.create_email(to, 'Gefeliciteerd!', msg)

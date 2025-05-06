@@ -38,10 +38,9 @@ class Messenger:
         self.minutes            = config.get('minutes')
         self.messages           = config.get('messages')
 
-        self.logger             = logger.Logger(self.log_level)
+        self.logger             = logger.Logger(self)
         self.logger.log_message("")
-        if self.debug:
-            self.logger.log_message("Debug is Enabled")
+        self.logger.log_message("Debug is Enabled", 'debug')
 
         self.logger.log_message(f"Log level is {self.log_level}")
 

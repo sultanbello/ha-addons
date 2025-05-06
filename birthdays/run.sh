@@ -11,7 +11,7 @@ if [ ! -f /data/pip ]; then
 
     python3 -m ensurepip --upgrade >/dev/null
 
-    pip install --upgrade google-api-python-client google-auth-httplib2 google-auth-oauthlib lxml requests num2words schedule >/dev/null
+    pip install --upgrade google-api-python-client google-auth-httplib2 google-auth-oauthlib lxml requests num2words schedule colorlog >/dev/null
 
     echo "pip done" > /data/pip
 fi

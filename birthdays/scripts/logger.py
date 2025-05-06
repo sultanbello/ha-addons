@@ -6,22 +6,22 @@ import sys
 print('Loading Logger')
 
 class Logger:
-    def __init__(self, level='info'):
-        self.log_level  = level
+    def __init__(self, parent):
+        self.log_level  = parent.log_level
+        self.parent     = parent
 
     def log_message(self, msg='', type = 'Info'):
         msg     = str(msg)
         type    = str(type).lower()
 
-        if self.log_level != 'info' and type == 'info':
+        if(
+            self.log_level == 'debug' and not self.parent.debug or
+            self.log_level != 'info' and type == 'info' or
+            self.log_level == 'warning' and type == 'info' or
+            self.log_level == 'error' and type != 'error'
+        ):
             return
-        
-        if self.log_level == 'warning' and type == 'info':
-            return
-        
-        if self.log_level == 'error' and type != 'error':
-            return
-        
+
         try:
             date        = datetime.strftime(datetime.now(), '%d-%m-%Y %H:%M')
             caller      = getframeinfo(stack()[1][0])

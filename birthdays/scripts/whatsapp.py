@@ -120,7 +120,7 @@ class Whatsapp:
             url         = f'chats/{chat_id}/messages'
 
             if self.parent.debug:
-                self.parent.logger.log_message(f"I would have sent '{msg}' via whatsapp message to {name} ({chat_id}) if debug was disabled")
+                self.parent.logger.log_message(f"I would have sent '{msg}' via whatsapp message to {name} ({chat_id}) if debug was disabled", 'debug')
                 return True
         
             post    = {
