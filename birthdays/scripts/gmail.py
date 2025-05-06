@@ -75,13 +75,16 @@ class Gmail:
 
                 if creds and creds.expired and creds.refresh_token:
                     self.parent.logger.log_message(f"Refreshing token", "debug")
-                    
+
                     creds.refresh(Request())
                 else:
                     print('')
                     print('########################')
                     flow    = InstalledAppFlow.from_client_secrets_file(credentials_file, SCOPES)
-                    creds   = flow.run_local_server(bind_addr="0.0.0.0", open_browser=False, port=self.parent.port)
+                    try:
+                        creds   = flow.run_local_server(bind_addr="0.0.0.0", open_browser=False, port=self.parent.port, timeout_seconds=600)
+                    except Exception as e:
+                        print(e)
                     print('########################')
                     print('')
 
