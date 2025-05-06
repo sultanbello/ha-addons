@@ -65,7 +65,7 @@ class Gmail:
                 with open(token_file, 'rb') as token:
                     creds = pickle.load(token)
 
-                self.parent.logger.log_message(f"Creds: {creds}", "debug")
+                self.parent.logger.log_message(f"Creds: {creds.to_json()}", "debug")
             else:
                 self.parent.logger.log_message(f"Token file {token_file} does not exist", "debug")
 
