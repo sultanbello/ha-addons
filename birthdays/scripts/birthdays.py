@@ -113,10 +113,12 @@ class CelebrationMessages():
             if 'id' in details:
                 #if we have a duplicate name
                 if details['name'] in self.names:
-                    self.parent.logger.log_message(f"I found another person with the name {details['name']}", 'warning')
+                    if details.get('birthyear') == self.names[details['name']].get('birthyear'):
+                        self.parent.logger.log_message(f"I found another person with the name {details['name']} and the same age, please check", 'warning')
                     self.names[details['name'] + '_1'] = details
                 else:
                     self.names[details['name']] = details
+
             return details
         except Exception as e:
             self.parent.logger.log_message(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}", "Error")
