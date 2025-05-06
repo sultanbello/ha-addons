@@ -59,6 +59,7 @@ class Whatsapp:
                 return False
 
             json    = result.json()
+
             if return_json:
                 return json
             elif 'result' in json:
@@ -66,7 +67,7 @@ class Whatsapp:
             elif 'success' in json and json['success']:
                 return json['success']
             else:
-                self.parent.logger.log_message(f"json is: {json}")
+                self.parent.logger.log_message(f"Json result is: {json} for request {url} {post}", "debug")
                 return json
         except requests.exceptions.RequestException as e:
             self.api_running  = False
