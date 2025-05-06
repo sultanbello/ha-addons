@@ -14,22 +14,16 @@ from pathlib import Path
 class Gmail:
     def __init__(self, Messenger):
         try:
-            self.parent         = Messenger
+            self.parent     = Messenger
         except Exception as e:
             self.parent.logger.log_message(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}", "Error")
 
-        self.auth_running = False
+        self.creds          = self.auth()
 
     def connect(self):
-        self.gmail_service  = build('gmail', 'v1', credentials=self.auth())
+        self.gmail_service  = build('gmail', 'v1', credentials=self.creds)
 
     def auth(self):
-        if self.auth_running:
-            self.parent.logger.log_message(f"Authentication already running", "debug")
-
-            return 
-        
-        self.auth_running = True
         try:
             # If modifying these scopes, delete the file token.json.
             SCOPES      = [
@@ -112,8 +106,6 @@ class Gmail:
             self.auth_running = False
             self.parent.logger.log_message(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}", "Error")
 
-        self.auth_running = False
-
     def create_email(self, to, subject, message_text):
         message             = MIMEText(message_text)
         message['to']       = to
@@ -134,7 +126,7 @@ class Gmail:
         try:
             self.parent.logger.log_message("Getting first 1000 Google contacts")
 
-            service = build('people', 'v1', credentials = self.auth())
+            service = build('people', 'v1', credentials = self.creds)
 
             # Call the People API
             fields  = 'names,emailAddresses,birthdays,relations,memberships,locales,phoneNumbers,addresses,genders,events' 
