@@ -97,7 +97,7 @@ class Messenger:
             # Check all phone numbers
             if 'numbers' in details:
                 for number in details['numbers']:
-                    print(f"Processing {number}"
+                    print(f"Processing {number}")
                           
                     if self.signal.up:
                         if self.signal.is_registered(number):
