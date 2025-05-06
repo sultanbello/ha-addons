@@ -67,7 +67,7 @@ class Whatsapp:
             elif 'success' in json and json['success']:
                 return json['success']
             elif 'isUser' in json:
-                return json.isUser
+                return json['isUser']
             else:
                 self.parent.logger.log_message(f"Json result is: {json} for request {url} {post}", "debug")
                 return json
