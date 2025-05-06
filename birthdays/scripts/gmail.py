@@ -92,6 +92,8 @@ class Gmail:
 
                 self.parent.logger.log_message(f"Creds refresh token: {creds.refresh_token}", "debug")
 
+                self.parent.logger.log_message(f"Creds: {creds.to_json()}", "debug")
+
                 # Save the credentials for the next run
                 with open(token_file, 'wb') as token:
                     pickle.dump(creds, token)
