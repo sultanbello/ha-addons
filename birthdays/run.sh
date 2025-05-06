@@ -6,7 +6,7 @@ python3 -m venv /data/venv
 source /data/venv/bin/activate
 
 echo "Checking prerequisites"
-pip install --upgrade python-pidfile
+
 if [ ! -f /data/pip ]; then
     echo "Installing prerequisites"
 

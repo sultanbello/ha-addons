@@ -66,6 +66,8 @@ class Whatsapp:
                 return json['result']
             elif 'success' in json and json['success']:
                 return json['success']
+            elif 'isUser' in json:
+                return json.isUser
             else:
                 self.parent.logger.log_message(f"Json result is: {json} for request {url} {post}", "debug")
                 return json
@@ -112,7 +114,7 @@ class Whatsapp:
         if 'error' in result:
             return False
         
-        return True
+        return result
     
     def send_message(self, name, msg, contentType='string'):       
         try:

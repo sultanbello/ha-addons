@@ -23,7 +23,7 @@ class Logger:
             return
 
         try:
-            date        = datetime.strftime(datetime.now(), '%d-%m-%Y %H:%M:s')
+            date        = datetime.strftime(datetime.now(), '%d-%m-%Y %H:%M:%S')
             caller      = getframeinfo(stack()[1][0])
             location    = f'{os.path.basename(caller.filename)}:{caller.lineno} -'.ljust(25)
 

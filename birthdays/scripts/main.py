@@ -141,6 +141,7 @@ try:
         creds = Path("/data/credentials.json")
         if not creds.is_file():
             print(f"Initiating first run")
+            
             # First run
             messenger   = Messenger()
 
