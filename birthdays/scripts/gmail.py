@@ -65,13 +65,15 @@ class Gmail:
                 with open(token_file, 'rb') as token:
                     creds = pickle.load(token)
 
-                self.parent.logger.log_message(f"Creds: {creds}", "debug")
+                self.parent.logger.log_message(f"Creds: {creds()}", "debug")
             else:
                 self.parent.logger.log_message(f"Token file {token_file} does not exist", "debug")
 
             # If there are no (valid) credentials available, let the user log in.
             if not creds or not creds.valid:
                 self.parent.logger.log_message(f"Creds are not valid", "debug")
+                self.parent.logger.log_message(f"Creds are not valid: {creds.expired}", "debug")
+                self.parent.logger.log_message(f"Creds are not valid {creds.refresh_token}", "debug")
 
                 if creds and creds.expired and creds.refresh_token:
                     self.parent.logger.log_message(f"Refreshing token", "debug")
