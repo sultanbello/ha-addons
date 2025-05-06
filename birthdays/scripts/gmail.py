@@ -72,15 +72,15 @@ class Gmail:
             # If there are no (valid) credentials available, let the user log in.
             if not creds or not creds.valid:
                 self.parent.logger.log_message(f"Creds are not valid", "debug")
-                self.parent.logger.log_message(f"Creds are not valid: {creds.expired}", "debug")
-                self.parent.logger.log_message(f"Creds are not valid {creds.refresh_token}", "debug")
+                self.parent.logger.log_message(f"Creds expired: {creds.expired}", "debug")
+                self.parent.logger.log_message(f"Creds refresh token: {creds.refresh_token}", "debug")
 
                 if creds and creds.expired and creds.refresh_token:
                     self.parent.logger.log_message(f"Refreshing token", "debug")
 
                     creds.refresh(Request())
                 else:
-                    print('')
+                    print(' ')
                     print('########################')
                     flow    = InstalledAppFlow.from_client_secrets_file(credentials_file, SCOPES)
                     try:
@@ -88,7 +88,9 @@ class Gmail:
                     except Exception as e:
                         print(e)
                     print('########################')
-                    print('')
+                    print(' ')
+
+                self.parent.logger.log_message(f"Creds refresh token: {creds.refresh_token}", "debug")
 
                 # Save the credentials for the next run
                 with open(token_file, 'wb') as token:
