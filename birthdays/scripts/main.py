@@ -169,7 +169,7 @@ class Messenger:
             self.logger.log_message(f"Updating sensor {name} failed\n\nResponse: {response}\n\nRequest:{data}", "Error")
 
 def daily():
-    print(f"Starting the sender script")
+    print(f"Starting to send messages..")
     messenger   = Messenger()
 
     messenger.send()

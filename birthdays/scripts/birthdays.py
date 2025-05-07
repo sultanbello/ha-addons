@@ -222,7 +222,7 @@ class CelebrationMessages():
             birthdays   = {}
 
             for name, details in self.names.items():
-                if 'languague' not in details:
+                if 'country' not in details:
                     if 'name' in details:
                         #self.parent.logger.log_message(f'Not sending messages to {details['name']} because I am not sure which languague to use')
                         pass
