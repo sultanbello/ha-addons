@@ -202,7 +202,7 @@ class CelebrationMessages():
             
             dict(sorted(self.names.items()))
 
-            birthdays   = []
+            birthdays   = {}
 
             for name, details in self.names.items():
                 if 'languague' not in details:
@@ -220,13 +220,13 @@ class CelebrationMessages():
                     try:
                         #Check if birthday
                         if details['birthmonth'] == self.now.month and details['birthday'] == self.now.day:
-                            birthdays.append(details)
-
                             self.parent.logger.log_message('Today is the birthday of ' + details['name'])
 
                             self.send_personal_message(details)
 
                             self.send_group_message(details)
+                            
+                            birthdays[details['name']]  =   details
                                         
                     except Exception as e:
                         self.parent.logger.log_message(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}", "Error")
