@@ -148,7 +148,7 @@ class Messenger:
         except Exception as e:
             self.logger.log_message(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}", "Error")
 
-    def update_sensor(name, state, attributes):
+    def update_sensor(self, name, state, attributes):
         data    = {
                 "state": state,
                 "attributes": attributes
