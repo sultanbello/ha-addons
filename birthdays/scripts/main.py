@@ -119,7 +119,7 @@ class Messenger:
             # Check all phone numbers
             if 'numbers' in details:
                 for number in details['numbers']:
-                    print(f"Processing {number}")
+                    self.logger.log_message(f"Processing {number}", 'debug')
                           
                     if 'signal_messenger' in available and self.signal.up:
                         if self.signal.is_registered(number):

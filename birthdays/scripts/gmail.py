@@ -129,7 +129,7 @@ class Gmail:
             service = build('people', 'v1', credentials = self.creds)
 
             # Call the People API
-            fields  = 'names,emailAddresses,birthdays,relations,memberships,locales,phoneNumbers,addresses,genders,events' 
+            fields  = 'names,emailAddresses,birthdays,relations,memberships,locales,phoneNumbers,addresses,genders,events,userDefined' 
             results = service.people().connections().list(
                 resourceName    = 'people/me',
                 pageSize        = 1000,

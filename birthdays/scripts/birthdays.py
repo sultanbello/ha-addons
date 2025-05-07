@@ -3,15 +3,12 @@
 
 
 ####################        IMPORTS         #####################################
-from googleapiclient.discovery import build
-from google_auth_oauthlib.flow import InstalledAppFlow
-from google.auth.transport.requests import Request
 from num2words import num2words
-from time import sleep
 import random
-import logger
 import datetime
 import sys
+import lxml.etree
+import urllib.request
 
 class CelebrationMessages():
     def __init__(self, Messenger):
@@ -21,9 +18,11 @@ class CelebrationMessages():
 
         self.messages   = {}
         for message in self.parent.messages:
+            # add an empty array if the current languague is not there yet
             if not message['languague'].lower() in self.messages:
                 self.messages[message['languague'].lower()] = []
 
+            # Add the message to the languague array
             self.messages[message['languague'].lower()].append(message['message'])
 
         self.group_ids  = {}
@@ -38,6 +37,9 @@ class CelebrationMessages():
         # build number -> name dict
         self.numbers    = {}
         self.names      = {}
+
+        # Fetch a list of country - languagues
+        self.country_languagues()
 
     # Checks a persons details and returns an dict of them
     def check_contact(self, person):
@@ -63,12 +65,20 @@ class CelebrationMessages():
                 if details['birthyear'] != None:
                     details['age']          = self.now.year - details['birthyear']
 
+            # Country
             if addresses and addresses[0].get("countryCode") != None:
-                details['languague'] = (addresses[0].get("countryCode")).lower()
+                details['country'] = (addresses[0].get("countryCode")).upper()
             else:
                 # this person has a birthday but no country set
                 if 'name' in details and 'birthday' in details:
                     self.parent.logger.log_message(f"Please set a country for {details['name']} at https://contacts.google.com/{person.get('resourceName', '').replace('people', 'person')}", "Warning")
+
+            # Languague
+            if person.get('userDefined') != None:
+                for data in person.get('userDefined'):
+                    if data.get('key') == 'languague':
+                        details['languague']    = data.get('value').upper()
+                        self.parent.logger.log_message(f"{details['name']} has a personal languague set", 'debug')
 
             # E-mail address
             email = person.get('emailAddresses')
@@ -138,14 +148,14 @@ class CelebrationMessages():
                             eventtype   = event.get('type')
                             year        = event.get('date').get("year")
                             
-                            if details['languague'] == "NL":
+                            if details['country'] == "NL":
                                 msg             = f"Gefeliciteerd met jullie"
                             else:
                                 msg             = f"Congratulations with your" 
 
                             if year != None:
                                 age = self.now.year - year
-                                age_in_words    = num2words(age, to = 'ordinal',  lang = details['languague'])
+                                age_in_words    = num2words(age, to = 'ordinal',  lang = self.get_languague(details['country']))
                                 
                                 msg += f" {age_in_words}"
 
@@ -161,12 +171,15 @@ class CelebrationMessages():
 
     def send_personal_message(self, details):
         try:
-            if details['languague'] in self.messages:
-                # Personall message
-                msg         = random.choice(self.messages[details['languague']])
-                self.parent.send_message(msg.replace("%firstname%", details['firstname']), details) 
+            # personal languague set, and there is a message in that languague
+            if 'languague' in details and details['languague'] in self.messages[languague]:
+                languague   = details['languague']
             else:
-                self.parent.logger.log_message(f"No message set for languague { details['languague']}", "Error")
+                languague   = self.get_languague(details['country'])
+
+            # Personall message
+            msg         = random.choice(self.messages[languague]).replace("%firstname%", details['firstname'])
+            self.parent.send_message(msg, details) 
             
             
         except Exception as e:
@@ -179,15 +192,19 @@ class CelebrationMessages():
                 for membership in details['memberships']:
                     label_id = membership.get('contactGroupMembership').get('contactGroupId')
 
-                    if label_id in self.group_ids['signal']:
-                        msg         = random.choice(self.messages[self.group_ids['signal'][label_id]['languague']])
+                    if 'signal_messenger' in self.parent.available and label_id in self.group_ids['signal']:
+                        languague   = self.group_ids['signal'][label_id]['languague']
+                        msg         = random.choice(self.messages[languague]).replace("%firstname%", details['firstname'])
+                        group_id    = self.group_ids['signal'][label_id]['group_id']
 
-                        self.parent.signal.send_message(self.group_ids['whatsapp'][label_id]['group_id'], msg.replace("%firstname%", details['firstname']))
+                        self.parent.signal.send_message(group_id, msg)
 
-                    if label_id in self.group_ids['whatsapp']:
-                        msg         = random.choice(self.messages[self.group_ids['whatsapp'][label_id]['languague']])
+                    if 'whatsapp' in self.parent.available and label_id in self.group_ids['whatsapp']:
+                        languague   = self.group_ids['whatsapp'][label_id]['languague']
+                        msg         = random.choice(self.messages[languague]).replace("%firstname%", details['firstname'])
+                        group_id    = self.group_ids['whatsapp'][label_id]['group_id']
 
-                        self.parent.whatsapp.send_message(self.group_ids['whatsapp'][label_id]['group_id'], msg.replace("%firstname%", details['firstname']))
+                        self.parent.whatsapp.send_message(group_id, msg)
                         
         except Exception as e:
             self.parent.logger.log_message(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}", "Error")
@@ -244,3 +261,36 @@ class CelebrationMessages():
             self.parent.logger.log_message("Finished sending birthday mesages")
         except Exception as e:
             self.parent.logger.log_message(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}", "Error")
+
+    def country_languagues(self):
+        url         = "https://raw.githubusercontent.com/unicode-org/cldr/master/common/supplemental/supplementalData.xml"
+        langxml     = urllib.request.urlopen(url)
+        langtree    = lxml.etree.XML(langxml.read())
+
+        self.languages = {}
+        for t in langtree.find('territoryInfo').findall('territory'):
+            langs = {}
+            for l in t.findall('languagePopulation'):
+                # If this is an official languague
+                if bool(l.get('officialStatus')):
+                    langs[l.get('type')] = float(l.get('populationPercent'))
+            self.languages[t.get('type')] = langs
+
+    def get_languague(self, country_code):
+        if country_code in self.languages:
+            # all the official languagues of this country
+            languagues  = self.languagues.get(country_code)
+
+            for languague in languagues:
+                # we have a message in this languague
+                if languague in self.messages:
+                    return languague
+            
+            # we should only come here if we do not have a message in the languague needed
+            self.parent.logger.log_message(f"Could not find a message in any of the languagues for country {country_code}.\nDefaulting to English", "Warning")
+            return 'EN'
+        
+         # we should only come here if we do not have a message in the languague needed
+        self.parent.logger.log_message(f"Invalid country {country_code}.\nDefaulting to English languague", "error")
+        return 'EN'
+        
