@@ -19,8 +19,12 @@ headers = {
 response = requests.get(url, headers=headers)
 if response.ok:
     print(response.text)
-    print(response.json())
+    print(response.json()['data']['addons'])
+    addons  = response.json()['data']['addons']
 
+    for addon in addons:
+        if addon['slug'] == '06c15c6e_whatsapp':
+            print(addon['state'])
 
 # Import other files in the directory
 import birthdays
