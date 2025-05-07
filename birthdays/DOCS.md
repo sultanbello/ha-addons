@@ -30,3 +30,7 @@ Each Signal group enty should look like:
 - group_id: The SIGNAL Group Id<br>
   label_id: Google tag id<br>
   languague: the group languague (ISO-639)<br>
+
+## Sensors
+This addon creates one sensor: "Todays birthdays"<br>
+It will be on if there are birthdays, and the attributes will hold all details of all persons who have their birthday today
