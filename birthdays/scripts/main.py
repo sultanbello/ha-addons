@@ -9,47 +9,83 @@ import schedule
 import time
 from pathlib import Path
 
-TOKEN = os.getenv('SUPERVISOR_TOKEN')
+TOKEN   = os.getenv('SUPERVISOR_TOKEN')
 
 url     = "http://supervisor/addons"
 headers = {
   "Authorization": f"Bearer {TOKEN}",
   "content-type": "application/json",
 }
-response = requests.get(url, headers=headers)
+response    = requests.get(url, headers=headers)
+
+available   = {}
 if response.ok:
-    print(response.text)
-    print(response.json()['data']['addons'])
     addons  = response.json()['data']['addons']
 
     for addon in addons:
-        if addon['slug'] == '06c15c6e_whatsapp':
-            print(addon['state'])
+        if addon['slug'] == '06c15c6e_whatsapp' or addon['slug'] == '1315902c_signal_messenger':
+            name_slug               = addon['slug'].split('_')[1]
+            available[name_slug]    = addon['state']
+
+            if name_slug == 'whatsapp':
+                whatsapp            = __import__(name_slug)
+            else:
+                signal_messenger    = __import__(name_slug)
+
+print(available)
+
+data    = {
+        "state": 'on',
+        "attributes": {
+            "friendly_name": "Samba Backup",
+            "backups_local": 'test',
+            "backups_remote": 'test2',
+            "total_backups_succeeded": 4,
+            "total_backups_failed": 5,
+            "last_backup": 'dsfdsfds'
+        }
+}
+
+url     = "http://supervisor/core/api/states/sensor.test_sensor"
+headers = {
+  "Authorization": f"Bearer {TOKEN}",
+  "content-type": "application/json",
+}
+response    = requests.post(url, json=data, headers=headers)
+
+print( response.text)
+print( response.content)
 
 # Import other files in the directory
 import birthdays
-import whatsapp
-import signal_messenger
 import gmail
 import logger
 import pidfile
 
 class Messenger:
     def __init__(self):
+        global available
+
+        self.available          = available
+
         self.debug              = config.get('debug')
         self.client_id          = config.get('client_id')
         self.client_secret      = config.get('client_secret')
         self.project_id         = config.get('project_id')
-        self.signal_port        = config.get('signal_port')
-        self.whatsapp_port      = config.get('whatsapp_port')
         self.port               = config.get('port')
-        self.signal_numbers     = config.get('signal_numbers')
-        self.signal_groups      = config.get('signal_groups')
-        self.whatsapp_groups    = config.get('whatsapp_groups')
         self.log_level          = config.get('log_level')
         self.hour               = config.get('hour')
         self.minutes            = config.get('minutes')
         self.messages           = config.get('messages')
+
+        if 'signal_messenger' in available:
+            self.signal_port        = config.get('signal_port')
+            self.signal_numbers     = config.get('signal_numbers')
+            self.signal_groups      = config.get('signal_groups')
+        
+        if 'whatsapp' in available:
+            self.whatsapp_port      = config.get('whatsapp_port')
+            self.whatsapp_groups    = config.get('whatsapp_groups')
 
         self.logger             = logger.Logger(self)
         self.logger.log_message("")
@@ -70,15 +106,17 @@ class Messenger:
         self.logger.log_message("Connected to the Internet")
 
         # Check whatsapp
-        self.whatsapp   = whatsapp.Whatsapp(self)
+        if 'whatsapp' in available:
+            self.whatsapp   = whatsapp.Whatsapp(self)
 
-        if not self.whatsapp.connected:
-            self.logger.log_message("Whatsapp Instance is Down")
+            if not self.whatsapp.connected:
+                self.logger.log_message("Whatsapp Instance is Down")
         
         # Check signal
-        self.signal     = signal_messenger.Signal(self)
-        if not self.signal.up:
-            self.logger.log_message("Signal Instance is not available", "Warning")
+        if 'signal_messenger' in available:
+            self.signal     = signal_messenger.Signal(self)
+            if not self.signal.up:
+                self.logger.log_message("Signal Instance is not available", "Warning")
 
         # Instantiate Birthay messages object
         self.birthdays  = birthdays.CelebrationMessages(self)
@@ -111,7 +149,7 @@ class Messenger:
                 for number in details['numbers']:
                     print(f"Processing {number}")
                           
-                    if self.signal.up:
+                    if 'signal_messenger' in available and self.signal.up:
                         if self.signal.is_registered(number):
                             result = self.signal.send_message(number, msg)
 
@@ -119,7 +157,7 @@ class Messenger:
                                 self.logger.log_message(f"Signal Message Sent To {number}")
                                 return result
 
-                    if self.whatsapp.is_registered(number):
+                    if 'whatsapp' in available and self.whatsapp.is_registered(number):
                         result = self.whatsapp.send_message(number, msg)
 
                         if result:
