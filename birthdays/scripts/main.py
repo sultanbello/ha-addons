@@ -151,7 +151,8 @@ class Messenger:
     def update_sensor(self, name, state, attributes):
         data    = {
             "state": state,
-            "attributes": attributes
+            "attributes": attributes,
+            "unique_id:": name
         }
 
         url     = f"http://supervisor/core/api/states/sensor.{name}"
@@ -163,7 +164,7 @@ class Messenger:
 
         response    = requests.post(url, json=data, headers=headers)
         if response.ok:
-            self.logger.log_message(f"Updated sensor {name}", "Error")
+            self.logger.log_message(f"Updated sensor {name}")
         else:
             self.logger.log_message(f"Updating sensor {name} failed\n\nResponse: {response}\n\nRequest:{data}", "Error")
 
