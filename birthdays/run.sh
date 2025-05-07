@@ -1,7 +1,7 @@
 #!/usr/bin/with-contenv bashio
 echo $SUPERVISOR_TOKEN
 
-response=$(curl -sSL -H "Authorization: Bearer $SUPERVISOR_TOKEN" http://supervisor/network/info)
+response=$(curl -X GET -sSL -H "Authorization: Bearer $SUPERVISOR_TOKEN" http://supervisor/addons)
 
 http_code=$(tail -n1 <<< "$response")  # get the last line
 content=$(sed '$ d' <<< "$response")   # get all but the last line which contains the status code
@@ -9,15 +9,7 @@ content=$(sed '$ d' <<< "$response")   # get all but the last line which contain
 echo "$http_code"
 echo "$content"
 
-response=$(curl -sSL -H "Authorization: Bearer $SUPERVISOR_TOKEN" http://supervisor/addons)
-
-http_code=$(tail -n1 <<< "$response")  # get the last line
-content=$(sed '$ d' <<< "$response")   # get all but the last line which contains the status code
-
-echo "$http_code"
-echo "$content"
-
-response=$(curl -sSL -H "Authorization: Bearer $SUPERVISOR_TOKEN" http://supervisor/addon/06c15c6e_whatsapp/info)
+response=$(curl -X GET -sSL -H "Authorization: Bearer $SUPERVISOR_TOKEN" http://supervisor/addon/06c15c6e_whatsapp/info)
 
 http_code=$(tail -n1 <<< "$response")  # get the last line
 content=$(sed '$ d' <<< "$response")   # get all but the last line which contains the status code
