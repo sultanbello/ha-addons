@@ -1,7 +1,6 @@
 import requests
 import sys
 from time import sleep
-import os
 
 class Whatsapp:
     def __init__(self, Messenger):
@@ -18,6 +17,11 @@ class Whatsapp:
             self.whatsapp_server_url = f"http://homeassistant.local:{self.parent.whatsapp_port}/api/"
 
             self.check_connected()
+
+            while not self.api_running:
+                sleep(60)
+                self.check_connected()
+                
         except Exception as e:
             self.parent.logger.log_message(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}", "Error")
 
