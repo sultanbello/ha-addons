@@ -150,8 +150,8 @@ class Messenger:
 
     def update_sensor(self, name, state, attributes):
         data    = {
-                "state": state,
-                "attributes": attributes
+            "state": state,
+            "attributes": attributes
         }
 
         url     = f"http://supervisor/core/api/states/sensor.{name}"
@@ -162,9 +162,10 @@ class Messenger:
         }
 
         response    = requests.post(url, json=data, headers=headers)
-
-        print( response.text)
-        print( response.content)
+        if response.ok:
+            self.logger.log_message(f"Updated sensor {name}", "Error")
+        else:
+            self.logger.log_message(f"Updating sensor {name} failed\n\nResponse: {response}\n\nRequest:{data}", "Error")
 
 def daily():
     print(f"Starting the sender script")
@@ -174,7 +175,7 @@ def daily():
 
 try:
     with pidfile.PIDFile("/datamain.pid"):
-        print("Started")
+        print("Started Script")
 
         # Get Options
         with open("/data/options.json", mode="r") as data_file:
