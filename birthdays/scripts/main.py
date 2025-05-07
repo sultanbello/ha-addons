@@ -77,15 +77,11 @@ class Messenger:
         self.hour               = config.get('hour')
         self.minutes            = config.get('minutes')
         self.messages           = config.get('messages')
-
-        if 'signal_messenger' in available:
-            self.signal_port        = config.get('signal_port')
-            self.signal_numbers     = config.get('signal_numbers')
-            self.signal_groups      = config.get('signal_groups')
-        
-        if 'whatsapp' in available:
-            self.whatsapp_port      = config.get('whatsapp_port')
-            self.whatsapp_groups    = config.get('whatsapp_groups')
+        self.signal_port        = config.get('signal_port')
+        self.signal_numbers     = config.get('signal_numbers')
+        self.signal_groups      = config.get('signal_groups')
+        self.whatsapp_port      = config.get('whatsapp_port')
+        self.whatsapp_groups    = config.get('whatsapp_groups')
 
         self.logger             = logger.Logger(self)
         self.logger.log_message("")
