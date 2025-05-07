@@ -32,30 +32,6 @@ if response.ok:
             else:
                 signal_messenger    = __import__(name_slug)
 
-print(available)
-
-data    = {
-        "state": 'on',
-        "attributes": {
-            "friendly_name": "Samba Backup",
-            "backups_local": 'test',
-            "backups_remote": 'test2',
-            "total_backups_succeeded": 4,
-            "total_backups_failed": 5,
-            "last_backup": 'dsfdsfds'
-        }
-}
-
-url     = "http://supervisor/core/api/states/sensor.test_sensor"
-headers = {
-  "Authorization": f"Bearer {TOKEN}",
-  "content-type": "application/json",
-}
-response    = requests.post(url, json=data, headers=headers)
-
-print( response.text)
-print( response.content)
-
 # Import other files in the directory
 import birthdays
 import gmail
@@ -171,6 +147,24 @@ class Messenger:
             return False
         except Exception as e:
             self.logger.log_message(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}", "Error")
+
+    def update_sensor(name, state, attributes):
+        data    = {
+                "state": state,
+                "attributes": attributes
+        }
+
+        url     = f"http://supervisor/core/api/states/sensor.{name}"
+
+        headers = {
+            "Authorization": f"Bearer {TOKEN}",
+            "content-type": "application/json",
+        }
+
+        response    = requests.post(url, json=data, headers=headers)
+
+        print( response.text)
+        print( response.content)
 
 def daily():
     print(f"Starting the sender script")

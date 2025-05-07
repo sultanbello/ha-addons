@@ -202,6 +202,8 @@ class CelebrationMessages():
             
             dict(sorted(self.names.items()))
 
+            birthdays   = []
+
             for name, details in self.names.items():
                 if 'languague' not in details:
                     if 'name' in details:
@@ -218,6 +220,8 @@ class CelebrationMessages():
                     try:
                         #Check if birthday
                         if details['birthmonth'] == self.now.month and details['birthday'] == self.now.day:
+                            birthdays.append(details)
+
                             self.parent.logger.log_message('Today is the birthday of ' + details['name'])
 
                             self.send_personal_message(details)
@@ -226,6 +230,17 @@ class CelebrationMessages():
                                         
                     except Exception as e:
                         self.parent.logger.log_message(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}", "Error")
+            
+            # update the birthdate sensor
+            if len(birthdays) == 0:
+                state   = 'off'
+            else:
+                state   = 'on'
+
+            self.parent.update_sensor('todays_birthdays', state, birthdays)
+
+            self.parent.logger.log_message(birthdays, 'debug')
+
             self.parent.logger.log_message("Finished sending birthday mesages")
         except Exception as e:
             self.parent.logger.log_message(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}", "Error")
