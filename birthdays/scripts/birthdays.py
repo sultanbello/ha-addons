@@ -263,34 +263,40 @@ class CelebrationMessages():
             self.parent.logger.log_message(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}", "Error")
 
     def country_languagues(self):
-        url         = "https://raw.githubusercontent.com/unicode-org/cldr/master/common/supplemental/supplementalData.xml"
-        langxml     = urllib.request.urlopen(url)
-        langtree    = lxml.etree.XML(langxml.read())
+        try:
+            url         = "https://raw.githubusercontent.com/unicode-org/cldr/master/common/supplemental/supplementalData.xml"
+            langxml     = urllib.request.urlopen(url)
+            langtree    = lxml.etree.XML(langxml.read())
 
-        self.languages = {}
-        for t in langtree.find('territoryInfo').findall('territory'):
-            langs = {}
-            for l in t.findall('languagePopulation'):
-                # If this is an official languague
-                if bool(l.get('officialStatus')):
-                    langs[l.get('type')] = float(l.get('populationPercent'))
-            self.languages[t.get('type')] = langs
+            self.languagues = {}
+            for t in langtree.find('territoryInfo').findall('territory'):
+                langs = {}
+                for l in t.findall('languagePopulation'):
+                    # If this is an official languague
+                    if bool(l.get('officialStatus')):
+                        langs[l.get('type')] = float(l.get('populationPercent'))
+                self.languagues[t.get('type')] = langs
+        except Exception as e:
+            self.parent.logger.log_message(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}", "Error")
 
     def get_languague(self, country_code):
-        if country_code in self.languages:
-            # all the official languagues of this country
-            languagues  = self.languagues.get(country_code)
+        try:
+            if country_code in self.languagues:
+                # all the official languagues of this country
+                languagues  = self.languagues.get(country_code)
 
-            for languague in languagues:
-                # we have a message in this languague
-                if languague in self.messages:
-                    return languague
+                for languague in languagues:
+                    # we have a message in this languague
+                    if languague in self.messages:
+                        return languague
+                
+                # we should only come here if we do not have a message in the languague needed
+                self.parent.logger.log_message(f"Could not find a message in any of the languagues for country {country_code}.\nDefaulting to English", "Warning")
+                return 'EN'
             
             # we should only come here if we do not have a message in the languague needed
-            self.parent.logger.log_message(f"Could not find a message in any of the languagues for country {country_code}.\nDefaulting to English", "Warning")
+            self.parent.logger.log_message(f"Invalid country {country_code}.\nDefaulting to English languague", "error")
             return 'EN'
-        
-         # we should only come here if we do not have a message in the languague needed
-        self.parent.logger.log_message(f"Invalid country {country_code}.\nDefaulting to English languague", "error")
-        return 'EN'
+        except Exception as e:
+            self.parent.logger.log_message(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}", "Error")
         
