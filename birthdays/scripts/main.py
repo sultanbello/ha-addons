@@ -9,10 +9,18 @@ import schedule
 import time
 from pathlib import Path
 
-#pip3 install --upgrade google-api-python-client google-auth-httplib2 google-auth-oauthlib lxml requests num2words --break-system-packages
+TOKEN = os.getenv('SUPERVISOR_TOKEN')
 
-# Changing working directory
-os.chdir(os.path.dirname(os.path.abspath(__file__)))
+url     = "http://supervisor/addons"
+headers = {
+  "Authorization": f"Bearer {TOKEN}",
+  "content-type": "application/json",
+}
+response = requests.get(url, headers=headers)
+if response.ok:
+    print(response.text)
+    print(response.json())
+
 
 # Import other files in the directory
 import birthdays
