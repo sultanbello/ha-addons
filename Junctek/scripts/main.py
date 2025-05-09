@@ -9,11 +9,24 @@ import os
 import json
 import mqtt
 
-handler = colorlog.StreamHandler()
-handler.setFormatter(colorlog.ColoredFormatter(
-	'%(log_color)s%(levelname)s:%(name)s:%(message)s'))
+formatter = colorlog.ColoredFormatter(
+	"%(log_color)s%(levelname)-8s%(reset)s %(blue)s%(message)s",
+	datefmt=None,
+	reset=True,
+	log_colors={
+		'DEBUG':    'cyan',
+		'INFO':     'green',
+		'WARNING':  'yellow',
+		'ERROR':    'red',
+		'CRITICAL': 'red,bg_white',
+	},
+	secondary_log_colors={},
+	style='%'
+)
 
-logger = colorlog.getLogger(__name__)
+handler = logging.StreamHandler()
+handler.setFormatter(formatter)
+logger = logging.getLogger('example')
 logger.addHandler(handler)
 
 charging            = False
@@ -60,11 +73,12 @@ class DeviceNotFoundError(Exception):
     pass
 
 async def discover():
-    devices = await BleakScanner.discover(return_adv=True)
+    devices = await BleakScanner.discover()
 
     print("Found Devices")
     for address, data in devices.items():
         print(data)
+        print(address)
         logger.info(f"BT Device {data[0].name} address={address}")
         logger.debug(data[1])
 
