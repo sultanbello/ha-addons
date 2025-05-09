@@ -32,8 +32,10 @@ params = {
 params_keys         = list(params.keys())
 params_values       = list(params.values())
 
-running_local       = True
-#running_local       = False
+if len(sys.argv) == 2:
+    running_local       = sys.argv[1]
+else:
+    running_local       = False
 
 if not running_local:
     # Get Options
