@@ -8,7 +8,7 @@ python3 -m venv /data/venv
 source /data/venv/bin/activate
 
 bashio::log.info "Checking prerequisites"
-#if [ ! -f /data/pip ]; then
+if [ ! -f /data/pip ]; then
     bashio::log.info "Installing prerequisites"
 
     python3 -m ensurepip --upgrade >/dev/null
@@ -16,7 +16,7 @@ bashio::log.info "Checking prerequisites"
     pip install --upgrade bleak requests paho.mqtt colorlog >/dev/null
 
     echo "pip done" > /data/pip
-#fi
+fi
 
 bashio::log.info "Starting Script..."
 

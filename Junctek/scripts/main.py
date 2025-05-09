@@ -73,16 +73,18 @@ class DeviceNotFoundError(Exception):
     pass
 
 async def discover():
-    devices = await BleakScanner.discover()
+    try:
+        devices = await BleakScanner.discover()
 
-    print("Found Devices")
-    for address, data in devices.items():
-        print(data)
-        print(address)
-        logger.info(f"BT Device {data[0].name} address={address}")
-        logger.debug(data[1])
+        print("Found Devices")
+        for device in devices:
+            print(device)
+            logger.info(f"BT Device {device[0].name} address={device}")
+            logger.debug(data[1])
 
-    print("Finished discovery")
+        print("Finished discovery")
+    except Exception as e:
+        logger.error(f" {str(e)} on line {sys.exc_info()[-1].tb_lineno}")
 
 async def process_data(_, value):
     global charging
