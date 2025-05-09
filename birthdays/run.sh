@@ -1,13 +1,13 @@
 #!/usr/bin/with-contenv bashio
-echo "Starting Python"
+bashio::log.info "Starting Python"
 
 python3 -m venv /data/venv
 source /data/venv/bin/activate
 
-echo "Checking prerequisites"
+bashio::log.info "Checking prerequisites"
 
 if [ ! -f /data/pip ]; then
-    echo "Installing prerequisites"
+    bashio::log.info "Installing prerequisites"
 
     python3 -m ensurepip --upgrade >/dev/null
 
@@ -16,8 +16,8 @@ if [ ! -f /data/pip ]; then
     echo "pip done" > /data/pip
 fi
 
-echo "Starting Script"
+bashio::log.info "Starting Script"
 
 python3 -u scripts/main.py
 
-echo Script finished
+bashio::log.info Script finished

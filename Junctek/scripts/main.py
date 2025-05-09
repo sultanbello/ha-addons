@@ -30,8 +30,6 @@ params = {
 params_keys         = list(params.keys())
 params_values       = list(params.values())
 
-MqqtToHa            = mqtt.MqqtToHa()
-
 running_local       = True
 running_local       = False
 
@@ -62,6 +60,8 @@ else:
     mac_address         = '38:3b:26:79:6f:c5'
     battery_capacity_ah = 400
     battery_voltage     = 48
+
+MqqtToHa            = mqtt.MqqtToHa()
 
 class DeviceNotFoundError(Exception):
     pass
