@@ -65,7 +65,7 @@ class MqqtToHa:
         except:
             pass
 
-        self.create_sensors()
+        #self.create_sensors()
 
     def __str__(self):
         return f"{self.device.name}"
@@ -197,7 +197,9 @@ class MqqtToHa:
     # Sends a sensor value
     def send_value(self, key, value, send_json=True):
         try:
-            self.logger.debug(self.sensors)
+            if not 'base_topic' in self.sensors[key]:
+                self.create_sensors()
+                
             topic                   = self.sensors[key]['base_topic'] + "/state"
 
             # TOTAL_INCREASING sensor are counting total, we just want to report a daily total
