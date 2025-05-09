@@ -31,8 +31,8 @@ class Logger:
             else:
                 log_msg     = f'{date} - {location}' + log_type.ljust(7) + ' - ' + msg
 
-            warning     = '\033[93m'
-            error       = '\033[91m'
+            warning     = '\033[33m'
+            error       = '\033[31m'
             endc        = '\033[0m'
 
             if log_type == 'error':
