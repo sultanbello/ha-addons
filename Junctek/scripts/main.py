@@ -215,14 +215,17 @@ async def main(device_mac):
     #interval_seconds = 60
 
     while True:
+        print("test")
         device = None
         while device is None:
+            print("test1")
             device = await BleakScanner.find_device_by_address( device_mac )
             if device is None:
                 lgr.error(f"Could not find device with address '{device_mac}'")
                 #raise DeviceNotFoundError
 
         try:
+            print("test2")
             async with BleakClient(device, disconnected_callback=disconnected_callback) as client:
                 lgr.info(f"Connected to {device_mac}")
                 await client.start_notify(read_characteristic_uuid, process_data)
