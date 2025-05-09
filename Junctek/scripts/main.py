@@ -10,6 +10,7 @@ import json
 import mqtt
 import sensors
 from datetime import datetime, timezone
+import atexit
 
 lgr                 = logger.Logger('info')
 
@@ -49,7 +50,7 @@ if not running_local:
     battery_voltage     = config.get('voltage')
 else:
     debug               = True
-    mac_address         = '' #38:3b:26:79:6f:c5
+    mac_address         = '38:3b:26:79:6f:c5' #38:3b:26:79:6f:c5
     battery_capacity    = 400
     battery_voltage     = 48
 
@@ -196,15 +197,12 @@ async def send_to_ha(values):
 disconnect_event    = asyncio.Event()
 
 def disconnected_callback(client):
-    lgr.debug(f"disconnected {client}")
+    lgr.debug(f"Disconnected {client}")
     disconnect_event.set()
-
-    # Start again
-    asyncio.run(main(mac_address))
 
 async def main(device_mac):
     global disconnect_event
-    
+
     #target_name_prefix = "BTG"
     read_characteristic_uuid = "0000fff1-0000-1000-8000-00805f9b34fb"
     #send a message to get all the measurement values 
@@ -220,11 +218,12 @@ async def main(device_mac):
             #raise DeviceNotFoundError
 
     try:
-        async with BleakClient(device, disconnected_callback=disconnected_callback) as client:
-            lgr.info(f"Connected to {device_mac}")
-            await client.start_notify(read_characteristic_uuid, process_data)
+        while True:
+            async with BleakClient(device, disconnected_callback=disconnected_callback) as client:
+                lgr.info(f"Connected to {device_mac}")
+                await client.start_notify(read_characteristic_uuid, process_data)
 
-            await disconnect_event.wait()
+                await disconnect_event.wait()
     except BleakError as e:
         lgr.error(f"Error: {e}")
         #continue  # continue in error case 
@@ -232,7 +231,12 @@ async def main(device_mac):
         pass
     except Exception as e:
         lgr.error(f" {str(e)} on line {sys.exc_info()[-1].tb_lineno}")
-        
+
+def on_finish():
+    lgr.debug(f"Exiting")
+
+atexit.register(on_finish)
+
 if __name__ == "__main__":
     try:
         if mac_address == '':

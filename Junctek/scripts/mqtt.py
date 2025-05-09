@@ -66,6 +66,8 @@ class MqqtToHa:
         except:
             pass
 
+        self.create_sensors()
+
     def __str__(self):
         return f"{self.device.name}"
 
