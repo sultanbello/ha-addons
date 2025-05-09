@@ -51,7 +51,7 @@ else:
     battery_capacity    = 400
     battery_voltage     = 48
 
-MqqtToHa            = mqtt.MqqtToHa()
+MqqtToHa            = mqtt.MqqtToHa(lgr)
 
 class DeviceNotFoundError(Exception):
     pass
@@ -186,10 +186,10 @@ async def main(device_mac):
         # Start again
         asyncio.run(main(mac_address))
 
-    #while True:  # loop for reestar in error
+
     try:
         async with BleakClient(device, disconnected_callback=disconnected_callback) as client:
-            lgr.debug(f"Connected to {device_mac}")
+            lgr.info(f"Connected to {device_mac}")
             await client.start_notify(read_characteristic_uuid, process_data)
 
             await disconnect_event.wait()

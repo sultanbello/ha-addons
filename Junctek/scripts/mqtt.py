@@ -16,10 +16,11 @@ import requests
 import sensors
 
 class MqqtToHa:
-    def __init__(self):
+    def __init__(self, logger):
         self.device         = sensors.device
         self.sensors        = sensors.sensors
         self.client_id      = 'battery_mon'
+        self.logger         = logger
 
         #Store send commands till they are received
         self.sent           = {}
@@ -57,6 +58,8 @@ class MqqtToHa:
                 self.password   = data['password']
                 self.host       = data['host']
                 self.port       = data['port']
+            else:
+
 
                 self.main()
         except:
@@ -66,7 +69,7 @@ class MqqtToHa:
         return f"{self.device.name}"
 
     def create_sensors(self):
-        logger.debug('Creating Sensors')
+        self.logger.debug('Creating Sensors')
         
         device_id       = self.device['identifiers'][0]
 
@@ -80,7 +83,7 @@ class MqqtToHa:
             self.sensors[key]['base_topic']   = f"homeassistant/{sensortype}/{device_id}/{sensor_name}"
             unique_id                           = f"{self.device_name}_{sensor_name}"
 
-            logger.debug(f"Creating sensor '{sensor_name}' with unique id {unique_id}")
+            self.logger.debug(f"Creating sensor '{sensor_name}' with unique id {unique_id}")
 
             config_payload  = {
                 "name": sensor['name'],
@@ -114,11 +117,11 @@ class MqqtToHa:
                 self.send_value(key, sensor['init'])
 
     def on_connect(self, client, userdata, flags, reason_code, test):
-        logger.debug(test)
+        self.logger.debug(test)
         if reason_code == 0:
-            logger.debug(f"Succesfuly connected to Home Assistant")
+            self.logger.debug(f"Succesfuly connected to Home Assistant")
         else:
-            logger.debug(f"Connected with result code {reason_code}", 'error')
+            self.logger.debug(f"Connected with result code {reason_code}", 'error')
 
         self.connected  = True
 
@@ -130,24 +133,24 @@ class MqqtToHa:
 
         self.create_sensors()
 
-        logger.debug('Sensors created')
+        self.logger.debug('Sensors created')
 
     def on_disconnect(self, client, userdata, rc):
-        logger.debug('Disconnected from Home Assistant')
+        self.logger.debug('Disconnected from Home Assistant')
         while True:
             # loop until client.reconnect()
             # returns 0, which means the
             # client is connected
             try:
-                logger.debug('Trying to Reconnect to Home Assistant')
+                self.logger.debug('Trying to Reconnect to Home Assistant')
                 if not client.reconnect():
-                    logger.debug('Reconnected to Home Assistant')
+                    self.logger.debug('Reconnected to Home Assistant')
                     self.create_sensors()
 
-                    logger.debug('Sensors recreated')
+                    self.logger.debug('Sensors recreated')
                     break
                 else:
-                    logger.debug('Trying to Reconnect to Home Assistant failed')
+                    self.logger.debug('Trying to Reconnect to Home Assistant failed')
             except ConnectionRefusedError:
                 # if the server is not running,
                 # then the host rejects the connection
@@ -156,7 +159,7 @@ class MqqtToHa:
                 # connect
                 pass
             except Exception as e:
-                logger.debug(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
+                self.logger.debug(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
 
             # if the reconnect was not successful,
             # wait 10 seconds
@@ -166,25 +169,25 @@ class MqqtToHa:
         if message.topic == 'homeassistant/status':
             if message.payload.decode() == 'offline':
                 self.connected  = False
-                logger.debug('Disconnected from Home Assistant')
+                self.logger.debug('Disconnected from Home Assistant')
             elif message.payload.decode() == 'online':
                 self.connected  = True
 
-                logger.debug('Reconnected To Home Assistant')
+                self.logger.debug('Reconnected To Home Assistant')
                 self.create_sensors()
 
-                logger.debug('Sensors created')
+                self.logger.debug('Sensors created')
 
         elif( 'SYS/' not in message.topic):
-            logger.debug(f"{message.topic} {message.payload.decode()}")
+            self.logger.debug(f"{message.topic} {message.payload.decode()}")
 
     def on_log(self, client, userdata, paho_log_level, message):
         if paho_log_level == mqtt.LogLevel.MQTT_LOG_ERR:
-            logger.debug(message)
+            self.logger.debug(message)
 
     # Called when the server received our publish succesfully
     def on_publish(self, client, userdata, mid, reason_code='', properties=''):
-        #logger.debug(send[mid] )
+        #self.logger.debug(send[mid] )
 
         #Remove from send dict
         del self.sent[mid]
@@ -222,17 +225,17 @@ class MqqtToHa:
             self.queue[topic]   = payload
 
             if not self.connected:
-                logger.debug('Not connected, adding to queue', 'warning')
+                self.logger.debug('Not connected, adding to queue', 'warning')
             else:
                 # post queued messages
                 for topic, payload in self.queue.items():
                     result                  = self.client.publish(topic=topic, payload=payload, qos=1, retain=False)
                     self.sent[result.mid]   = payload
         except Exception as e:
-            logger.debug(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
+            self.logger.debug(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
 
     def main(self):
-        logger.debug('Starting application')
+        self.logger.debug('Starting application')
 
         #client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
         self.client.username_pw_set(self.username, self.password)
@@ -243,7 +246,7 @@ class MqqtToHa:
         self.client.on_publish      = self.on_publish
         self.client.will_set(f'system-sensors/sensor/{self.device_name}/availability', 'offline', retain=True)
 
-        logger.debug('Connecting to Home Assistant')
+        self.logger.debug('Connecting to Home Assistant')
 
         while True:
             try:
@@ -260,6 +263,6 @@ class MqqtToHa:
                 # this feels like a dirty hack. Is there some other way to do this?
                 time.sleep(600)
             except Exception as e:
-                logger.debug(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
+                self.logger.debug(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
         
         self.client.loop_start()
