@@ -2,15 +2,18 @@ from bleak import BleakScanner
 from bleak import BleakClient
 from bleak import BleakError
 import asyncio
-import logger, colorlog
+import logging, colorlog
 import sys
 import requests
 import os
 import json
 import mqtt
 
-logger              = logger.getLogger(__name__)
-handler             = logger.StreamHandler()
+handler = colorlog.StreamHandler()
+handler.setFormatter(colorlog.ColoredFormatter(
+	'%(log_color)s%(levelname)s:%(name)s:%(message)s'))
+
+logger = colorlog.getLogger(__name__)
 logger.addHandler(handler)
 
 charging            = False
