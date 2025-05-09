@@ -114,7 +114,8 @@ class MqqtToHa:
             if('init' in sensor):
                 self.send_value(key, sensor['init'])
 
-    def on_connect(self, client, userdata, flags, reason_code):
+    def on_connect(self, client, userdata, flags, reason_code, test):
+        logging.debug(test)
         if reason_code == 0:
             logging.debug(f"Succesfuly connected to Home Assistant")
         else:

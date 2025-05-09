@@ -13,7 +13,7 @@ bashio::log.info "Checking prerequisites"
 
     python3 -m ensurepip --upgrade >/dev/null
 
-    pip install --upgrade bleak requests paho.mqtt >/dev/null
+    pip install --upgrade bleak requests paho.mqtt colorlog >/dev/null
 
     echo "pip done" > /data/pip
 #fi
