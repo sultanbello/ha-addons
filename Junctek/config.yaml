@@ -14,7 +14,7 @@ host_dbus: true
 
 hassio_api: true
 homeassistant_api: true
-hassio_role: default
+hassio_role: admin
 
 options:
   debug: true
@@ -29,7 +29,7 @@ schema:
   voltage: int
 
 services:
-  mqtt: need
+  - mqtt: need
 
 map:
   - share:rw

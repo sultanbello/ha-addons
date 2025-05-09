@@ -1,19 +1,13 @@
-# Birthdays
+# Junctek Battery Monitor
 
-_An addon to fetch Google Contacts and send them a message on their birthday_
+_An addon to fetch Junctek Battery Data over BLE_
 
 ## Initial Installation
-Start the addon and watch the log.
-Copy the url displayed and paste it in your browser.
-Give permission to the app
-You will be redirected to a localhost page.
-Replace "localhost" with "homeassistant.local" and press enter.
-You should be good to go now
+Fill in your battery capacity and voltage and start the addon.<br>
+If you do not fill in a mac address it will discover all bluetooth devices in range and display the results in the log.
 
 ## Description
-This addon will fetch your Google Contacts using the [people api](https://developers.google.com/people).
-If it is the birthday of one or more of them it will send a message via [Signal](https://github.com/haberda/signal-addon) [WhatsApp](https://github.com/gajosu/whatsapp-ha-addon/) or Gmail.
-It will only do so once a day
+This addon will fetch your Junctek battery Monitor data over bluetooth
 
 ![Supports aarch64 Architecture][aarch64-shield]
 ![Supports amd64 Architecture][amd64-shield]
