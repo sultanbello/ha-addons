@@ -193,7 +193,18 @@ async def send_to_ha(values):
     except Exception as e:
         lgr.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
 
+disconnect_event    = asyncio.Event()
+
+def disconnected_callback(client):
+    lgr.debug(f"disconnected {client}")
+    disconnect_event.set()
+
+    # Start again
+    asyncio.run(main(mac_address))
+
 async def main(device_mac):
+    global disconnect_event
+    
     #target_name_prefix = "BTG"
     read_characteristic_uuid = "0000fff1-0000-1000-8000-00805f9b34fb"
     #send a message to get all the measurement values 
@@ -207,15 +218,6 @@ async def main(device_mac):
         if device is None:
             lgr.error(f"Could not find device with address '{device_mac}'")
             #raise DeviceNotFoundError
-
-    disconnect_event    = asyncio.Event()
-
-    def disconnected_callback(client):
-        lgr.debug(f"disconnected {client}")
-        disconnect_event.set()
-
-        # Start again
-        asyncio.run(main(mac_address))
 
     try:
         async with BleakClient(device, disconnected_callback=disconnected_callback) as client:
