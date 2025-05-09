@@ -9,7 +9,7 @@ import os
 import json
 import mqtt
 import sensors
-import datetime
+from datetime import datetime, timezone
 
 lgr                 = logger.Logger('info')
 
