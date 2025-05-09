@@ -4,8 +4,6 @@ from bleak import BleakError
 import asyncio
 import logger
 import sys
-import requests
-import os
 import json
 import mqtt
 import sensors
@@ -48,6 +46,8 @@ if not running_local:
     mac_address         = config.get('macaddress')
     battery_capacity    = config.get('battery capacity')
     battery_voltage     = config.get('voltage')
+
+    lgr.info(config)
 else:
     debug               = True
     mac_address         = '38:3b:26:79:6f:c5' #38:3b:26:79:6f:c5
