@@ -30,16 +30,18 @@ class Logger:
             else:
                 log_msg     = f'{date} - {location}' + log_type.ljust(7) + ' - ' + msg
 
-            warning     = '\033[33m'
-            error       = '\033[31m'
+            colors = {
+                'info':     '\033[32m',
+                'warning':  '\033[33m',
+                'error':    '\033[31m'
+            }
+
             endc        = '\033[0m'
 
-            if log_type == 'error':
-                print(f"{error}{log_msg}{endc}")
-            elif log_type == 'warning':
-                print(f"{warning}{log_msg}{endc}")
-            else:
+            if log_type == 'debug':
                 print(log_msg)
+            else:
+                print(f"{colors[log_type]}{log_msg}{endc}")
                 
         except Exception as e:
             print(f"Logger.py - Error - {str(e)} on line {sys.exc_info()[-1].tb_lineno}") 

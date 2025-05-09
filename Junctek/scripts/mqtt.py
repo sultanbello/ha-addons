@@ -43,8 +43,6 @@ class MqqtToHa:
         try:
             token               = os.getenv('SUPERVISOR_TOKEN')
 
-            print(token)
-
             url                 = "http://supervisor//services/mqtt"
             headers             = {
                 "Authorization": f"Bearer {token}",
@@ -53,8 +51,6 @@ class MqqtToHa:
             response            = requests.get(url, headers=headers)
 
             if response.ok:
-                print(response.json()['data'])
-
                 data            = response.json()['data']
 
                 self.username   = data['username']

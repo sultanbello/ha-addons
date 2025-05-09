@@ -60,7 +60,7 @@ async def discover():
 
         lgr.debug("Found Devices")
         for device in devices:
-            lgr.info(f"BT Device found: Name:{device.name} Address={device.address}")
+            lgr.info(f"BT Device found:\nName: {device.name}\nAddress: {device.address}")
             lgr.debug(device)
 
         lgr.debug("Finished discovery")
@@ -200,8 +200,10 @@ async def main(device_mac):
 if __name__ == "__main__":
     try:
         if mac_address == '':
+            lgr.debug("Starting discovery")
             asyncio.run(discover())
         else:
+            lgr.debug("Starting connection")
             asyncio.run(main(mac_address))
     except KeyboardInterrupt:
         lgr.debug("ctrl+c pressed")
