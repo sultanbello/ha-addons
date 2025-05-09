@@ -2,32 +2,12 @@ from bleak import BleakScanner
 from bleak import BleakClient
 from bleak import BleakError
 import asyncio
-import logging, colorlog
+import logger
 import sys
 import requests
 import os
 import json
 import mqtt
-
-formatter = colorlog.ColoredFormatter(
-	"%(log_color)s%(levelname)-8s%(reset)s %(blue)s%(message)s",
-	datefmt=None,
-	reset=True,
-	log_colors={
-		'DEBUG':    'cyan',
-		'INFO':     'green',
-		'WARNING':  'yellow',
-		'ERROR':    'red',
-		'CRITICAL': 'red,bg_white',
-	},
-	secondary_log_colors={},
-	style='%'
-)
-
-handler = logging.StreamHandler()
-handler.setFormatter(formatter)
-logger = logging.getLogger('example')
-logger.addHandler(handler)
 
 charging            = False
 
@@ -80,7 +60,7 @@ async def discover():
         error       = '\033[31m'
         endc        = '\033[0m'
         print(f"{warning}Found Devices{endc}")
-        print("Found Devices")
+        logger.debug("Found Devices")
         for device in devices:
             print(device)
             logger.info(f"BT Device {device.name} address={device.address}")
