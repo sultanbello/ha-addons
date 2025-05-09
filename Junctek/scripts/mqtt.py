@@ -137,7 +137,7 @@ class MqqtToHa:
 
         self.logger.debug('Sensors created')
 
-    def on_disconnect(self, client, userdata, rc):
+    def on_disconnect(self, client, userdata, flags, reason_code, properties):
         self.logger.warning('Disconnected from Home Assistant')
         while True:
             # loop until client.reconnect()
