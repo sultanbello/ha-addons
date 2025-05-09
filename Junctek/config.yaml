@@ -1,6 +1,6 @@
 name: "Junctek Battery Monitor"
 description: "Reads your Junctek Battery Monitor Values via BTL"
-version: "1.0.26"
+version: "1.0.27"
 slug: "junctek"
 init: false
 arch:
