@@ -34,20 +34,6 @@ running_local       = True
 running_local       = False
 
 if not running_local:
-    token               = os.getenv('SUPERVISOR_TOKEN')
-
-    print(token)
-
-    url                 = "http://supervisor//services/mqtt"
-    headers             = {
-    "Authorization": f"Bearer {token}",
-    "content-type": "application/json",
-    }
-    response            = requests.get(url, headers=headers)
-
-    if response.ok:
-        print(response.json())
-
     # Get Options
     with open("/data/options.json", mode="r") as data_file:
         config = json.load(data_file)

@@ -11,13 +11,15 @@ import time
 import importlib.metadata
 import sys
 import logging
-
+import os
+import requests
 import sensors
 
 class MqqtToHa:
     def __init__(self):
         self.device         = sensors.device
         self.sensors        = sensors.sensors
+        self.client_id      = 'battery_mon'
 
         #Store send commands till they are received
         self.sent           = {}
@@ -28,15 +30,36 @@ class MqqtToHa:
         # if paho-mqtt v1.6.x gets removed, a full code migration must be made
         if importlib.metadata.version("paho-mqtt")[0] == '1':
             # for paho 1.x clients
-            self.client = mqtt.Client(client_id=mqtt_client_id)
+            self.client = mqtt.Client(client_id=self.client_id)
         else:
             # for paho 2.x clients
             # note that a deprecation warning gets logged 
-            self.client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, client_id=mqtt_client_id)
+            self.client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, client_id=self.client_id)
 
         self.connected      = False
 
         self.device_name    = self.device['name'].lower().replace(" ", "_")
+
+        token               = os.getenv('SUPERVISOR_TOKEN')
+
+        print(token)
+
+        url                 = "http://supervisor//services/mqtt"
+        headers             = {
+            "Authorization": f"Bearer {token}",
+            "content-type": "application/json",
+        }
+        response            = requests.get(url, headers=headers)
+
+        if response.ok:
+            print(response.json()['data'])
+
+            data            = response.json()['data']
+
+            self.username   = data['username']
+            self.password   = data['password']
+            self.host       = data['host']
+            self.port       = data['port']
 
         self.main()
 
@@ -212,7 +235,7 @@ class MqqtToHa:
         logging.debug('Starting application')
 
         #client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
-        self.client.username_pw_set(mqtt_username, mqtt_password)
+        self.client.username_pw_set(self.username, self.password)
         self.client.on_connect      = self.on_connect
         self.client.on_disconnect   = self.on_disconnect
         self.client.on_message      = self.on_message
@@ -224,7 +247,7 @@ class MqqtToHa:
 
         while True:
             try:
-                self.client.connect(mqtt_host, mqtt_port)
+                self.client.connect(self.host, self.port)
                 break
             except ConnectionRefusedError:
                 # sleep for 2 minutes if broker is unavailable and retry.
