@@ -231,6 +231,7 @@ async def main(device_mac):
                 await disconnect_event.wait()
 
                 # Now run again to connect again
+                disconnect_event.clear()
         except BleakError as e:
             lgr.error(f"Error: {e}")
             #continue  # continue in error case 
