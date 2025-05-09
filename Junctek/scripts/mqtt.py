@@ -58,10 +58,11 @@ class MqqtToHa:
                 self.password   = data['password']
                 self.host       = data['host']
                 self.port       = data['port']
-            else:
-
-
                 self.main()
+            else:
+                self.logger.error('Not connected to mqtt')
+                self.logger.debug(response)
+                
         except:
             pass
 
