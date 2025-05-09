@@ -8,6 +8,8 @@ import requests
 import os
 import json
 import mqtt
+import sensors
+import datetime
 
 lgr                 = logger.Logger('info')
 
@@ -159,9 +161,38 @@ async def process_data(_, value):
         # Now it should be formatted corrected, in a dictionary
         if debug:
             lgr.debug(f"Final values: {values}")
+
+        await send_to_ha(values)
+
     except Exception as e:
         lgr.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
-        
+
+async def send_to_ha(values):
+    try:           
+        for key, value in values.items():
+            if not key in sensors.sensors:
+                continue
+
+            if key == "ah_remaining" or key == "cap" or key == "accum_charge_cap" or key == "discharge" or key == "charge":
+                val   = round(value * 48 , 2)
+            elif key == "mins_remaining":
+                val   = round(value , 0)
+            else:
+                val   = round(value , 1)
+
+            if val > -99:
+                MqqtToHa.send_value(key, val)
+                
+        # https://www.home-assistant.io/docs/configuration/templating/#time
+        # 2023-07-30T20:03:49.253717+00:00
+        timestring  = str(datetime.now(datetime.now().astimezone().tzinfo).isoformat())
+        if debug:
+            lgr.debug(f"Sending time: {timestring}") 
+
+        MqqtToHa.send_value('last_message', timestring, False)
+    except Exception as e:
+        lgr.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
+
 async def main(device_mac):
     #target_name_prefix = "BTG"
     read_characteristic_uuid = "0000fff1-0000-1000-8000-00805f9b34fb"
@@ -185,7 +216,6 @@ async def main(device_mac):
 
         # Start again
         asyncio.run(main(mac_address))
-
 
     try:
         async with BleakClient(device, disconnected_callback=disconnected_callback) as client:
