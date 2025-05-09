@@ -48,7 +48,7 @@ if not running_local:
 else:
     debug               = True
     mac_address         = '' #38:3b:26:79:6f:c5
-    battery_capacity_ah = 400
+    battery_capacity    = 400
     battery_voltage     = 48
 
 MqqtToHa            = mqtt.MqqtToHa()
@@ -154,12 +154,11 @@ async def process_data(_, value):
 
         # Calculate percentage
         if "ah_remaining" in values:
-            values["soc"] = values["ah_remaining"] / battery_capacity_ah * 100
+            values["soc"] = values["ah_remaining"] / battery_capacity * 100
 
         # Now it should be formatted corrected, in a dictionary
         if debug:
-            lgr.debug(values)  
-            print(values)
+            lgr.debug(f"Final values: {values}")
     except Exception as e:
         lgr.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
         
@@ -183,6 +182,9 @@ async def main(device_mac):
     def disconnected_callback(client):
         lgr.debug(f"disconnected {client}")
         disconnect_event.set()
+
+        # Start again
+        asyncio.run(main(mac_address))
 
     #while True:  # loop for reestar in error
     try:
