@@ -61,7 +61,9 @@ class Messenger:
 
         self.logger             = logger.Logger(self)
         self.logger.log_message("")
-        self.logger.log_message("Debug is Enabled", 'debug')
+
+        if self.debug:
+            self.logger.log_message("Debug is Enabled", 'debug')
 
         self.logger.log_message(f"Log level is {self.log_level}")
 

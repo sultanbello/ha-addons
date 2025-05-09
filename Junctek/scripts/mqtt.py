@@ -40,28 +40,31 @@ class MqqtToHa:
 
         self.device_name    = self.device['name'].lower().replace(" ", "_")
 
-        token               = os.getenv('SUPERVISOR_TOKEN')
+        try:
+            token               = os.getenv('SUPERVISOR_TOKEN')
 
-        print(token)
+            print(token)
 
-        url                 = "http://supervisor//services/mqtt"
-        headers             = {
-            "Authorization": f"Bearer {token}",
-            "content-type": "application/json",
-        }
-        response            = requests.get(url, headers=headers)
+            url                 = "http://supervisor//services/mqtt"
+            headers             = {
+                "Authorization": f"Bearer {token}",
+                "content-type": "application/json",
+            }
+            response            = requests.get(url, headers=headers)
 
-        if response.ok:
-            print(response.json()['data'])
+            if response.ok:
+                print(response.json()['data'])
 
-            data            = response.json()['data']
+                data            = response.json()['data']
 
-            self.username   = data['username']
-            self.password   = data['password']
-            self.host       = data['host']
-            self.port       = data['port']
+                self.username   = data['username']
+                self.password   = data['password']
+                self.host       = data['host']
+                self.port       = data['port']
 
-        self.main()
+                self.main()
+        except:
+            pass
 
     def __str__(self):
         return f"{self.device.name}"

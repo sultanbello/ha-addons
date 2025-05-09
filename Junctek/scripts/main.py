@@ -63,7 +63,7 @@ if not running_local:
     battery_voltage     = config.get('voltage')
 else:
     debug               = True
-    mac_address         = '38:3b:26:79:6f:c5'
+    mac_address         = '' #38:3b:26:79:6f:c5
     battery_capacity_ah = 400
     battery_voltage     = 48
 
@@ -74,13 +74,17 @@ class DeviceNotFoundError(Exception):
 
 async def discover():
     try:
-        devices = await BleakScanner.discover()
+        devices    = await BleakScanner.discover()
 
+        warning     = '\033[33m'
+        error       = '\033[31m'
+        endc        = '\033[0m'
+        print(f"{warning}Found Devices{endc}")
         print("Found Devices")
         for device in devices:
             print(device)
-            logger.info(f"BT Device {device[0].name} address={device}")
-            logger.debug(data[1])
+            logger.info(f"BT Device {device.name} address={device.address}")
+            logger.debug(device)
 
         print("Finished discovery")
     except Exception as e:
