@@ -10,7 +10,7 @@ from time import strftime, localtime
 import time
 import importlib.metadata
 import sys
-import logging, colorlog
+import logger
 import os
 import requests
 import sensors
@@ -66,7 +66,7 @@ class MqqtToHa:
         return f"{self.device.name}"
 
     def create_sensors(self):
-        logging.debug('Creating Sensors')
+        logger.debug('Creating Sensors')
         
         device_id       = self.device['identifiers'][0]
 
@@ -80,7 +80,7 @@ class MqqtToHa:
             self.sensors[key]['base_topic']   = f"homeassistant/{sensortype}/{device_id}/{sensor_name}"
             unique_id                           = f"{self.device_name}_{sensor_name}"
 
-            logging.debug(f"Creating sensor '{sensor_name}' with unique id {unique_id}")
+            logger.debug(f"Creating sensor '{sensor_name}' with unique id {unique_id}")
 
             config_payload  = {
                 "name": sensor['name'],
@@ -114,11 +114,11 @@ class MqqtToHa:
                 self.send_value(key, sensor['init'])
 
     def on_connect(self, client, userdata, flags, reason_code, test):
-        logging.debug(test)
+        logger.debug(test)
         if reason_code == 0:
-            logging.debug(f"Succesfuly connected to Home Assistant")
+            logger.debug(f"Succesfuly connected to Home Assistant")
         else:
-            logging.debug(f"Connected with result code {reason_code}", 'error')
+            logger.debug(f"Connected with result code {reason_code}", 'error')
 
         self.connected  = True
 
@@ -130,24 +130,24 @@ class MqqtToHa:
 
         self.create_sensors()
 
-        logging.debug('Sensors created')
+        logger.debug('Sensors created')
 
     def on_disconnect(self, client, userdata, rc):
-        logging.debug('Disconnected from Home Assistant')
+        logger.debug('Disconnected from Home Assistant')
         while True:
             # loop until client.reconnect()
             # returns 0, which means the
             # client is connected
             try:
-                logging.debug('Trying to Reconnect to Home Assistant')
+                logger.debug('Trying to Reconnect to Home Assistant')
                 if not client.reconnect():
-                    logging.debug('Reconnected to Home Assistant')
+                    logger.debug('Reconnected to Home Assistant')
                     self.create_sensors()
 
-                    logging.debug('Sensors recreated')
+                    logger.debug('Sensors recreated')
                     break
                 else:
-                    logging.debug('Trying to Reconnect to Home Assistant failed')
+                    logger.debug('Trying to Reconnect to Home Assistant failed')
             except ConnectionRefusedError:
                 # if the server is not running,
                 # then the host rejects the connection
@@ -156,7 +156,7 @@ class MqqtToHa:
                 # connect
                 pass
             except Exception as e:
-                logging.debug(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
+                logger.debug(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
 
             # if the reconnect was not successful,
             # wait 10 seconds
@@ -166,25 +166,25 @@ class MqqtToHa:
         if message.topic == 'homeassistant/status':
             if message.payload.decode() == 'offline':
                 self.connected  = False
-                logging.debug('Disconnected from Home Assistant')
+                logger.debug('Disconnected from Home Assistant')
             elif message.payload.decode() == 'online':
                 self.connected  = True
 
-                logging.debug('Reconnected To Home Assistant')
+                logger.debug('Reconnected To Home Assistant')
                 self.create_sensors()
 
-                logging.debug('Sensors created')
+                logger.debug('Sensors created')
 
         elif( 'SYS/' not in message.topic):
-            logging.debug(f"{message.topic} {message.payload.decode()}")
+            logger.debug(f"{message.topic} {message.payload.decode()}")
 
     def on_log(self, client, userdata, paho_log_level, message):
         if paho_log_level == mqtt.LogLevel.MQTT_LOG_ERR:
-            logging.debug(message)
+            logger.debug(message)
 
     # Called when the server received our publish succesfully
     def on_publish(self, client, userdata, mid, reason_code='', properties=''):
-        #logging.debug(send[mid] )
+        #logger.debug(send[mid] )
 
         #Remove from send dict
         del self.sent[mid]
@@ -222,17 +222,17 @@ class MqqtToHa:
             self.queue[topic]   = payload
 
             if not self.connected:
-                logging.debug('Not connected, adding to queue', 'warning')
+                logger.debug('Not connected, adding to queue', 'warning')
             else:
                 # post queued messages
                 for topic, payload in self.queue.items():
                     result                  = self.client.publish(topic=topic, payload=payload, qos=1, retain=False)
                     self.sent[result.mid]   = payload
         except Exception as e:
-            logging.debug(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
+            logger.debug(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
 
     def main(self):
-        logging.debug('Starting application')
+        logger.debug('Starting application')
 
         #client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
         self.client.username_pw_set(self.username, self.password)
@@ -243,7 +243,7 @@ class MqqtToHa:
         self.client.on_publish      = self.on_publish
         self.client.will_set(f'system-sensors/sensor/{self.device_name}/availability', 'offline', retain=True)
 
-        logging.debug('Connecting to Home Assistant')
+        logger.debug('Connecting to Home Assistant')
 
         while True:
             try:
@@ -260,6 +260,6 @@ class MqqtToHa:
                 # this feels like a dirty hack. Is there some other way to do this?
                 time.sleep(600)
             except Exception as e:
-                logging.debug(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
+                logger.debug(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
         
         self.client.loop_start()

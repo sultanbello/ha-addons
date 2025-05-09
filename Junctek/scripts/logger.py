@@ -9,7 +9,13 @@ class Logger:
     def __init__(self, log_level='info'):
         self.log_level  = log_level
 
-    def log_message(self, msg='', log_type = 'info'):
+    def log_message(self, msg='', log_type = ''):
+        if log_type == '':
+            log_type = 'info'
+            index   = 1
+        else:
+            index   = 2
+            
         msg         = str(msg)
         log_type    = str(log_type).lower()
 
@@ -22,7 +28,7 @@ class Logger:
 
         try:
             date        = datetime.strftime(datetime.now(), '%d-%m-%Y %H:%M:%S')
-            caller      = getframeinfo(stack()[2][0])
+            caller      = getframeinfo(stack()[index][0])
             location    = f'{os.path.basename(caller.filename)}:{caller.lineno} -'.ljust(25)
 
             if msg == '':
