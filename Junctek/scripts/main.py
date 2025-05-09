@@ -2,12 +2,16 @@ from bleak import BleakScanner
 from bleak import BleakClient
 from bleak import BleakError
 import asyncio
-import logging
+import logger, colorlog
 import sys
 import requests
 import os
 import json
 import mqtt
+
+logger              = logger.getLogger(__name__)
+handler             = logger.StreamHandler()
+logger.addHandler(handler)
 
 charging            = False
 
@@ -54,9 +58,14 @@ class DeviceNotFoundError(Exception):
 
 async def discover():
     devices = await BleakScanner.discover(return_adv=True)
+
+    print("Found Devices")
     for address, data in devices.items():
-        logging.info(f"BT Device {data[0].name} address={address}")
-        logging.debug(data[1])
+        print(data)
+        logger.info(f"BT Device {data[0].name} address={address}")
+        logger.debug(data[1])
+
+    print("Finished discovery")
 
 async def process_data(_, value):
     global charging
@@ -92,9 +101,9 @@ async def process_data(_, value):
                 
         if debug:
             if not values: 
-                logging.warning(f"Nothing found for {data}")
+                logger.warning(f"Nothing found for {data}")
             else:
-                logging.debug(f"Raw values: {values}")
+                logger.debug(f"Raw values: {values}")
 
         # now format to the correct decimal place, or perform other formatting
         for key,value in list(values.items()):
@@ -147,10 +156,10 @@ async def process_data(_, value):
 
         # Now it should be formatted corrected, in a dictionary
         if debug:
-            logging.debug(values)  
+            logger.debug(values)  
             print(values)
     except Exception as e:
-        logging.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
+        logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
         
 async def main(device_mac):
     #target_name_prefix = "BTG"
@@ -164,29 +173,29 @@ async def main(device_mac):
     while device is None:
         device = await BleakScanner.find_device_by_address( device_mac )
         if device is None:
-            logging.error("Could not find device with address '%s'", device_mac)
+            logger.error("Could not find device with address '%s'", device_mac)
             #raise DeviceNotFoundError
 
     disconnect_event    = asyncio.Event()
 
     def disconnected_callback(client):
-        logging.debug(f"disconnected {client}")
+        logger.debug(f"disconnected {client}")
         disconnect_event.set()
 
     #while True:  # loop for reestar in error
     try:
         async with BleakClient(device, disconnected_callback=disconnected_callback) as client:
-            logging.debug(f"Connected to {device_mac}")
+            logger.debug(f"Connected to {device_mac}")
             await client.start_notify(read_characteristic_uuid, process_data)
 
             await disconnect_event.wait()
     except BleakError as e:
-        logging.error(f"Error: {e}")
+        logger.error(f"Error: {e}")
         #continue  # continue in error case 
     except TimeoutError as e:
         pass
     except Exception as e:
-        logging.error(f" {str(e)} on line {sys.exc_info()[-1].tb_lineno}")
+        logger.error(f" {str(e)} on line {sys.exc_info()[-1].tb_lineno}")
         
 if __name__ == "__main__":
     try:
@@ -195,9 +204,9 @@ if __name__ == "__main__":
         else:
             asyncio.run(main(mac_address))
     except KeyboardInterrupt:
-        logging.debug("ctrl+c pressed")
+        logger.debug("ctrl+c pressed")
     except Exception as e:
-        logging.error(f" {str(e)} on line {sys.exc_info()[-1].tb_lineno}")
+        logger.error(f" {str(e)} on line {sys.exc_info()[-1].tb_lineno}")
         """         async with BleakClient(device) as client:
-            logging.debug("connected")
+            logger.debug("connected")
             await client.stop_notify(read_characteristic_uuid) """

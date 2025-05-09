@@ -10,7 +10,7 @@ from time import strftime, localtime
 import time
 import importlib.metadata
 import sys
-import logging
+import logging, colorlog
 import os
 import requests
 import sensors
