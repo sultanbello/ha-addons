@@ -40,7 +40,7 @@ if not running_local:
     # Get Options
     with open("/data/options.json", mode="r") as data_file:
         config = json.load(data_file)
-        
+
     log_level           = config.get('log_level')
     mac_address         = config.get('macaddress')
     battery_capacity    = config.get('battery capacity')
@@ -55,6 +55,8 @@ lgr                 = logger.Logger(log_level)
 
 if log_level == 'debug':
     debug   = True
+else:
+    debug   = False
 
 MqqtToHa            = mqtt.MqqtToHa(lgr)
 
@@ -225,7 +227,10 @@ async def main(device_mac):
                 lgr.info(f"Connected to {device_mac}")
                 await client.start_notify(read_characteristic_uuid, process_data)
 
+                # Wait till disconnected
                 await disconnect_event.wait()
+
+                # Now run again to connect again
         except BleakError as e:
             lgr.error(f"Error: {e}")
             #continue  # continue in error case 

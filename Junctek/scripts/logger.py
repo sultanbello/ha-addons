@@ -3,8 +3,6 @@ from datetime import datetime
 import os
 import sys
 
-print('Loading Logger')
-
 class Logger:
     def __init__(self, log_level='info'):
         self.log_level  = log_level
