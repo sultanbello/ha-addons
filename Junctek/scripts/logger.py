@@ -6,9 +6,8 @@ import sys
 print('Loading Logger')
 
 class Logger:
-    def __init__(self, parent):
-        self.log_level  = parent.log_level
-        self.parent     = parent
+    def __init__(self, log_level='info'):
+        self.log_level  = log_level
 
     def log_message(self, msg='', log_type = 'info'):
         msg         = str(msg)
@@ -41,10 +40,6 @@ class Logger:
                 print(f"{warning}{log_msg}{endc}")
             else:
                 print(log_msg)
-
-            f   = open('/share/birthdays_debug.log', "a", encoding="utf-8")
-            f.write(log_msg + "\n")
-            f.close()
                 
         except Exception as e:
             print(f"Logger.py - Error - {str(e)} on line {sys.exc_info()[-1].tb_lineno}") 

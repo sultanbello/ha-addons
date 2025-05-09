@@ -9,6 +9,8 @@ import os
 import json
 import mqtt
 
+lgr                 = logger.Logger('info')
+
 charging            = False
 
 params = {
@@ -31,7 +33,7 @@ params_keys         = list(params.keys())
 params_values       = list(params.values())
 
 running_local       = True
-running_local       = False
+#running_local       = False
 
 if not running_local:
     # Get Options
@@ -56,19 +58,14 @@ async def discover():
     try:
         devices    = await BleakScanner.discover()
 
-        warning     = '\033[33m'
-        error       = '\033[31m'
-        endc        = '\033[0m'
-        print(f"{warning}Found Devices{endc}")
-        logger.debug("Found Devices")
+        lgr.debug("Found Devices")
         for device in devices:
-            print(device)
-            logger.info(f"BT Device {device.name} address={device.address}")
-            logger.debug(device)
+            lgr.info(f"BT Device found: Name:{device.name} Address={device.address}")
+            lgr.debug(device)
 
-        print("Finished discovery")
+        lgr.debug("Finished discovery")
     except Exception as e:
-        logger.error(f" {str(e)} on line {sys.exc_info()[-1].tb_lineno}")
+        lgr.error(f" {str(e)} on line {sys.exc_info()[-1].tb_lineno}")
 
 async def process_data(_, value):
     global charging
@@ -104,9 +101,9 @@ async def process_data(_, value):
                 
         if debug:
             if not values: 
-                logger.warning(f"Nothing found for {data}")
+                lgr.warning(f"Nothing found for {data}")
             else:
-                logger.debug(f"Raw values: {values}")
+                lgr.debug(f"Raw values: {values}")
 
         # now format to the correct decimal place, or perform other formatting
         for key,value in list(values.items()):
@@ -159,10 +156,10 @@ async def process_data(_, value):
 
         # Now it should be formatted corrected, in a dictionary
         if debug:
-            logger.debug(values)  
+            lgr.debug(values)  
             print(values)
     except Exception as e:
-        logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
+        lgr.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
         
 async def main(device_mac):
     #target_name_prefix = "BTG"
@@ -176,29 +173,29 @@ async def main(device_mac):
     while device is None:
         device = await BleakScanner.find_device_by_address( device_mac )
         if device is None:
-            logger.error("Could not find device with address '%s'", device_mac)
+            lgr.error("Could not find device with address '%s'", device_mac)
             #raise DeviceNotFoundError
 
     disconnect_event    = asyncio.Event()
 
     def disconnected_callback(client):
-        logger.debug(f"disconnected {client}")
+        lgr.debug(f"disconnected {client}")
         disconnect_event.set()
 
     #while True:  # loop for reestar in error
     try:
         async with BleakClient(device, disconnected_callback=disconnected_callback) as client:
-            logger.debug(f"Connected to {device_mac}")
+            lgr.debug(f"Connected to {device_mac}")
             await client.start_notify(read_characteristic_uuid, process_data)
 
             await disconnect_event.wait()
     except BleakError as e:
-        logger.error(f"Error: {e}")
+        lgr.error(f"Error: {e}")
         #continue  # continue in error case 
     except TimeoutError as e:
         pass
     except Exception as e:
-        logger.error(f" {str(e)} on line {sys.exc_info()[-1].tb_lineno}")
+        lgr.error(f" {str(e)} on line {sys.exc_info()[-1].tb_lineno}")
         
 if __name__ == "__main__":
     try:
@@ -207,9 +204,9 @@ if __name__ == "__main__":
         else:
             asyncio.run(main(mac_address))
     except KeyboardInterrupt:
-        logger.debug("ctrl+c pressed")
+        lgr.debug("ctrl+c pressed")
     except Exception as e:
-        logger.error(f" {str(e)} on line {sys.exc_info()[-1].tb_lineno}")
+        lgr.error(f" {str(e)} on line {sys.exc_info()[-1].tb_lineno}")
         """         async with BleakClient(device) as client:
-            logger.debug("connected")
+            lgr.debug("connected")
             await client.stop_notify(read_characteristic_uuid) """
