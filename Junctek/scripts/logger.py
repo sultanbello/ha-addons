@@ -19,16 +19,9 @@ class Logger:
         msg         = str(msg)
         log_type    = str(log_type).lower()
 
-        print(self.parent.debug)
-
-        if self.parent.debug:
-            print('debug on')
-        else:
-            print('debug off')
-
         if(
-            self.log_level == 'debug' and not self.parent.debug or
-            self.log_level == 'warning' and log_type == 'info' or
+            self.log_level != 'debug' and log_type == 'debug' or
+            self.log_level == 'warning' and ( log_type == 'info' or log_type == 'debug') or
             self.log_level == 'error' and log_type != 'error'
         ):
             return

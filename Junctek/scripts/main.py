@@ -10,8 +10,6 @@ import sensors
 from datetime import datetime, timezone
 import atexit
 
-lgr                 = logger.Logger('info')
-
 charging            = False
 
 params = {
@@ -42,17 +40,21 @@ if not running_local:
     # Get Options
     with open("/data/options.json", mode="r") as data_file:
         config = json.load(data_file)
-    debug               = config.get('debug')
+        
+    log_level           = config.get('log_level')
     mac_address         = config.get('macaddress')
     battery_capacity    = config.get('battery capacity')
     battery_voltage     = config.get('voltage')
-
-    lgr.info(config)
 else:
-    debug               = True
+    log_level           = 'debug'
     mac_address         = '38:3b:26:79:6f:c5' #38:3b:26:79:6f:c5
     battery_capacity    = 400
     battery_voltage     = 48
+
+lgr                 = logger.Logger(log_level)
+
+if log_level == 'debug':
+    debug   = True
 
 MqqtToHa            = mqtt.MqqtToHa(lgr)
 

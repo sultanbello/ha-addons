@@ -1,6 +1,6 @@
 name: "Junctek Battery Monitor"
 description: "Reads your Junctek Battery Monitor Values via BTL"
-version: "1.0.29"
+version: "1.0.30"
 slug: "junctek"
 init: false
 arch:
@@ -17,16 +17,16 @@ homeassistant_api: true
 hassio_role: admin
 
 options:
-  debug: true
   macaddress: 
   battery capacity: 400
   voltage: 48
+  log_level: info
 
 schema:
-  debug: bool
   macaddress: str?
   battery capacity: int
   voltage: int
+  log_level: list(debug|info|warning|error)
 
 services:
   - mqtt:need
