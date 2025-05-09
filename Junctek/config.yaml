@@ -1,0 +1,36 @@
+name: "Junctek Battery Monitor"
+description: "Reads your Junctek Battery Monitor Values via BTL"
+version: "1.0.0"
+slug: "junctek"
+init: false
+arch:
+  - aarch64
+  - amd64
+  - armhf
+  - armv7
+  - i386
+startup: services
+host_dbus: true
+
+hassio_api: true
+homeassistant_api: true
+hassio_role: default
+
+options:
+  debug: true
+  macaddress: D6:6C:0A:61:14:30
+  battery capacity: 400
+  voltage: 48
+
+schema:
+  debug: bool
+  macaddress: str
+  battery capacity: int
+  voltage: int
+
+services:
+  mqtt: need
+
+map:
+  - share:rw
+  

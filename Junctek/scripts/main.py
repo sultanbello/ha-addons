@@ -1,0 +1,213 @@
+from bleak import BleakScanner
+from bleak import BleakClient
+from bleak import BleakError
+import asyncio
+import logging
+import sys
+import requests
+import os
+import json
+import mqtt
+
+charging            = False
+
+params = {
+    "voltage":          "c0",       
+    "current":          "c1",       # Amps
+    "cur_soc":          "d0",       # %
+    "dir_of_current":   "d1",   
+    "ah_remaining":     "d2",
+    "discharge":        "d3",		# todays total in kWh
+    "charge":           "d4",       # todays total in kWh
+    "accum_charge_cap": "d5",       # accumulated charging capacity Ah (/1000)
+    "mins_remaining":   "d6",
+    "power":            "d8",       # Watt
+    "temp":             "d9",       # C
+    "full_charge_volt": "e6",
+    "zero_charge_volt": "e7",
+}
+
+params_keys         = list(params.keys())
+params_values       = list(params.values())
+
+MqqtToHa            = mqtt.MqqtToHa()
+
+running_local       = True
+running_local       = False
+
+if not running_local:
+    token               = os.getenv('SUPERVISOR_TOKEN')
+
+    url                 = "http://supervisor//services/mqtt"
+    headers             = {
+    "Authorization": f"Bearer {token}",
+    "content-type": "application/json",
+    }
+    response            = requests.get(url, headers=headers)
+
+    if response.ok:
+        print(response.json())
+
+    # Get Options
+    with open("/data/options.json", mode="r") as data_file:
+        config = json.load(data_file)
+    debug               = config.get('debug')
+    mac_address         = config.get('macaddress')
+    battery_capacity    = config.get('battery capacity')
+    battery_voltage     = config.get('voltage')
+else:
+    debug               = True
+    mac_address         = '38:3b:26:79:6f:c5'
+    battery_capacity_ah = 400
+    battery_voltage     = 48
+
+class DeviceNotFoundError(Exception):
+    pass
+
+async def discover():
+    devices = await BleakScanner.discover(return_adv=True)
+    for address, data in devices.items():
+        logging.info(f"BT Device {data[0].name} address={address}")
+        logging.debug(data[1])
+
+async def process_data(_, value):
+    global charging
+    
+    try:
+        data = str(value.hex())
+
+        # split bs into a list of all values and hex keys
+        bs_list             = [data[i:i+2] for i in range(0, len(data), 2)]
+
+        # reverse the list so that values come after hex params
+        bs_list_rev         = list(reversed(bs_list))
+
+        values      = {}
+        # iterate through the list and if a param is found,
+        # add it as a key to the dict. The value for that key is a
+        # concatenation of all following elements in the list
+        # until a non-numeric element appears. This would either
+        # be the next param or the beginning hex value.
+        for i in range(len(bs_list_rev)-1):
+            if bs_list_rev[i] in params_values:
+                value_str = ''
+                j = i + 1
+                while j < len(bs_list_rev) and bs_list_rev[j].isdigit():
+                    value_str = bs_list_rev[j] + value_str
+                    j += 1
+
+                position    = params_values.index(bs_list_rev[i])
+
+                key         = params_keys[position]
+                
+                values[key] = value_str
+                
+        if debug:
+            if not values: 
+                logging.warning(f"Nothing found for {data}")
+            else:
+                logging.debug(f"Raw values: {values}")
+
+        # now format to the correct decimal place, or perform other formatting
+        for key,value in list(values.items()):
+            if not value.isdigit():
+                del values[key]
+
+            val_int = int(value)                
+            if key == "voltage":
+                voltage   = val_int / 100 
+
+                # Only keep valid values leave out unrealistically values
+                if voltage > ( battery_voltage - (battery_voltage * 0.2)):
+                    values[key] = voltage               
+            elif key == "current":
+                values[key] = val_int / 100
+                
+                if charging == False:
+                    values["current"] *= -1
+            elif key == "discharge":
+                values[key] = val_int / 100000
+                charging = False
+            elif key == "charge":
+                values[key] = val_int / 100000
+                charging = True
+            elif key == "dir_of_current":
+                if value == "01":
+                    charging = True
+                else:
+                    charging = False
+            elif key == "ah_remaining":
+                values[key] = val_int / 1000
+            elif key == "mins_remaining":
+                values[key] = val_int
+            elif key == "power":
+                values[key] = val_int / 100
+                
+                if charging == False:
+                    values["power"] *= -1
+            elif key == "temp":
+                temp    = val_int - 100
+
+                if temp > 10:
+                    values[key] = temp
+            elif key == "accum_charge_cap":
+                values[key] = val_int / 1000    
+
+        # Calculate percentage
+        if "ah_remaining" in values:
+            values["soc"] = values["ah_remaining"] / battery_capacity_ah * 100
+
+        # Now it should be formatted corrected, in a dictionary
+        if debug:
+            logging.debug(values)  
+            print(values)
+    except Exception as e:
+        logging.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
+        
+async def main(device_mac):
+    #target_name_prefix = "BTG"
+    read_characteristic_uuid = "0000fff1-0000-1000-8000-00805f9b34fb"
+    #send a message to get all the measurement values 
+    #send_characteristic_uuid = "0000fff2-0000-1000-8000-00805f9b34fb"
+    #message = ":R50=1,2,1,\n"
+    #interval_seconds = 60
+
+    device = None
+    while device is None:
+        device = await BleakScanner.find_device_by_address( device_mac )
+        if device is None:
+            logging.error("Could not find device with address '%s'", device_mac)
+            #raise DeviceNotFoundError
+
+    disconnect_event    = asyncio.Event()
+
+    def disconnected_callback(client):
+        logging.debug(f"disconnected {client}")
+        disconnect_event.set()
+
+    #while True:  # loop for reestar in error
+    try:
+        async with BleakClient(device, disconnected_callback=disconnected_callback) as client:
+            logging.debug(f"Connected to {device_mac}")
+            await client.start_notify(read_characteristic_uuid, process_data)
+
+            await disconnect_event.wait()
+    except BleakError as e:
+        logging.error(f"Error: {e}")
+        #continue  # continue in error case 
+    except TimeoutError as e:
+        pass
+    except Exception as e:
+        logging.error(f" {str(e)} on line {sys.exc_info()[-1].tb_lineno}")
+        
+if __name__ == "__main__":
+    try:
+        #asyncio.run(discover())
+        asyncio.run(main(mac_address))
+    except KeyboardInterrupt:
+        logging.debug("ctrl+c pressed")
+    except Exception as e:
+        logging.error(f" {str(e)} on line {sys.exc_info()[-1].tb_lineno}")
+        """         async with BleakClient(device) as client:
+            logging.debug("connected")
+            await client.stop_notify(read_characteristic_uuid) """
