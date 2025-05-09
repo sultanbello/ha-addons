@@ -1,6 +1,6 @@
 name: "Junctek Battery Monitor"
 description: "Reads your Junctek Battery Monitor Values via BTL"
-version: "1.0.1"
+version: "1.0.2"
 slug: "junctek"
 init: false
 arch:
@@ -18,13 +18,13 @@ hassio_role: admin
 
 options:
   debug: true
-  macaddress: D6:6C:0A:61:14:30
+  macaddress: 
   battery capacity: 400
   voltage: 48
 
 schema:
   debug: bool
-  macaddress: str
+  macaddress: str?
   battery capacity: int
   voltage: int
 

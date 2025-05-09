@@ -38,6 +38,8 @@ running_local       = False
 if not running_local:
     token               = os.getenv('SUPERVISOR_TOKEN')
 
+    print(token)
+
     url                 = "http://supervisor//services/mqtt"
     headers             = {
     "Authorization": f"Bearer {token}",
@@ -202,8 +204,10 @@ async def main(device_mac):
         
 if __name__ == "__main__":
     try:
-        #asyncio.run(discover())
-        asyncio.run(main(mac_address))
+        if mac_address == '':
+            asyncio.run(discover())
+        else:
+            asyncio.run(main(mac_address))
     except KeyboardInterrupt:
         logging.debug("ctrl+c pressed")
     except Exception as e:
