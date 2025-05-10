@@ -1,6 +1,6 @@
-from bleak import BleakScanner
-from bleak import BleakClient
-from bleak import BleakError
+from bleak import BleakScanner, BleakClient, BleakError
+from bleak.backends.device import BLEDevice
+from bleak.backends.scanner import AdvertisementData
 import asyncio
 import logger
 import sys
@@ -198,14 +198,32 @@ async def send_to_ha(values):
     except Exception as e:
         lgr.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
 
-disconnect_event    = asyncio.Event()
-
-def disconnected_callback(client):
-    lgr.debug(f"Disconnected {client}")
-    disconnect_event.set()
-
 async def main(device_mac):
-    global disconnect_event
+    stop_event          = asyncio.Event()
+    disconnect_event    = asyncio.Event()
+    device              = None
+
+    def scanner_callback(device_data, advertisement_data):
+        global device
+        
+        # TODO: do something with incoming data
+        lgr.info("%s: %r", device_data.address, advertisement_data)
+
+        if device_data.address == device_mac:
+            device = device_data
+            stop_event.set()
+
+    def disconnected_callback(client):
+        lgr.debug(f"Disconnected {client}")
+        disconnect_event.set()
+
+    async with BleakScanner(scanner_callback) as scanner:
+        # Important! Wait for an event to trigger stop, otherwise scanner
+        # will stop immediately.
+        await stop_event.wait()
+        print(device)
+
+    # scanner stops when block exits
 
     #target_name_prefix = "BTG"
     read_characteristic_uuid = "0000fff1-0000-1000-8000-00805f9b34fb"
@@ -215,7 +233,7 @@ async def main(device_mac):
     #interval_seconds = 60
 
     while True:
-        device = None
+        """device = None
         while device is None:
             print("test1")
             try:
@@ -226,7 +244,7 @@ async def main(device_mac):
                 
             if device is None:
                 lgr.error(f"Could not find device with address '{device_mac}'")
-                #raise DeviceNotFoundError
+                #raise DeviceNotFoundError """
 
         try:
             print("test2")
