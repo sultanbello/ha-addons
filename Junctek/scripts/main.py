@@ -47,12 +47,12 @@ class JunctekMonitor:
                 config = json.load(data_file)
 
             self.log_level           = config.get('log_level')
-            self.mac_address         = config.get('macaddress')
+            self.mac_address         = config.get('macaddress').upper()
             self.battery_capacity    = config.get('battery capacity')
             self.battery_voltage     = config.get('voltage')
         else:
             self.log_level           = 'debug'
-            self.mac_address         = '38:3b:26:79:6f:c5' #38:3b:26:79:6f:c5
+            self.mac_address         = '38:3b:26:79:6f:c5'.upper() #38:3b:26:79:6f:c5
             self.battery_capacity    = 400
             self.battery_voltage     = 48
 
@@ -204,7 +204,7 @@ class JunctekMonitor:
 
     def scanner_callback(self, device, advertisement_data):
         try:
-            if device.address == self.mac_address:
+            if device.address.upper() == self.mac_address:
                 self.logger.info(f"Found device\nAddress: {device.address} Name: {advertisement_data.local_name} Rssi: {advertisement_data.rssi}")
                 self.device = device
                 self.stop_event.set()
