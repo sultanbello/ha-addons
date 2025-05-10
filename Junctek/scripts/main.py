@@ -205,9 +205,9 @@ async def main(device_mac):
 
     def scanner_callback(device_data, advertisement_data):
         global device
-        
+
         # TODO: do something with incoming data
-        lgr.info("%s: %r", device_data.address, advertisement_data)
+        lgr.info(f"{device_data.address}: {advertisement_data}")
 
         if device_data.address == device_mac:
             device = device_data
