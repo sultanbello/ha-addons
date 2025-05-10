@@ -218,8 +218,12 @@ async def main(device_mac):
         device = None
         while device is None:
             print("test1")
-            device = await BleakScanner.find_device_by_address( device_mac )
-            print(device)
+            try:
+               device = await BleakScanner.find_device_by_address( device_mac )
+               print(device)
+            except Exception as e:
+                print(e)
+                
             if device is None:
                 lgr.error(f"Could not find device with address '{device_mac}'")
                 #raise DeviceNotFoundError
@@ -234,7 +238,7 @@ async def main(device_mac):
                 await disconnect_event.wait()
                 asyncio.sleep(5)
                 # Now run again to connect again
-                disconnect_event.clear()
+                #disconnect_event.clear()
         except BleakError as e:
             lgr.error(f"Error: {e}")
             #continue  # continue in error case 
