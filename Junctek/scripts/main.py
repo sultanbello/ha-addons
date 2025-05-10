@@ -205,6 +205,7 @@ def disconnected_callback(client):
     disconnect_event.set()
 
 async def main(device_mac):
+    print(device_mac)
     global disconnect_event
 
     #target_name_prefix = "BTG"
@@ -232,7 +233,7 @@ async def main(device_mac):
 
                 # Wait till disconnected
                 await disconnect_event.wait()
-
+                asyncio.sleep(5)
                 # Now run again to connect again
                 disconnect_event.clear()
         except BleakError as e:
