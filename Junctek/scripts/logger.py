@@ -4,8 +4,8 @@ import os
 import sys
 
 class Logger:
-    def __init__(self, log_level='info'):
-        self.log_level  = log_level
+    def __init__(self, parent):
+        self.log_level  = parent.log_level
 
     def log_message(self, msg='', log_type = ''):
         if log_type == '':

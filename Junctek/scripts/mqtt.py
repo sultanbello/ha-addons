@@ -15,11 +15,11 @@ import requests
 import sensors
 
 class MqqtToHa:
-    def __init__(self, logger):
+    def __init__(self, parent):
         self.device         = sensors.device
         self.sensors        = sensors.sensors
         self.client_id      = 'battery_mon'
-        self.logger         = logger
+        self.logger         = parent.logger
 
         #Store send commands till they are received
         self.sent           = {}
@@ -199,7 +199,7 @@ class MqqtToHa:
         try:
             if not 'base_topic' in self.sensors[key]:
                 self.create_sensors()
-                
+
             topic                   = self.sensors[key]['base_topic'] + "/state"
 
             # TOTAL_INCREASING sensor are counting total, we just want to report a daily total
