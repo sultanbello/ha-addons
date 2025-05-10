@@ -205,7 +205,6 @@ def disconnected_callback(client):
     disconnect_event.set()
 
 async def main(device_mac):
-    print(device_mac)
     global disconnect_event
 
     #target_name_prefix = "BTG"
@@ -216,11 +215,11 @@ async def main(device_mac):
     #interval_seconds = 60
 
     while True:
-        print("test")
         device = None
         while device is None:
             print("test1")
             device = await BleakScanner.find_device_by_address( device_mac )
+            print(device)
             if device is None:
                 lgr.error(f"Could not find device with address '{device_mac}'")
                 #raise DeviceNotFoundError
