@@ -133,19 +133,19 @@ class JunctekMonitor:
                 elif key == "current":
                     values[key] = val_int / 100
                     
-                    if charging == False:
+                    if self.charging == False:
                         values["current"] *= -1
                 elif key == "discharge":
                     values[key] = val_int / 100000
-                    charging = False
+                    self.charging = False
                 elif key == "charge":
                     values[key] = val_int / 100000
-                    charging = True
+                    self.charging = True
                 elif key == "dir_of_current":
                     if value == "01":
-                        charging = True
+                        self.charging = True
                     else:
-                        charging = False
+                        self.charging = False
                 elif key == "ah_remaining":
                     values[key] = val_int / 1000
                 elif key == "mins_remaining":
@@ -153,7 +153,7 @@ class JunctekMonitor:
                 elif key == "power":
                     values[key] = val_int / 100
                     
-                    if charging == False:
+                    if self.charging == False:
                         values["power"] *= -1
                 elif key == "temp":
                     temp    = val_int - 100
