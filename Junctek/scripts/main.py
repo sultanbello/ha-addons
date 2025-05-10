@@ -223,6 +223,7 @@ async def main(device_mac):
             disconnect_event.set()
         except Exception as e:
             lgr.error(f" {str(e)} on line {sys.exc_info()[-1].tb_lineno}")
+    
     try:
         async with BleakScanner(scanner_callback) as scanner:
             # Important! Wait for an event to trigger stop, otherwise scanner
@@ -241,6 +242,7 @@ async def main(device_mac):
     except Exception as e:
         lgr.error(f" {str(e)} on line {sys.exc_info()[-1].tb_lineno}")
 
+    await stop_event.wait()
     while True:
         try:
             while device == None:
