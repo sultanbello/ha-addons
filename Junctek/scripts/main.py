@@ -204,34 +204,42 @@ async def main(device_mac):
     device              = None
 
     def scanner_callback(device_data, advertisement_data):
-        global device        
+        try:
+            global device        
 
-        if device_data.address == device_mac:
-            data = str(advertisement_data)
-            lgr.info(f"{device_data.address}: {data}")
-            device = device_data
-            stop_event.set()
-        else:
-            lgr.info(f"{device_data.address} is not: {device_mac}")
+            if device_data.address == device_mac:
+                data = str(advertisement_data)
+                lgr.info(f"{device_data.address}: {data}")
+                device = device_data
+                stop_event.set()
+            else:
+                lgr.info(f"{device_data.address} is not: {device_mac}")
+        except Exception as e:
+            lgr.error(f" {str(e)} on line {sys.exc_info()[-1].tb_lineno}")
 
     def disconnected_callback(client):
-        lgr.debug(f"Disconnected {client}")
-        disconnect_event.set()
-
-    async with BleakScanner(scanner_callback) as scanner:
-        # Important! Wait for an event to trigger stop, otherwise scanner
-        # will stop immediately.
-        await stop_event.wait()
-        print(device)
-
-    # scanner stops when block exits
-
-    #target_name_prefix = "BTG"
-    read_characteristic_uuid = "0000fff1-0000-1000-8000-00805f9b34fb"
-    #send a message to get all the measurement values 
-    #send_characteristic_uuid = "0000fff2-0000-1000-8000-00805f9b34fb"
-    #message = ":R50=1,2,1,\n"
-    #interval_seconds = 60
+        try:
+            lgr.debug(f"Disconnected {client}")
+            disconnect_event.set()
+        except Exception as e:
+            lgr.error(f" {str(e)} on line {sys.exc_info()[-1].tb_lineno}")
+    try:
+        async with BleakScanner(scanner_callback) as scanner:
+            # Important! Wait for an event to trigger stop, otherwise scanner
+            # will stop immediately.
+            await stop_event.wait()
+            print(device)
+    
+        # scanner stops when block exits
+    
+        #target_name_prefix = "BTG"
+        read_characteristic_uuid = "0000fff1-0000-1000-8000-00805f9b34fb"
+        #send a message to get all the measurement values 
+        #send_characteristic_uuid = "0000fff2-0000-1000-8000-00805f9b34fb"
+        #message = ":R50=1,2,1,\n"
+        #interval_seconds = 60
+    except Exception as e:
+        lgr.error(f" {str(e)} on line {sys.exc_info()[-1].tb_lineno}")
 
     while True:
         """device = None
