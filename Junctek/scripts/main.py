@@ -207,7 +207,7 @@ async def main(device_mac):
         global device        
 
         if device_data.address == device_mac:
-            data = str(advertisement_data.hex())
+            data = str(advertisement_data)
             lgr.info(f"{device_data.address}: {data}")
             device = device_data
             stop_event.set()
