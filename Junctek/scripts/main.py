@@ -208,8 +208,7 @@ async def main(device_mac):
             global device        
 
             if device_data.address == device_mac:
-                data = str(advertisement_data['rssi'])
-                lgr.info(f"{device_data.address}: {data}")
+                lgr.info(f"address: {device_data.address} name: {advertisement_data.local_name} rssi: {advertisement_data.rssi}")
                 device = device_data
                 stop_event.set()
             else:
