@@ -208,7 +208,7 @@ async def main(device_mac):
             global device        
 
             if device_data.address == device_mac:
-                data = str(advertisement_data)
+                data = str(advertisement_data['rssi'])
                 lgr.info(f"{device_data.address}: {data}")
                 device = device_data
                 stop_event.set()
@@ -246,7 +246,7 @@ async def main(device_mac):
     while True:
         try:
             while device == None:
-                asyncio.sleep(5)
+                await asyncio.sleep(5)
 
             print(device)
             async with BleakClient(device, disconnected_callback=disconnected_callback) as client:
@@ -266,7 +266,7 @@ async def main(device_mac):
         except Exception as e:
             lgr.error(f" {str(e)} on line {sys.exc_info()[-1].tb_lineno}")
 
-        asyncio.sleep(5)
+        await asyncio.sleep(5)
 
 def on_finish():
     lgr.debug(f"Exiting")
