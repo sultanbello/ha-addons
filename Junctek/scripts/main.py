@@ -204,14 +204,15 @@ async def main(device_mac):
     device              = None
 
     def scanner_callback(device_data, advertisement_data):
-        global device
-
-        # TODO: do something with incoming data
-        lgr.info(f"{device_data.address}: {advertisement_data}")
+        global device        
 
         if device_data.address == device_mac:
+            data = str(advertisement_data.hex())
+            lgr.info(f"{device_data.address}: {data}")
             device = device_data
             stop_event.set()
+        else:
+            lgr.info(f"{device_data.address} is not: {device_mac}")
 
     def disconnected_callback(client):
         lgr.debug(f"Disconnected {client}")
