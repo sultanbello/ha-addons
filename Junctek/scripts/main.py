@@ -242,21 +242,11 @@ async def main(device_mac):
         lgr.error(f" {str(e)} on line {sys.exc_info()[-1].tb_lineno}")
 
     while True:
-        """device = None
-        while device is None:
-            print("test1")
-            try:
-               device = await BleakScanner.find_device_by_address( device_mac )
-               print(device)
-            except Exception as e:
-                print(e)
-                
-            if device is None:
-                lgr.error(f"Could not find device with address '{device_mac}'")
-                #raise DeviceNotFoundError """
-
         try:
-            print("test2")
+            while device == None:
+                asyncio.sleep(5)
+
+            print(device)
             async with BleakClient(device, disconnected_callback=disconnected_callback) as client:
                 lgr.info(f"Connected to {device_mac}")
                 await client.start_notify(read_characteristic_uuid, process_data)
@@ -273,6 +263,8 @@ async def main(device_mac):
             pass
         except Exception as e:
             lgr.error(f" {str(e)} on line {sys.exc_info()[-1].tb_lineno}")
+
+        asyncio.sleep(5)
 
 def on_finish():
     lgr.debug(f"Exiting")
