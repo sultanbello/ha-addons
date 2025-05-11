@@ -1,8 +1,4 @@
 configuration:
-  debug:
-    name: debug
-    description: If enabled will not actually send messages but tells you what would have been sent
-
   client_id:
     name: client_id
     description: The client id from [google console](https://console.cloud.google.com/)
@@ -45,7 +41,7 @@ configuration:
 
   log_level:
     name: log_level
-    description: How much to log 'info'|'warning'|'error'
+    description: Log level detail. Debug will give most detailed info and will not actually send messages.
 
   signal_port:
     name: signal_port
