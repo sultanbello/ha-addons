@@ -16,7 +16,7 @@ class Signal:
 
             self.available()
         except Exception as e:
-            self.parent.logger.log_message(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}", "Error")
+            self.parent.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
             self.up     = False
 
     def available(self):
@@ -25,10 +25,10 @@ class Signal:
 
             if response.ok:
                 self.up     = True
-                self.parent.logger.log_message("Signal Api is Up and Running")
+                self.parent.logger.info("Signal Api is Up and Running")
         except Exception as e:
-            self.parent.logger.log_message(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}", "Error")
-            self.parent.logger.log_message(f"Signal is not available", "Warning") 
+            self.parent.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
+            self.parent.logger.warning(f"Signal is not available") 
             self.up     = False
 
     def is_registered(self, number):
@@ -43,12 +43,12 @@ class Signal:
             #Phonenumber is not valid
             return False
         except Exception as e:
-            self.parent.logger.log_message(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}", "Error")
+            self.parent.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
             return False
 
     def send_message(self, number, msg):
         if self.parent.debug:
-            self.parent.logger.log_message("I would have sent '{msg}' via signal to {number} if debug was disabled", 'debug')
+            self.parent.logger.debug("I would have sent '{msg}' via signal to {number} if debug was disabled")
             return True
         
         try:
@@ -60,13 +60,13 @@ class Signal:
             response    = requests.post(f'{self.url}/v2/send', json=data, headers=self.headers)
 
             if response.ok:
-                self.parent.logger.log_message(f'Send Signal Message Succesfully. Timestamp { response.json()["timestamp"] }') 
+                self.parent.logger.info(f'Send Signal Message Succesfully. Timestamp { response.json()["timestamp"] }') 
                 return response.json()['timestamp']
 
             
-            self.parent.logger.log_message(f'Send Signal message failed. Error is {response.json()["error"]} ', 'error')
+            self.parent.logger.error(f'Send Signal message failed. Error is {response.json()["error"]} ')
 
             return False
         except Exception as e:
-            self.parent.logger.log_message(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}", "Error")
+            self.parent.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
             

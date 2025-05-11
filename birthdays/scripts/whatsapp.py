@@ -23,26 +23,26 @@ class Whatsapp:
                 self.check_connected()
                 
         except Exception as e:
-            self.parent.logger.log_message(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}", "Error")
+            self.parent.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
 
     def check_connected(self):
         try:
             status              = requests.get(f'{self.whatsapp_server_url}status').json()['status']
             self.api_running    = True
-            self.parent.logger.log_message("Whatsapp Api is Up and Running")
+            self.parent.logger.info("Whatsapp Api is Up and Running")
 
             if status == 'CONNECTED':
-                self.parent.logger.log_message(f"Connected to a Whatsapp Session!")
+                self.parent.logger.info(f"Connected to a Whatsapp Session!")
 
                 self.connected  = True
             else:
-                self.parent.logger.log_message("Not connected to a Whatsapp Session!", 'warning')
+                self.parent.logger.warning("Not connected to a Whatsapp Session!")
         except requests.exceptions.RequestException as e:
             self.api_running  = False
 
-            self.parent.logger.log_message(f"The Whatsapp api is not running on {self.whatsapp_server_url}", "Error") 
+            self.parent.logger.error(f"The Whatsapp api is not running on {self.whatsapp_server_url}") 
         except Exception as e:
-            self.parent.logger.log_message(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}", "Error")
+            self.parent.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
 
     def make_request(self, url, post='', return_json=False):
         try:
@@ -58,7 +58,7 @@ class Whatsapp:
                 self.connected      = False
                 self.check_connected()
 
-                self.parent.logger.log_message(f"Command with url {url} and post {post} failed with status code {result.status_code} {result.text}", "error")
+                self.parent.logger.error(f"Command with url {url} and post {post} failed with status code {result.status_code} {result.text}")
                 
                 return False
 
@@ -73,14 +73,14 @@ class Whatsapp:
             elif 'isUser' in json:
                 return json['isUser']
             else:
-                self.parent.logger.log_message(f"Json result is: {json} for request {url} {post}", "debug")
+                self.parent.logger.debug(f"Json result is: {json} for request {url} {post}")
                 return json
         except requests.exceptions.RequestException as e:
             self.api_running  = False
 
-            self.parent.logger.log_message(f"The Whatsapp api is not running on {self.whatsapp_server_url}", "Error") 
+            self.parent.logger.error(f"The Whatsapp api is not running on {self.whatsapp_server_url}") 
         except Exception as e:
-            self.parent.logger.log_message(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}", "Error")
+            self.parent.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
     
     def get_chat_id(self, name):
         try:
@@ -95,12 +95,12 @@ class Whatsapp:
                 else:
                     # chat_id is most likely a name
                     if not chat_id in self.chats:
-                        self.parent.logger.log_message(f"No chat id found for {chat_id}", "Error")
+                        self.parent.logger.error(f"No chat id found for {chat_id}")
                         return False
                     
                     chat_id  = self.chats[chat_id]
         except Exception as e:
-            self.parent.logger.log_message(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}", "Error") 
+            self.parent.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}") 
 
         return chat_id
     
@@ -121,7 +121,7 @@ class Whatsapp:
         
             return result
         except Exception as e:
-            self.parent.logger.log_message(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}", "Error") 
+            self.parent.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}") 
     
     def send_message(self, name, msg, contentType='string'):       
         try:
@@ -130,7 +130,7 @@ class Whatsapp:
             url         = f'chats/{chat_id}/messages'
 
             if self.parent.debug:
-                self.parent.logger.log_message(f"I would have sent '{msg}' via whatsapp message to {name} ({chat_id}) if debug was disabled", 'debug')
+                self.parent.logger.debug(f"I would have sent '{msg}' via whatsapp message to {name} ({chat_id}) if debug was disabled")
                 return True
         
             post    = {
@@ -139,7 +139,7 @@ class Whatsapp:
 
             return self.make_request(url, post)
         except Exception as e:
-            self.parent.logger.log_message(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}", "Error") 
+            self.parent.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}") 
     
     def get_all_chats(self):
         try:
@@ -148,4 +148,4 @@ class Whatsapp:
                 for chat in result['chats']:
                     self.chats[chat['name']] = chat['id']['_serialized']
         except Exception as e:
-            self.parent.logger.log_message(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}", "Error")
+            self.parent.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")

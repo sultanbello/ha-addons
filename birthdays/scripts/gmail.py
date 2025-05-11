@@ -16,7 +16,7 @@ class Gmail:
         try:
             self.parent     = Messenger
         except Exception as e:
-            self.parent.logger.log_message(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}", "Error")
+            self.parent.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
 
         self.creds          = self.auth()
 
@@ -38,7 +38,7 @@ class Gmail:
             # credentials do not exist yet
             file = Path(credentials_file)
             if not file.is_file():
-                self.parent.logger.log_message(f"credeting {credentials_file}", "debug")
+                self.parent.logger.debug(f"credeting {credentials_file}")
                 content = {
                     "installed":
                         {
@@ -63,22 +63,22 @@ class Gmail:
             # created automatically when the authorization flow completes for the first
             # time.
             if os.path.exists(token_file):
-                self.parent.logger.log_message(f"Tokenfile {token_file} does exist", "debug")
+                self.parent.logger.debug(f"Tokenfile {token_file} does exist")
                 with open(token_file, 'rb') as token:
                     creds = pickle.load(token)
 
-                self.parent.logger.log_message(f"Creds: {creds.to_json()}", "debug")
+                self.parent.logger.debug(f"Creds: {creds.to_json()}")
             else:
-                self.parent.logger.log_message(f"Token file {token_file} does not exist", "debug")
+                self.parent.logger.debug(f"Token file {token_file} does not exist")
 
             # If there are no (valid) credentials available, let the user log in.
             if not creds or not creds.valid:
-                self.parent.logger.log_message(f"Creds are not valid", "debug")
-                self.parent.logger.log_message(f"Creds expired: {creds.expired}", "debug")
-                self.parent.logger.log_message(f"Creds refresh token: {creds.refresh_token}", "debug")
+                self.parent.logger.debug(f"Creds are not valid")
+                self.parent.logger.debug(f"Creds expired: {creds.expired}")
+                self.parent.logger.debug(f"Creds refresh token: {creds.refresh_token}")
 
                 if creds and creds.expired and creds.refresh_token:
-                    self.parent.logger.log_message(f"Refreshing token", "debug")
+                    self.parent.logger.debug(f"Refreshing token")
 
                     creds.refresh(Request())
                 else:
@@ -93,9 +93,9 @@ class Gmail:
                     print('########################')
                     print(' ')
 
-                self.parent.logger.log_message(f"Creds refresh token: {creds.refresh_token}", "debug")
+                self.parent.logger.debug(f"Creds refresh token: {creds.refresh_token}")
 
-                self.parent.logger.log_message(f"Creds: {creds.to_json()}", "debug")
+                self.parent.logger.debug(f"Creds: {creds.to_json()}")
 
                 # Save the credentials for the next run
                 with open(token_file, 'wb') as token:
@@ -104,7 +104,7 @@ class Gmail:
             return creds
         except Exception as e:
             self.auth_running = False
-            self.parent.logger.log_message(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}", "Error")
+            self.parent.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
 
     def create_email(self, to, subject, message_text):
         message             = MIMEText(message_text)
@@ -115,7 +115,7 @@ class Gmail:
 
     def send_email(self, to, msg):
         if self.parent.debug:
-            self.parent.logger.log_message(f"I would have sent {msg} via e-mail to {to} if debug was disabled", 'debug')
+            self.parent.logger.debug(f"I would have sent {msg} via e-mail to {to} if debug was disabled")
             return True
         
         message = self.create_email(to, 'Gefeliciteerd!', msg)
@@ -124,7 +124,7 @@ class Gmail:
 
     def get_contacts(self):
         try:
-            self.parent.logger.log_message("Getting first 1000 Google contacts")
+            self.parent.logger.info("Getting first 1000 Google contacts")
 
             service = build('people', 'v1', credentials = self.creds)
 
@@ -140,7 +140,7 @@ class Gmail:
             
             # We can only fetch 1000 contacts per query, keep going till we have them all
             while 'nextPageToken' in results:
-                self.parent.logger.log_message("Fetching next page")
+                self.parent.logger.info("Fetching next page")
                 pageToken   = results['nextPageToken']
                 results     = service.people().connections().list(
                     resourceName    = 'people/me',
@@ -153,4 +153,4 @@ class Gmail:
 
             return connections
         except Exception as e:
-            self.parent.logger.log_message(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}", "Error")
+            self.parent.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")

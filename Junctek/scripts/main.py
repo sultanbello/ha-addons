@@ -205,7 +205,7 @@ class JunctekMonitor:
     def scanner_callback(self, device, advertisement_data):
         try:
             if device.address.upper() == self.mac_address:
-                self.logger.info(f"Found device\nAddress: {device.address} Name: {advertisement_data.local_name} Rssi: {advertisement_data.rssi}")
+                self.logger.info(f"Found device\nAddress: {device.address}\nName: {advertisement_data.local_name}\nRssi: {advertisement_data.rssi}")
                 self.device = device
                 self.stop_event.set()
             else:
@@ -246,7 +246,6 @@ class JunctekMonitor:
                 while self.device == None:
                     await asyncio.sleep(5)
 
-                print(self.device)
                 async with BleakClient(self.device, disconnected_callback=self.disconnected_callback) as client:
                     self.logger.info(f"Connected to {self.mac_address}")
                     await client.start_notify(read_characteristic_uuid, self.process_data)

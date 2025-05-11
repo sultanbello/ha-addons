@@ -71,14 +71,14 @@ class CelebrationMessages():
             else:
                 # this person has a birthday but no country set
                 if 'name' in details and 'birthday' in details:
-                    self.parent.logger.log_message(f"Please set a country for {details['name']} at https://contacts.google.com/{person.get('resourceName', '').replace('people', 'person')}", "Warning")
+                    self.parent.logger.warning(f"Please set a country for {details['name']} at https://contacts.google.com/{person.get('resourceName', '').replace('people', 'person')}")
 
             # Languague
             if person.get('userDefined') != None:
                 for data in person.get('userDefined'):
                     if data.get('key') == 'languague':
                         details['languague']    = data.get('value').upper()
-                        self.parent.logger.log_message(f"{details['name']} has a personal languague set", 'debug')
+                        self.parent.logger.debug(f"{details['name']} has a personal languague set")
 
             # E-mail address
             email = person.get('emailAddresses')
@@ -109,7 +109,7 @@ class CelebrationMessages():
                     # Send warning for user without a phone number
                     if p.get('canonicalForm') == None:
                         if 'birthday' in details:
-                            self.parent.logger.log_message("Please set a proper phonenumber for " + details['name'] + str(p), "Warning")
+                            self.parent.logger.warning("Please set a proper phonenumber for " + details['name'] + str(p))
                     # only add a number once
                     elif p['canonicalForm'] not in numbers:
                         numbers.append(p['canonicalForm'])
@@ -124,14 +124,14 @@ class CelebrationMessages():
                 #if we have a duplicate name
                 if details['name'] in self.names:
                     if details.get('birthyear') == self.names[details['name']].get('birthyear'):
-                        self.parent.logger.log_message(f"I found another person with the name {details['name']} and the same age, please check", 'warning')
+                        self.parent.logger.warning(f"I found another person with the name {details['name']} and the same age, please check")
                     self.names[details['name'] + '_1'] = details
                 else:
                     self.names[details['name']] = details
 
             return details
         except Exception as e:
-            self.parent.logger.log_message(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}", "Error")
+            self.parent.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
     
     def send_event_message(self, details):
         try:
@@ -163,11 +163,11 @@ class CelebrationMessages():
 
                             self.parent.send_message(msg, details)             
                         except Exception as e:
-                            self.parent.logger.log_message(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}", "Error")
+                            self.parent.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
                 except Exception as e:
-                    self.parent.logger.log_message(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}", "Error")
+                    self.parent.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
         except Exception as e:
-            self.parent.logger.log_message(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}", "Error")
+            self.parent.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
 
     def send_personal_message(self, details):
         try:
@@ -183,7 +183,7 @@ class CelebrationMessages():
             
             
         except Exception as e:
-            self.parent.logger.log_message(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}", "Error")
+            self.parent.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
     
     def send_group_message(self, details):
         try:                    
@@ -207,12 +207,12 @@ class CelebrationMessages():
                         self.parent.whatsapp.send_message(group_id, msg)
                         
         except Exception as e:
-            self.parent.logger.log_message(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}", "Error")
+            self.parent.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
 
     def send_birthday_messages(self, contacts):
         try:
             i = 0
-            self.parent.logger.log_message("Getting birthday messages")        
+            self.parent.logger.info("Getting birthday messages")        
         
             for person in contacts:
                 details  = self.check_contact(person)
@@ -224,10 +224,10 @@ class CelebrationMessages():
             for name, details in self.names.items():
                 if 'country' not in details:
                     if 'name' in details:
-                        #self.parent.logger.log_message(f'Not sending messages to {details['name']} because I am not sure which languague to use')
+                        #self.parent.logger.info(f'Not sending messages to {details['name']} because I am not sure which languague to use')
                         pass
                     else:
-                        self.parent.logger.log_message(f"No valid details found for {details} {person['resourceName']}")
+                        self.parent.logger.info(f"No valid details found for {details} {person['resourceName']}")
 
                     continue
 
@@ -237,7 +237,7 @@ class CelebrationMessages():
                     try:
                         #Check if birthday
                         if details['birthmonth'] == self.now.month and details['birthday'] == self.now.day:
-                            self.parent.logger.log_message('Today is the birthday of ' + details['name'])
+                            self.parent.logger.info('Today is the birthday of ' + details['name'])
 
                             self.send_personal_message(details)
 
@@ -246,7 +246,7 @@ class CelebrationMessages():
                             birthdays[details['name']]  =   details
                                         
                     except Exception as e:
-                        self.parent.logger.log_message(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}", "Error")
+                        self.parent.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
             
             # update the birthdate sensor
             if len(birthdays) == 0:
@@ -256,11 +256,11 @@ class CelebrationMessages():
 
             self.parent.update_sensor('todays_birthdays', state, birthdays)
 
-            self.parent.logger.log_message(birthdays, 'debug')
+            self.parent.logger.debug(birthdays)
 
-            self.parent.logger.log_message("Finished sending birthday mesages")
+            self.parent.logger.info("Finished sending birthday mesages")
         except Exception as e:
-            self.parent.logger.log_message(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}", "Error")
+            self.parent.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
 
     def country_languagues(self):
         try:
@@ -277,7 +277,7 @@ class CelebrationMessages():
                         langs[l.get('type')] = float(l.get('populationPercent'))
                 self.languagues[t.get('type')] = langs
         except Exception as e:
-            self.parent.logger.log_message(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}", "Error")
+            self.parent.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
 
     def get_languague(self, country_code):
         try:
@@ -291,12 +291,12 @@ class CelebrationMessages():
                         return languague
                 
                 # we should only come here if we do not have a message in the languague needed
-                self.parent.logger.log_message(f"Could not find a message in any of the languagues for country {country_code}.\nDefaulting to English", "Warning")
+                self.parent.logger.warning(f"Could not find a message in any of the languagues for country {country_code}.\nDefaulting to English")
                 return 'EN'
             
             # we should only come here if we do not have a message in the languague needed
-            self.parent.logger.log_message(f"Invalid country {country_code}.\nDefaulting to English languague", "error")
+            self.parent.logger.error(f"Invalid country {country_code}.\nDefaulting to English languague")
             return 'EN'
         except Exception as e:
-            self.parent.logger.log_message(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}", "Error")
+            self.parent.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
         

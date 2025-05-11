@@ -1,6 +1,6 @@
 name: "Birthdays"
 description: "Imports Google Contacts into Home Assistant and sends automated birthday messages"
-version: "1.1.50"
+version: "1.1.51"
 slug: "birthdays"
 url: https://github.com/Tsjippy/ha-addons/tree/main/birthdays
 init: false
@@ -51,7 +51,7 @@ schema:
       group_id: str
       label_id: str
       languague: str
-  log_level: list(info|warning|error)
+  log_level: list(debug|info|warning|error)
   signal_port: int(2,99999)?
   whatsapp_port: int(2,99999)?
   port: int(2,99999)?
