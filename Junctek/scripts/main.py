@@ -246,26 +246,25 @@ class JunctekMonitor:
                     self.logger.debug("Waiting for device conection")
                     await asyncio.sleep(5)
 
-                self.logger.info("Test 1")
-
                 async with BleakClient(self.device, disconnected_callback=self.disconnected_callback) as client:
-                    self.logger.info(f"Connected to {self.mac_address}")
+                    self.logger.info(f"Connected to {self.device.name}")
                     await client.start_notify(read_characteristic_uuid, self.process_data)
 
                     # Wait till disconnected
                     await self.disconnect_event.wait()
-                    asyncio.sleep(5)
-                    # Now run again to connect again
-                    #disconnect_event.clear()
 
-                self.logger.info("Test 2")
+                    await asyncio.sleep(5)
+
+                    # Now run again to connect again
+                    self.disconnect_event.clear()
             except BleakError as e:
                 self.logger.error(f"Error: {e}")
                 #continue  # continue in error case 
             except TimeoutError as e:
-                pass
+                self.logger.debug("Timeout {e}")
             except Exception as e:
-                self.logger.error(f" {str(e)} on line {sys.exc_info()[-1].tb_lineno}")
+                if str(e) != '':
+                    self.logger.error(f" {str(e)} on line {sys.exc_info()[-1].tb_lineno}")
 
             await asyncio.sleep(5)
 
