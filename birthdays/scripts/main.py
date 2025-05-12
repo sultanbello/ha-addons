@@ -69,14 +69,12 @@ class Messenger:
 
         self.logger.info(f"Log level is {self.log_level}")
 
-        self.logger.debug(available)
-
         # Check whatsapp
         if 'whatsapp' in available:
             self.whatsapp   = whatsapp.Whatsapp(self)
         
         # Check signal
-        if 'signal_messenger' in available:
+        if 'signal' in available:
             self.signal     = signal_messenger.Signal(self)
 
         # Instantiate Birthay messages object
