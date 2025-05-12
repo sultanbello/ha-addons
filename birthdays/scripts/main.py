@@ -52,6 +52,7 @@ class Messenger:
         
         # Check signal
         if 'signal' in available:
+            print(config)
             self.signal     = signal_messenger.Signal(self)
 
         # Instantiate Birthay messages object
