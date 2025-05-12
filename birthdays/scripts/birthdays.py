@@ -261,8 +261,6 @@ class CelebrationMessages():
 
             self.parent.update_sensor('todays_birthdays', state, birthdays)
 
-            self.parent.logger.debug(birthdays)
-
             self.parent.logger.info("Finished sending birthday mesages")
         except Exception as e:
             self.parent.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")

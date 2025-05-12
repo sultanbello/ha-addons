@@ -13,8 +13,6 @@ class Signal:
             self.headers = {
                 'Content-Type': 'application/json',
             }
-
-            self.available()
         except Exception as e:
             self.parent.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
             self.up     = False

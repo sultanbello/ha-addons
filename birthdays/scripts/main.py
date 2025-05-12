@@ -69,6 +69,20 @@ class Messenger:
 
         self.logger.info(f"Log level is {self.log_level}")
 
+        # Check whatsapp
+        if 'whatsapp' in available:
+            self.whatsapp   = whatsapp.Whatsapp(self)
+        
+        # Check signal
+        if 'signal_messenger' in available:
+            self.signal     = signal_messenger.Signal(self)
+
+        # Instantiate Birthay messages object
+        self.birthdays  = birthdays.CelebrationMessages(self)
+
+        # Gmail
+        self.gmail      = gmail.Gmail(self)
+
     def connect_services(self):
         x = 60
         while not self.is_connected():
@@ -84,14 +98,19 @@ class Messenger:
 
         # Check whatsapp
         if 'whatsapp' in available:
-            self.whatsapp   = whatsapp.Whatsapp(self)
+            self.whatsapp.check_connected()
+
+            if not self.api_running:
+                sleep(60)
+                self.whatsapp.check_connected()
 
             if not self.whatsapp.connected:
                 self.logger.warning("Whatsapp Instance is Down")
         
         # Check signal
         if 'signal_messenger' in available:
-            self.signal     = signal_messenger.Signal(self)
+            self.signal.available()
+
             if not self.signal.up:
                 self.logger.warning("Signal Instance is not available")
 
@@ -99,7 +118,6 @@ class Messenger:
         self.birthdays  = birthdays.CelebrationMessages(self)
 
         # Gmail
-        self.gmail      = gmail.Gmail(self)
         self.gmail.connect()
 
     def send(self):

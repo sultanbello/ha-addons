@@ -15,12 +15,6 @@ class Whatsapp:
             self.api_running    = True
 
             self.whatsapp_server_url = f"http://homeassistant.local:{self.parent.whatsapp_port}/api/"
-
-            self.check_connected()
-
-            while not self.api_running:
-                sleep(60)
-                self.check_connected()
                 
         except Exception as e:
             self.parent.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")

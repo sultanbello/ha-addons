@@ -82,16 +82,16 @@ class Gmail:
 
                     creds.refresh(Request())
                 else:
-                    print(' ')
-                    print('########################')
+                    self.parent.logger.info('')
+                    self.parent.logger.info('########################')
                     flow    = InstalledAppFlow.from_client_secrets_file(credentials_file, SCOPES)
 
                     try:
                         creds   = flow.run_local_server(bind_addr="0.0.0.0", open_browser=False, port=self.parent.port, timeout_seconds=600)
                     except Exception as e:
-                        print(e)
-                    print('########################')
-                    print(' ')
+                        self.parent.logger.error(e)
+                    self.parent.logger.info('########################')
+                    self.parent.logger.info('')
 
                 self.parent.logger.debug(f"Creds refresh token: {creds.refresh_token}")
 
@@ -120,6 +120,7 @@ class Gmail:
         try:
             if '.empty' in to:
                 self.parent.logger.debug(f"Not sending an e-mail to {to} as it does not exist")
+            return False
 
             if self.parent.debug:
                 self.parent.logger.debug(f"I would have sent {msg} via e-mail to {to} if debug was disabled")
