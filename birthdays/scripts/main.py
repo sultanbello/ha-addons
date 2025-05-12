@@ -12,7 +12,6 @@ from pathlib import Path
 import birthdays
 import gmail
 import logger
-import pidfile
 
 class Messenger:
     def __init__(self):
@@ -52,7 +51,6 @@ class Messenger:
         
         # Check signal
         if 'signal' in available:
-            print(config)
             self.signal     = signal_messenger.Signal(self)
 
         # Instantiate Birthay messages object
@@ -177,57 +175,73 @@ def daily():
     messenger.send()
 
 try:
-    TOKEN   = os.getenv('SUPERVISOR_TOKEN')
+    if len(sys.argv) == 2:
+        running_local       = sys.argv[1]
+    else:
+        import pidfile
+        running_local       = False
 
-    url     = "http://supervisor/addons"
-    headers = {
-    "Authorization": f"Bearer {TOKEN}",
-    "content-type": "application/json",
-    }
-    response    = requests.get(url, headers=headers)
+    if running_local:
+        config  = {'client_id': '1018721936279-hgd1c0cap7c38c9132f78ne50dff6pci.apps.googleusercontent.com', 'client_secret': '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', 'project_id': 'gmail-1615801131703', 'hour': 9, 'minutes': 45, 'messages': [{'message': 'Happy birthday %firstname%!\nMay this new year be full of blessings\nEwald&Lianne', 'languague': 'En'}, {'message': 'Happy birthday %firstname%! Have a wonderfull day\nEwald & Lianne', 'languague': 'En'}, {'message': 'Happy birthday %firstname%!🎂 🎉🎈\nEwald&Lianne', 'languague': 'En'}, {'message': 'Happy birthday %firstname%!🎊🎂🥳\nEwald&Lianne', 'languague': 'En'}, {'message': 'Happy birthday %firstname%!\nMay this new year be full of blessings\nLianne & Ewald', 'languague': 'En'}, {'message': 'Happy birthday %firstname%!\nHave a wonderfull day\nLianne & Ewald', 'languague': 'En'}, {'message': 'Happy birthday %firstname%!🎂 🎉🎈\nLianne & Ewald', 'languague': 'En'}, {'message': 'Happy birthday %firstname%!🎊🎂🥳\nLianne & Ewald', 'languague': 'En'}, {'message': 'Happy birthday %firstname%!\n   \xa0\nMay this new year be full of blessings\nFrom the Harmsens', 'languague': 'En'}, {'message': 'Happy birthday %firstname%!\nHave a wonderfull day\nFrom the Harmsens', 'languague': 'En'}, {'message': 'Happy birthday %firstname%!🎂 🎉🎈\n\nFrom the Harmsens', 'languague': 'En'}, {'message': 'Happy birthday %firstname%!🎊🎂🥳\nFrom the Harmsens', 'languague': 'En'}, {'message': 'Gefeliciteerd met je verjaardag %firstname%!🎂 🎉🎈', 'languague': 'NL'}, {'message': 'Gefeliciteerd met je verjaardag %firstname%!🎊🎂🥳', 'languague': 'NL'}, {'message': 'Gefeliciteerd met je verjaardag %firstname%!\nFijne dag!', 'languague': 'NL'}, {'message': 'Gefeliciteerd met je verjaardag %firstname%!\nEen hele fijne dag toegewenst\nEwald & Lianne', 'languague': 'NL'}, {'message': 'Gefeliciteerd met je verjaardag %firstname%!\nEen hele fijne dag toegewenst\nLianne & Ewald', 'languague': 'NL'}], 'signal_numbers': ['+2349045252526'], 'signal_groups': [{'group_id': 'FTrLH0chjLDIzNHeAMMGmHMTwEjx6p/XJ97/IRDgSE0=', 'label_id': '67709b318999ea56', 'languague': 'en'}], 'whatsapp_groups': [{'group_name': 'Fam v.d. Wart', 'group_id': '31610742567-1407596543@g.us', 'label_id': '59e818140f151ed8', 'languague': 'NL'}, {'group_name': 'Fam Harmsen', 'group_id': '31610742567-1401264746@g.us', 'label_id': '169b51d90910e33d', 'languague': 'NL'}, {'group_name': 'Thuisfront Team Harmsen', 'group_id': '31610742567-1563642823@g.us', 'label_id': '12fce5118f53a6e8', 'languague': 'NL'}], 'log_level': 'debug', 'signal_port': 8080, 'whatsapp_port': 3000, 'port': 9090}
 
-    available   = {}
-    if response.ok:
-        addons  = response.json()['data']['addons']
+        available   = {'signal':'started', 'whatsapp':'started'}
 
-        for addon in addons:
-            if addon['slug'] == '06c15c6e_whatsapp' or addon['slug'] == '1315902c_signal_messenger':
-                name_slug               = addon['slug'].split('_')[1]
-                available[name_slug]    = addon['state']
+        whatsapp            = __import__('whatsapp')
+        signal_messenger    = __import__('signal_messenger')
+    else:
+        TOKEN   = os.getenv('SUPERVISOR_TOKEN')
 
-                if name_slug == 'whatsapp':
-                    print("importing whatsapp.py")
-                    whatsapp            = __import__(name_slug)
-                else:
-                    print("importing signal_messenger.py")
-                    signal_messenger    = __import__(name_slug)
+        url     = "http://supervisor/addons"
+        headers = {
+            "Authorization": f"Bearer {TOKEN}",
+            "content-type": "application/json",
+        }
+        response    = requests.get(url, headers=headers)
 
-    # Get Options
-    with open("/data/options.json", mode="r") as data_file:
-        config = json.load(data_file)
+        available   = {}
+        if response.ok:
+            addons  = response.json()['data']['addons']
+
+            for addon in addons:
+                if addon['slug'] == '06c15c6e_whatsapp' or addon['slug'] == '1315902c_signal_messenger':
+                    name_slug               = addon['slug'].split('_')[1]
+                    available[name_slug]    = addon['state']
+
+                    if name_slug == 'whatsapp':
+                        print("Importing whatsapp.py")
+                        whatsapp            = __import__(name_slug)
+                    else:
+                        print("Importing signal_messenger.py")
+                        signal_messenger    = __import__('signal_messenger')
+
+        # Get Options
+        with open("/data/options.json", mode="r") as data_file:
+            config = json.load(data_file)
 
     messenger   = Messenger()
 
-    with pidfile.PIDFile("/datamain.pid"):
-        messenger.logger.info("Started Script")
+    #with pidfile.PIDFile("/datamain.pid"):
+    messenger.logger.info("Started Script")
 
-        creds = Path("/data/credentials.json")
-        if not creds.is_file():
-            messenger.logger.info(f"Initiating first run")
-            
-            # First run
-            messenger.connect_services()
+    creds = Path("/data/credentials.json")
+    if not creds.is_file():
+        messenger.logger.info(f"Initiating first run")
+        
+        # First run
+        messenger.connect_services()
 
-        if messenger.debug:
-            daily()
+    if messenger.debug:
+        daily()
 
-        messenger.logger.info(f"Will run at {config.get('hour')}:{config.get('minutes')} daily")
-        schedule.every().day.at("{:02d}:{:02d}:00".format(config.get('hour'), config.get('minutes'))).do(daily)
+    messenger.logger.info(f"Will run at {config.get('hour')}:{config.get('minutes')} daily")
+    schedule.every().day.at("{:02d}:{:02d}:00".format(config.get('hour'), config.get('minutes'))).do(daily)
 
-        while True:
-            schedule.run_pending()
-            sleep(1)
+    while True:
+        schedule.run_pending()
+        sleep(1)
 except pidfile.AlreadyRunningError:
     messenger.logger.error("Already running")
+except Exception as e:
+    print(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
 
 messenger.logger.info("Exitting")
