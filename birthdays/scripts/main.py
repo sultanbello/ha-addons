@@ -6,7 +6,6 @@ import sys
 from time import sleep
 import json
 import schedule
-import time
 from pathlib import Path
 
 TOKEN   = os.getenv('SUPERVISOR_TOKEN')
@@ -69,6 +68,7 @@ class Messenger:
 
         self.logger.info(f"Log level is {self.log_level}")
 
+    def connect_services(self):
         x = 60
         while not self.is_connected():
             #Write to log every minute
@@ -79,7 +79,7 @@ class Messenger:
             sleep(1)
             x += 1
         
-        self.logger.warning("Connected to the Internet")
+        self.logger.info("Connected to the Internet")
 
         # Check whatsapp
         if 'whatsapp' in available:
@@ -103,6 +103,8 @@ class Messenger:
 
     def send(self):
         try:
+            self.connect_services()
+
             self.logger.info('Getting Google Contacts')
             self.contacts    = self.gmail.get_contacts()
             self.logger.info('Finished Getting Google Contacts')
@@ -174,13 +176,14 @@ class Messenger:
 
 def daily():
     print(f"Starting to send messages..")
-    messenger   = Messenger()
 
     messenger.send()
 
 try:
+    messenger   = Messenger()
+
     with pidfile.PIDFile("/datamain.pid"):
-        print("Started Script")
+        messenger.logger.info("Started Script")
 
         # Get Options
         with open("/data/options.json", mode="r") as data_file:
@@ -188,21 +191,21 @@ try:
 
         creds = Path("/data/credentials.json")
         if not creds.is_file():
-            print(f"Initiating first run")
+            messenger.logger.info(f"Initiating first run")
             
             # First run
-            messenger   = Messenger()
+            messenger.connect_services()
 
-        if config.get('debug'):
+        if messenger.debug:
             daily()
 
-        print(f"Will run at {config.get('hour')}:{config.get('minutes')} daily")
+        messenger.logger.info(f"Will run at {config.get('hour')}:{config.get('minutes')} daily")
         schedule.every().day.at("{:02d}:{:02d}:00".format(config.get('hour'), config.get('minutes'))).do(daily)
 
         while True:
             schedule.run_pending()
             sleep(1)
 except pidfile.AlreadyRunningError:
-    print("Already running")
+    messenger.logger.error("Already running")
 
-print("exit")
+messenger.logger.info("Exitting")
