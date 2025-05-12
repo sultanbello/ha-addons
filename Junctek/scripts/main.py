@@ -220,14 +220,13 @@ class JunctekMonitor:
         except Exception as e:
             self.logger.error(f" {str(e)} on line {sys.exc_info()[-1].tb_lineno}")
         
-
     async def main(self):
         try:
             async with BleakScanner(self.scanner_callback) as scanner:
                 # Important! Wait for an event to trigger stop, otherwise scanner
                 # will stop immediately.
                 await self.stop_event.wait()
-                print(self.device)
+                self.logger.info(f"Connected to {self.device}")
         
             # scanner stops when block exits
         
@@ -240,10 +239,13 @@ class JunctekMonitor:
         except Exception as e:
             self.logger.error(f" {str(e)} on line {sys.exc_info()[-1].tb_lineno}")
 
+        self.logger.debug("Waiting for device conection")
         await self.stop_event.wait()
+        
         while True:
             try:
                 while self.device == None:
+                    self.logger.debug("Waiting for device conection")
                     await asyncio.sleep(5)
 
                 async with BleakClient(self.device, disconnected_callback=self.disconnected_callback) as client:
