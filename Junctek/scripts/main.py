@@ -240,6 +240,7 @@ class JunctekMonitor:
             self.logger.error(f" {str(e)} on line {sys.exc_info()[-1].tb_lineno}")
 
         while True:
+            self.logger.info("Starting Listener")
             try:
                 while self.device == None:
                     self.logger.debug("Waiting for device conection")
