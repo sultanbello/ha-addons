@@ -69,6 +69,8 @@ class Messenger:
 
         self.logger.info(f"Log level is {self.log_level}")
 
+        self.logger.debug(available)
+
         # Check whatsapp
         if 'whatsapp' in available:
             self.whatsapp   = whatsapp.Whatsapp(self)
