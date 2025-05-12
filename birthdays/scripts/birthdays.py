@@ -186,18 +186,16 @@ class CelebrationMessages():
             self.parent.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
     
     def send_group_message(self, details):
-        self.parent.logger.debug("Checking for Group messages") 
-        self.parent.logger.debug(details)
+        self.parent.logger.debug(f"Checking for Group messages for {details['name']}") 
         try:                    
             # check the groups in Google this person is a member of
             if 'memberships' in details:
                 for membership in details['memberships']:
                     label_id = membership.get('contactGroupMembership').get('contactGroupId')
 
-                    self.parent.logger.debug(self.parent.available) 
                     self.parent.logger.debug(f"Found label {label_id}") 
 
-                    if 'signal_messenger' in self.parent.available and label_id in self.group_ids['signal']:
+                    if 'signal' in self.parent.available and label_id in self.group_ids['signal']:
                         languague   = self.group_ids['signal'][label_id]['languague']
                         msg         = random.choice(self.messages[languague]).replace("%firstname%", details['firstname'])
                         group_id    = self.group_ids['signal'][label_id]['group_id']

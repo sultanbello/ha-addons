@@ -107,23 +107,29 @@ class Gmail:
             self.parent.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
 
     def create_email(self, to, subject, message_text):
-        message             = MIMEText(message_text)
-        message['to']       = to
-        message['subject']  = subject
+        try:
+            message             = MIMEText(message_text)
+            message['to']       = to
+            message['subject']  = subject
 
-        return {'raw': base64.urlsafe_b64encode(message.as_string().encode()).decode()}
+            return {'raw': base64.urlsafe_b64encode(message.as_string().encode()).decode()}
+        except Exception as e:
+            self.parent.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
 
     def send_email(self, to, msg):
-        if to.includes('.empty'):
-            self.parent.logger.debug(f"Not sending an e-mail to {to} as it does not exist")
-            
-        if self.parent.debug:
-            self.parent.logger.debug(f"I would have sent {msg} via e-mail to {to} if debug was disabled")
-            return True
-        
-        message = self.create_email(to, 'Gefeliciteerd!', msg)
+        try:
+            if '.empty' in to:
+                self.parent.logger.debug(f"Not sending an e-mail to {to} as it does not exist")
 
-        return (self.gmail_service.users().messages().send(userId="me", body=message).execute())
+            if self.parent.debug:
+                self.parent.logger.debug(f"I would have sent {msg} via e-mail to {to} if debug was disabled")
+                return True
+            
+            message = self.create_email(to, 'Gefeliciteerd!', msg)
+
+            return (self.gmail_service.users().messages().send(userId="me", body=message).execute())
+        except Exception as e:
+            self.parent.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
 
     def get_contacts(self):
         try:
