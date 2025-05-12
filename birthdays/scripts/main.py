@@ -181,14 +181,14 @@ def daily():
     messenger.send()
 
 try:
+    # Get Options
+    with open("/data/options.json", mode="r") as data_file:
+        config = json.load(data_file)
+
     messenger   = Messenger()
 
     with pidfile.PIDFile("/datamain.pid"):
         messenger.logger.info("Started Script")
-
-        # Get Options
-        with open("/data/options.json", mode="r") as data_file:
-            config = json.load(data_file)
 
         creds = Path("/data/credentials.json")
         if not creds.is_file():
