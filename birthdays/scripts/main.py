@@ -100,7 +100,7 @@ class Messenger:
         if 'whatsapp' in available:
             self.whatsapp.check_connected()
 
-            if not self.api_running:
+            if not self.whatsapp.api_running:
                 sleep(60)
                 self.whatsapp.check_connected()
 
