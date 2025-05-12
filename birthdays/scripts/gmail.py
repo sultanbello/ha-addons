@@ -114,6 +114,9 @@ class Gmail:
         return {'raw': base64.urlsafe_b64encode(message.as_string().encode()).decode()}
 
     def send_email(self, to, msg):
+        if to.includes('.empty'):
+            self.parent.logger.debug(f"Not sending an e-mail to {to} as it does not exist")
+            
         if self.parent.debug:
             self.parent.logger.debug(f"I would have sent {msg} via e-mail to {to} if debug was disabled")
             return True
