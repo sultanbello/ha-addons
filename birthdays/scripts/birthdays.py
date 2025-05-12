@@ -181,7 +181,6 @@ class CelebrationMessages():
             msg         = random.choice(self.messages[languague]).replace("%firstname%", details['firstname'])
             self.parent.send_message(msg, details) 
             
-            
         except Exception as e:
             self.parent.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
     
@@ -200,7 +199,7 @@ class CelebrationMessages():
                         msg         = random.choice(self.messages[languague]).replace("%firstname%", details['firstname'])
                         group_id    = self.group_ids['signal'][label_id]['group_id']
 
-                        self.parent.logger.debug(f"Sending a Signal messsage to {group_id}")
+                        self.parent.logger.info(f"Sending a Signal messsage to group with id: {group_id}")
 
                         self.parent.signal.send_message(group_id, msg)
 
@@ -214,7 +213,7 @@ class CelebrationMessages():
         except Exception as e:
             self.parent.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
 
-    def send_birthday_messages(self, contacts):
+    def send_birthday_messages(self, contacts, send=True):
         try:
             i = 0
             self.parent.logger.info("Getting birthday messages")        
@@ -236,7 +235,8 @@ class CelebrationMessages():
 
                     continue
 
-                self.send_event_message(details)
+                if send:
+                    self.send_event_message(details)
                 
                 if 'birthday' in details:
                     try:
@@ -244,9 +244,10 @@ class CelebrationMessages():
                         if details['birthmonth'] == self.now.month and details['birthday'] == self.now.day:
                             self.parent.logger.info('Today is the birthday of ' + details['name'])
 
-                            self.send_personal_message(details)
+                            if send:
+                                self.send_personal_message(details)
 
-                            self.send_group_message(details)
+                                self.send_group_message(details)
                             
                             birthdays[details['name']]  =   details
                                         

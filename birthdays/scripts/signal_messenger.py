@@ -46,7 +46,7 @@ class Signal:
 
     def send_message(self, number, msg):
         if self.parent.debug:
-            self.parent.logger.debug("I would have sent '{msg}' via signal to {number} if debug was disabled")
+            self.parent.logger.debug(f"I would have sent '{msg}' via signal to {number} if debug was disabled")
             return True
         
         try:

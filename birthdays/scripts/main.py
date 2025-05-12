@@ -96,7 +96,7 @@ class Messenger:
         # Gmail
         self.gmail.connect()
 
-    def send(self):
+    def send(self, send=True):
         try:
             self.connect_services()
 
@@ -104,7 +104,7 @@ class Messenger:
             self.contacts    = self.gmail.get_contacts()
             self.logger.info('Finished Getting Google Contacts')
                 
-            self.birthdays.send_birthday_messages(self.contacts)
+            self.birthdays.send_birthday_messages(self.contacts, send)
         except Exception as e:
             self.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
 
@@ -174,6 +174,11 @@ def daily():
 
     messenger.send()
 
+def get_sensor_data():
+    messenger.logger.info(f"Starting to check birthdays")
+
+    messenger.send(False)
+
 try:
     if len(sys.argv) == 2:
         running_local       = sys.argv[1]
@@ -230,11 +235,18 @@ try:
         # First run
         messenger.connect_services()
 
+    # run without actually sending
     if messenger.debug:
         daily()
+    else:
+        # fill the birthdays sensor
+        get_sensor_data()
 
     messenger.logger.info(f"Will run at {config.get('hour')}:{config.get('minutes')} daily")
     schedule.every().day.at("{:02d}:{:02d}:00".format(config.get('hour'), config.get('minutes'))).do(daily)
+
+    # Run ad midnight to fill the sensor data
+    schedule.every().day.at("00:00:00").do(get_sensor_data)
 
     while True:
         schedule.run_pending()
