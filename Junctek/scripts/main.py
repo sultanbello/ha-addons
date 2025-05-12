@@ -239,9 +239,6 @@ class JunctekMonitor:
         except Exception as e:
             self.logger.error(f" {str(e)} on line {sys.exc_info()[-1].tb_lineno}")
 
-        self.logger.debug("Waiting for device conection")
-        await self.stop_event.wait()
-        
         while True:
             try:
                 while self.device == None:
