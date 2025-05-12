@@ -15,7 +15,6 @@ ports:
   9090/tcp: 9090
 
 options:
-  debug: true
   client_id: null
   client_secret: null
   project_id: null
@@ -31,7 +30,6 @@ options:
   port: 9090
 
 schema:
-  debug: bool
   client_id: str
   client_secret: str
   project_id: str
