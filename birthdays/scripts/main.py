@@ -8,29 +8,6 @@ import json
 import schedule
 from pathlib import Path
 
-TOKEN   = os.getenv('SUPERVISOR_TOKEN')
-
-url     = "http://supervisor/addons"
-headers = {
-  "Authorization": f"Bearer {TOKEN}",
-  "content-type": "application/json",
-}
-response    = requests.get(url, headers=headers)
-
-available   = {}
-if response.ok:
-    addons  = response.json()['data']['addons']
-
-    for addon in addons:
-        if addon['slug'] == '06c15c6e_whatsapp' or addon['slug'] == '1315902c_signal_messenger':
-            name_slug               = addon['slug'].split('_')[1]
-            available[name_slug]    = addon['state']
-
-            if name_slug == 'whatsapp':
-                whatsapp            = __import__(name_slug)
-            else:
-                signal_messenger    = __import__(name_slug)
-
 # Import other files in the directory
 import birthdays
 import gmail
@@ -108,7 +85,7 @@ class Messenger:
                 self.logger.warning("Whatsapp Instance is Down")
         
         # Check signal
-        if 'signal_messenger' in available:
+        if 'signal' in available:
             self.signal.available()
 
             if not self.signal.up:
@@ -146,7 +123,7 @@ class Messenger:
                 for number in details['numbers']:
                     self.logger.debug(f"Processing {number}")
                           
-                    if 'signal_messenger' in available and self.signal.up:
+                    if 'signal' in available and self.signal.up:
                         if self.signal.is_registered(number):
                             result = self.signal.send_message(number, msg)
 
@@ -199,6 +176,31 @@ def daily():
     messenger.send()
 
 try:
+    TOKEN   = os.getenv('SUPERVISOR_TOKEN')
+
+    url     = "http://supervisor/addons"
+    headers = {
+    "Authorization": f"Bearer {TOKEN}",
+    "content-type": "application/json",
+    }
+    response    = requests.get(url, headers=headers)
+
+    available   = {}
+    if response.ok:
+        addons  = response.json()['data']['addons']
+
+        for addon in addons:
+            if addon['slug'] == '06c15c6e_whatsapp' or addon['slug'] == '1315902c_signal_messenger':
+                name_slug               = addon['slug'].split('_')[1]
+                available[name_slug]    = addon['state']
+
+                if name_slug == 'whatsapp':
+                    print("importing whatsapp.py")
+                    whatsapp            = __import__(name_slug)
+                else:
+                    print("importing signal_messenger.py")
+                    signal_messenger    = __import__(name_slug)
+
     # Get Options
     with open("/data/options.json", mode="r") as data_file:
         config = json.load(data_file)
