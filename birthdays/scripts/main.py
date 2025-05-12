@@ -40,6 +40,7 @@ import pidfile
 class Messenger:
     def __init__(self):
         global available
+        global config
 
         self.available          = available
         self.client_id          = config.get('client_id')
