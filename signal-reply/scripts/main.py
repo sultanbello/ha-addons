@@ -24,7 +24,7 @@ class SocketListener:
 		with open(file_path, mode="r") as data_file:
 			config = json.load(data_file)
 
-			self.log_level          = config.get('log_level')
+			self.log_level          = config.get('log level')
 			self.signal_port        = config.get('signal_port')
 			self.signal_number     	= config.get('signal_number')
 

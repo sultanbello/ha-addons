@@ -6,15 +6,15 @@ source /data/venv/bin/activate
 
 bashio::log.info "Checking prerequisites"
 
-if [ ! -f /data/pip ]; then
+#if [ ! -f /data/pip ]; then
     bashio::log.info "Installing prerequisites"
 
     python3 -m ensurepip --upgrade >/dev/null
 
-    pip install --upgrade websocket-client rel >/dev/null
+    pip install --upgrade websocket-client rel requests >/dev/null
 
     echo "pip done" > /data/pip
-fi
+#fi
 
 bashio::log.info "Starting Script"
 
