@@ -1,13 +1,11 @@
 from bleak import BleakScanner, BleakClient, BleakError
-from bleak.backends.device import BLEDevice
-from bleak.backends.scanner import AdvertisementData
 import asyncio
 import logger
 import sys
 import json
 import mqtt
 import sensors
-from datetime import datetime, timezone
+from datetime import datetime
 import atexit
 
 class DeviceNotFoundError(Exception):

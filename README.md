@@ -9,6 +9,8 @@ Click the link below to add this repository to Home Assistant
 This repository contains the following add-ons
 
 ### [Birthdays add-on](./birthdays)
+### [Junctek add-on](./Junctek)
+### [Signal Auto Reply add-on](./signal-reply)
 
 ![Supports aarch64 Architecture][aarch64-shield]
 ![Supports amd64 Architecture][amd64-shield]

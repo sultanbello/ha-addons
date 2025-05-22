@@ -8,3 +8,6 @@ birthdays/scripts/__pycache__/birthdays.cpython-313.pyc
 birthdays/scripts/__pycache__/gmail.cpython-313.pyc
 .gitignore
 birthdays/scripts/__pycache__/whatsapp.cpython-313.pyc
+signal-reply/scripts/__pycache__/logger.cpython-313.pyc
+signal-reply/scripts/data/options.json
+birthdays/scripts/data/options.json

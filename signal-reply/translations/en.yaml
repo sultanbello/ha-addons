@@ -1,0 +1,15 @@
+configuration:
+  signal_number:
+    name: signal_number
+    description: The Signal Messenger number you want to listen to
+
+  log_level:
+    name: log_level
+    description: Log level detail. Debug will give most detailed info and will not actually send messages.
+
+  signal_port:
+    name: signal_port
+    description: The port the signal integration is listening
+
+
+
