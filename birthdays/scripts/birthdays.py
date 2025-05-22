@@ -195,7 +195,7 @@ class CelebrationMessages():
                     self.parent.logger.debug(f"Found label {label_id}") 
 
                     if 'signal' in self.parent.available and label_id in self.group_ids['signal']:
-                        languague   = self.group_ids['signal'][label_id]['languague']
+                        languague   = self.group_ids['signal'][label_id]['languague'].lower()
                         msg         = random.choice(self.messages[languague]).replace("%firstname%", details['firstname'])
                         group_id    = self.group_ids['signal'][label_id]['group_id']
 
@@ -204,7 +204,7 @@ class CelebrationMessages():
                         self.parent.signal.send_message(group_id, msg)
 
                     if 'whatsapp' in self.parent.available and label_id in self.group_ids['whatsapp']:
-                        languague   = self.group_ids['whatsapp'][label_id]['languague']
+                        languague   = self.group_ids['whatsapp'][label_id]['languague'].lower()
                         msg         = random.choice(self.messages[languague]).replace("%firstname%", details['firstname'])
                         group_id    = self.group_ids['whatsapp'][label_id]['group_id']
 

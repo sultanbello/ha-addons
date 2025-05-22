@@ -14,10 +14,7 @@ class SocketListener:
 		self.token 		= os.getenv('SUPERVISOR_TOKEN')
 
 		file_path		= '/data/options.json'
-		if os.path.exists(file_path):
-			print(f"File '{file_path}' exists.")
-		else:
-			print(f"File '{file_path}' does not exist.")
+		if not os.path.exists(file_path):
 			file_path	= os.path.dirname(os.path.realpath(__file__))+file_path
 				
 		# Get Options
