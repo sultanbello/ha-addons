@@ -1,11 +1,15 @@
 name: Signal Messenger Receiver
-url: https://github.com/Tsjippy/ha-addons/tree/main/signal-receiver
-version: 1.0.4
+url: https://github.com/Tsjippy/ha-addons/tree/main/signal-reply
+version: 1.0.5
 slug: signal_receiver
 arch:
-- aarch64
-- amd64
-- armv7
+arch:
+  - aarch64
+  - amd64
+  - armhf
+  - armv7
+  - i386
+
 description: Signal Messenger Receiver Home Assistant Addon
 startup: services
 

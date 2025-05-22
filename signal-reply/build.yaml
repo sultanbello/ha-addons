@@ -6,9 +6,9 @@ build_from:
   armv7: "ghcr.io/home-assistant/armv7-base:3.21"
   i386: "ghcr.io/home-assistant/i386-base:3.21"
 labels:
-  org.opencontainers.image.title: "Birthdays Addon"
-  org.opencontainers.image.description: "Send automated Birthday Messages"
-  org.opencontainers.image.source: "https://github.com/Tsjippy/ha-addons/tree/main/birthdays"
+  org.opencontainers.image.title: "Signal Messenger Receiver"
+  org.opencontainers.image.description: "Receive Signal Messenger Messages"
+  org.opencontainers.image.source: "https://github.com/Tsjippy/ha-addons/tree/main/signal-reply"
   org.opencontainers.image.licenses: "Apache License 2.0"
 args:
   TEMPIO_VERSION: "2024.11.2"
