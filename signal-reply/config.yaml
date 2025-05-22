@@ -1,6 +1,6 @@
 name: Signal Messenger Receiver
 url: https://github.com/Tsjippy/ha-addons/tree/main/signal-receiver
-version: 1.0.0
+version: 1.0.1
 slug: signal_receiver
 arch:
 - aarch64
@@ -9,12 +9,14 @@ arch:
 description: Signal Messenger Receiver Home Assistant Addon
 startup: services
 options:
-  log_level: null
+  log level: null
   signal_port: 8080
   signal_number: ''
 schema:
-  log_level: list(debug|info|warning|error)
+  log level: list(debug|info|warning|error)
   signal_port: int
   signal_number: str
+
+init: false
 
 #image: "ghcr.io/tsjippy/{arch}-signal-receiver"
