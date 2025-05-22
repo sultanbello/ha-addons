@@ -1,4 +1,4 @@
-ik name: "Junctek Battery Monitor"
+name: "Junctek Battery Monitor"
 description: "Reads your Junctek Battery Monitor Values via BLE"
 version: "1.0.54"
 slug: "junctek"
