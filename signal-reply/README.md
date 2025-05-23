@@ -3,7 +3,7 @@
 An addon to listen to incoming signal messages 
 
 ## Initial Installation
-Make sure you have [https://github.com/haberda/signal-addon/tree/main](The Signal addon installed and set to json-rpc mode)
+Make sure you have [The Signal addon](https://github.com/haberda/signal-addon/tree/main) installed and set to json-rpc mode
 
 ![Supports aarch64 Architecture][aarch64-shield]
 ![Supports amd64 Architecture][amd64-shield]
