@@ -74,8 +74,6 @@ class Gmail:
             # If there are no (valid) credentials available, let the user log in.
             if not creds or not creds.valid:
                 self.parent.logger.debug(f"Creds are not valid")
-                self.parent.logger.debug(f"Creds expired: {creds.expired}")
-                self.parent.logger.debug(f"Creds refresh token: {creds.refresh_token}")
 
                 if creds and creds.expired and creds.refresh_token:
                     self.parent.logger.debug(f"Refreshing token")
