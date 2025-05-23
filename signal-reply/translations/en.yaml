@@ -11,5 +11,31 @@ configuration:
     name: signal_port
     description: The port the signal integration is listening
 
+  client_id:
+    name: client_id
+    description: The client id from [google console](https://console.cloud.google.com/)
 
+  client_secret:
+    name: client_secret
+    description: The client secret from [google console](https://console.cloud.google.com/)
+
+  project_id:
+    name: project_id
+    description: The project id from [google console](https://console.cloud.google.com/)
+
+  hour:
+    name: hour
+    description: The hour on which we should send birthday messages (0-23)
+
+  minutes:
+    name: minutes
+    description: The minute on which we should send birthday messages (0-59)
+
+  messages:
+    name: messages
+    description: >
+      A list of language and messages. The message to be sent will be picked randomly\n
+        Example
+        - languague: EN
+          message: To try to message me today: I won't answer
 

@@ -1,6 +1,6 @@
 name: Signal Messenger Receiver
 url: https://github.com/Tsjippy/ha-addons/tree/main/signal-reply
-version: 1.0.7
+version: 1.0.8
 slug: signal_receiver
 arch:
 arch:
@@ -17,7 +17,9 @@ options:
   log level: null
   signal_port: 8080
   signal_number: ''
-  messages: [{"message": "I am currently not able to respond, but will respond as quicly as possible", "languague": "en"}]
+  messages: 
+    - message: I am currently not able to respond, but will respond as quickly as possible
+      languague: en
   google_label: ''
   client_id: null
   client_secret: null
