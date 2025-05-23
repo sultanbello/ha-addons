@@ -16,21 +16,6 @@ class SocketListener:
 		try:
 			self.token 		= os.getenv('SUPERVISOR_TOKEN')
 
-			self.sensor		= {}
-			self.auto_reply	= 'binary_sensor.signal_auto_reply'
-
-			# Create auto reply sensor
-			state			= 'off'
-			attributes		= {}
-
-			self.sensor_path		= '/data/sensor.json'
-			if os.path.exists(self.sensor_path):
-				self.sensor = json.load(self.sensor_path)
-				state		= self.sensor.get('state')
-				attributes	= self.sensor.get('attributes')
-
-			self.update_sensor(self.auto_reply, state, attributes)
-
 			file_path		= '/data/options.json'
 			if not os.path.exists(file_path):
 				file_path	= os.path.dirname(os.path.realpath(__file__))+file_path
@@ -49,28 +34,43 @@ class SocketListener:
 				self.project_id         = config.get('project_id')
 				self.port         		= config.get('port')
 
-				self.logger             = logger.Logger(self)
-				self.logger.info("")
+			self.logger             = logger.Logger(self)
+			self.logger.info("")
 
-				if self.google_label != '':
-					self.contacts			= google_contacts.Contacts(self)
+			if self.google_label != '':
+				self.contacts			= google_contacts.Contacts(self)
 
-				if self.log_level == 'debug':
-					self.debug  = True
-				else:
-					self.debug  = False
-					
-				self.logger.debug("Debug is Enabled")
+			if self.log_level == 'debug':
+				self.debug  = True
+			else:
+				self.debug  = False
+				
+			self.logger.debug("Debug is Enabled")
 
-				self.logger.info(f"Log level is {self.log_level}")
+			self.logger.info(f"Log level is {self.log_level}")
 
-				self.socket = f'ws://homeassistant.local:{self.signal_port}/v1/receive/{self.signal_number}'
+			self.sensor		= {}
+			self.auto_reply	= 'binary_sensor.signal_auto_reply'
 
-				ws = websocket.WebSocketApp(self.socket, on_open = self.on_open, on_close = self.on_close, on_message = self.on_message, on_error = self.on_error)
+			# Create auto reply sensor
+			state			= 'off'
+			attributes		= {}
 
-				ws.run_forever(dispatcher=rel, reconnect=5)  # Set dispatcher to automatic reconnection, 5 second reconnect delay if connection closed unexpectedly
-				rel.signal(2, rel.abort)  # Keyboard Interrupt
-				rel.dispatch()
+			self.sensor_path		= '/data/sensor.json'
+			if os.path.exists(self.sensor_path):
+				self.sensor = json.load(self.sensor_path)
+				state		= self.sensor.get('state')
+				attributes	= self.sensor.get('attributes')
+
+			self.update_sensor(self.auto_reply, state, attributes)
+
+			self.socket = f'ws://homeassistant.local:{self.signal_port}/v1/receive/{self.signal_number}'
+
+			ws = websocket.WebSocketApp(self.socket, on_open = self.on_open, on_close = self.on_close, on_message = self.on_message, on_error = self.on_error)
+
+			ws.run_forever(dispatcher=rel, reconnect=5)  # Set dispatcher to automatic reconnection, 5 second reconnect delay if connection closed unexpectedly
+			rel.signal(2, rel.abort)  # Keyboard Interrupt
+			rel.dispatch()
 		except Exception as e:
 			self.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
 
