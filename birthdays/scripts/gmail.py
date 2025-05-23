@@ -32,8 +32,8 @@ class Gmail:
             ]
 
             creds               = None
-            token_file          = '/share/token.pickle'
-            credentials_file    = '/share/credentials.json'
+            token_file          = '/share/google/token.pickle'
+            credentials_file    = '/share/google/credentials.json'
 
             # credentials do not exist yet
             file = Path(credentials_file)

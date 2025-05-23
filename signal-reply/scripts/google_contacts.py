@@ -42,7 +42,8 @@ class Contacts:
         try:
             # If modifying these scopes, delete the file token.json.
             SCOPES      = [
-                'https://www.googleapis.com/auth/contacts'
+                'https://www.googleapis.com/auth/contacts', 
+                'https://www.googleapis.com/auth/gmail.send'
             ]
 
             creds               = None
