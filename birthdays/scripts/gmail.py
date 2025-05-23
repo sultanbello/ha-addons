@@ -31,6 +31,8 @@ class Gmail:
                 'https://www.googleapis.com/auth/gmail.send'
             ]
 
+            Path("/share/google").mkdir(parents=True, exist_ok=True)
+
             creds               = None
             token_file          = '/share/google/token.pickle'
             credentials_file    = '/share/google/credentials.json'
