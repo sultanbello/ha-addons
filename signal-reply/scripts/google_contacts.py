@@ -99,7 +99,7 @@ class Contacts:
 
                     creds.refresh(Request())
                 else:
-                    self.parent.logger.info('')
+                    self.parent.logger.debug(f'Listening for token on port {self.parent.port}')
                     self.parent.logger.info('########################')
                     flow    = InstalledAppFlow.from_client_secrets_file(credentials_file, SCOPES)
 

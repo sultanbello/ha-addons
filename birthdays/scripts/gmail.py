@@ -32,13 +32,13 @@ class Gmail:
             ]
 
             creds               = None
-            token_file          = '/data/token.pickle'
-            credentials_file    = '/data/credentials.json'
+            token_file          = '/share/token.pickle'
+            credentials_file    = '/share/credentials.json'
 
             # credentials do not exist yet
             file = Path(credentials_file)
             if not file.is_file():
-                self.parent.logger.debug(f"credeting {credentials_file}")
+                self.parent.logger.debug(f"Creating {credentials_file}")
                 content = {
                     "installed":
                         {
