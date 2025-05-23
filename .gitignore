@@ -11,3 +11,7 @@ birthdays/scripts/__pycache__/whatsapp.cpython-313.pyc
 signal-reply/scripts/__pycache__/logger.cpython-313.pyc
 signal-reply/scripts/data/options.json
 birthdays/scripts/data/options.json
+debug.log
+signal-reply/scripts/data/credentials.json
+signal-reply/scripts/data/token.pickle
+signal-reply/scripts/__pycache__/google_contacts.cpython-313.pyc

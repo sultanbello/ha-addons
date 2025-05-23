@@ -1,6 +1,6 @@
 name: Signal Messenger Receiver
 url: https://github.com/Tsjippy/ha-addons/tree/main/signal-reply
-version: 1.0.5
+version: 1.0.6
 slug: signal_receiver
 arch:
 arch:
@@ -17,13 +17,31 @@ options:
   log level: null
   signal_port: 8080
   signal_number: ''
+  messages: []
+  google_label: ''
+  client_id: null
+  client_secret: null
+  project_id: null
+  port: 9191
 
 schema:
   log level: list(debug|info|warning|error)
   signal_port: int
   signal_number: str
+  messages:
+    - languague: str
+      message: str
+  google_label: str?
+  client_id: str?
+  client_secret: str?
+  project_id: str?
+  port: int(2,99999)?
 
 init: false
+
+ports:
+  9191/tcp: 9191
+
 
 hassio_api: true
 homeassistant_api: true

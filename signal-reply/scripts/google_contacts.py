@@ -1,24 +1,39 @@
 from google_auth_oauthlib.flow import InstalledAppFlow
-from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from google.auth.transport.requests import Request
-from google_auth_oauthlib.flow import Flow
-from email.mime.text import MIMEText
 import os
 import pickle
-import base64
 import sys
 import json
 from pathlib import Path
+import time
+import urllib
+import lxml.etree
 
-class Gmail:
-    def __init__(self, Messenger):
+class Contacts:
+    def __init__(self, parent):
         try:
-            self.parent     = Messenger
+            self.parent     = parent
         except Exception as e:
             self.parent.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
 
         self.creds          = self.auth()
+
+        # Fetch a list of country - languagues
+        self.country_languagues()
+
+        self.messages   = {}
+        for message in self.parent.messages:
+            # add an empty array if the current languague is not there yet
+            if not message['languague'].lower() in self.messages:
+                self.messages[message['languague'].lower()] = []
+
+            # Add the message to the languague array
+            self.messages[message['languague'].lower()].append(message['message'])
+
+        self.connections    = {}
+
+        self.get_contacts()
 
     def connect(self):
         self.gmail_service  = build('gmail', 'v1', credentials=self.creds)
@@ -27,18 +42,22 @@ class Gmail:
         try:
             # If modifying these scopes, delete the file token.json.
             SCOPES      = [
-                'https://www.googleapis.com/auth/contacts', 
-                'https://www.googleapis.com/auth/gmail.send'
+                'https://www.googleapis.com/auth/contacts'
             ]
 
             creds               = None
             token_file          = '/data/token.pickle'
             credentials_file    = '/data/credentials.json'
 
+            file_path		= '/data/options.json'
+            if not os.path.exists(file_path):
+                token_file	        = os.path.dirname(os.path.realpath(__file__))+token_file
+                credentials_file	= os.path.dirname(os.path.realpath(__file__))+credentials_file
+
             # credentials do not exist yet
             file = Path(credentials_file)
             if not file.is_file():
-                self.parent.logger.debug(f"credeting {credentials_file}")
+                self.parent.logger.debug(f"Creating {credentials_file}")
                 content = {
                     "installed":
                         {
@@ -74,8 +93,6 @@ class Gmail:
             # If there are no (valid) credentials available, let the user log in.
             if not creds or not creds.valid:
                 self.parent.logger.debug(f"Creds are not valid")
-                self.parent.logger.debug(f"Creds expired: {creds.expired}")
-                self.parent.logger.debug(f"Creds refresh token: {creds.refresh_token}")
 
                 if creds and creds.expired and creds.refresh_token:
                     self.parent.logger.debug(f"Refreshing token")
@@ -106,40 +123,18 @@ class Gmail:
             self.auth_running = False
             self.parent.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
 
-    def create_email(self, to, subject, message_text):
-        try:
-            message             = MIMEText(message_text)
-            message['to']       = to
-            message['subject']  = subject
-
-            return {'raw': base64.urlsafe_b64encode(message.as_string().encode()).decode()}
-        except Exception as e:
-            self.parent.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
-
-    def send_email(self, to, msg):
-        try:
-            if '.empty' in to:
-                self.parent.logger.debug(f"Not sending an e-mail to {to} as it does not exist")
-            return False
-
-            if self.parent.debug:
-                self.parent.logger.debug(f"I would have sent {msg} via e-mail to {to} if debug was disabled")
-                return True
-            
-            message = self.create_email(to, 'Gefeliciteerd!', msg)
-
-            return (self.gmail_service.users().messages().send(userId="me", body=message).execute())
-        except Exception as e:
-            self.parent.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
-
     def get_contacts(self):
+        # Only fetch once every 24 hours
+        if 'time' in self.connections and self.connections['time'] > time.time() - 86400:
+            return self.connections['connections']
+
         try:
             self.parent.logger.info("Getting first 1000 Google contacts")
 
             service = build('people', 'v1', credentials = self.creds)
 
             # Call the People API
-            fields  = 'names,emailAddresses,birthdays,relations,memberships,locales,phoneNumbers,addresses,genders,events,userDefined' 
+            fields  = 'names,memberships,locales,phoneNumbers,addresses,userDefined' 
             results = service.people().connections().list(
                 resourceName    = 'people/me',
                 pageSize        = 1000,
@@ -161,6 +156,67 @@ class Gmail:
                 
                 connections = connections + results.get('connections', [])
 
+            # Store for future use
+            self.connections['time']        = time.time()
+
+            phonenumbers            = {}
+            for contact in connections:
+                if 'phoneNumbers' in contact and 'memberships' in contact:
+                    for membership in contact['memberships']:
+                        if membership.get('contactGroupMembership').get('contactGroupId')   == self.parent.google_label:
+                            data    = {}
+                            if 'names' in contact:
+                                data['name']    = contact.get('names')[0]['givenName']
+
+                            if 'addresses' in contact:
+                                data['country']    = contact.get('addresses')[0].get('countryCode')
+
+                                data['languague']  = self.get_languague(data['country'])
+
+                            for nr in contact['phoneNumbers']:
+                                phonenumbers[nr.get('canonicalForm')]    = data
+
+            self.connections['phonenumbers'] = phonenumbers
+
             return connections
         except Exception as e:
             self.parent.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
+
+    def country_languagues(self):
+        try:
+            url         = "https://raw.githubusercontent.com/unicode-org/cldr/master/common/supplemental/supplementalData.xml"
+            langxml     = urllib.request.urlopen(url)
+            langtree    = lxml.etree.XML(langxml.read())
+
+            self.languagues = {}
+            for t in langtree.find('territoryInfo').findall('territory'):
+                langs = {}
+                for l in t.findall('languagePopulation'):
+                    # If this is an official languague
+                    if bool(l.get('officialStatus')):
+                        langs[l.get('type')] = float(l.get('populationPercent'))
+                self.languagues[t.get('type')] = langs
+        except Exception as e:
+            self.parent.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
+
+    def get_languague(self, country_code):
+        try:
+            if country_code in self.languagues:
+                # all the official languagues of this country
+                languagues  = self.languagues.get(country_code)
+
+                for languague in languagues:
+                    # we have a message in this languague
+                    if languague in self.messages:
+                        return languague
+                
+                # we should only come here if we do not have a message in the languague needed
+                self.parent.logger.warning(f"Could not find a message in any of the languagues for country {country_code}.\nDefaulting to English")
+                return 'EN'
+            
+            # we should only come here if we do not have a message in the languague needed
+            self.parent.logger.error(f"Invalid country {country_code}.\nDefaulting to English languague")
+            return 'EN'
+        except Exception as e:
+            self.parent.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
+        
