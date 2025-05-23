@@ -107,7 +107,7 @@ class Contacts:
                         creds   = flow.run_local_server(bind_addr="0.0.0.0", open_browser=False, port=self.parent.port, timeout_seconds=600)
                     except Exception as e:
                         self.parent.logger.error(e)
-                        self.auth()
+                        self.parent.logger.error("Please restart this addon and try again")
             
                     self.parent.logger.info('########################')
                     self.parent.logger.info('')
