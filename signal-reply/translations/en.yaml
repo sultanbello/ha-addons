@@ -23,14 +23,6 @@ configuration:
     name: project_id
     description: The project id from [google console](https://console.cloud.google.com/)
 
-  hour:
-    name: hour
-    description: The hour on which we should send birthday messages (0-23)
-
-  minutes:
-    name: minutes
-    description: The minute on which we should send birthday messages (0-59)
-
   messages:
     name: messages
     description: >
