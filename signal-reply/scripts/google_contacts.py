@@ -179,6 +179,12 @@ class Contacts:
                             for nr in contact['phoneNumbers']:
                                 phonenumbers[nr.get('canonicalForm')]    = data
 
+                            # personal languague set, and there is a message in that languague
+            if 'languague' in details and details['languague'] in self.messages[languague]:
+                languague   = details['languague']
+            else:
+                languague   = self.get_languague(details['country'])
+
             self.connections['phonenumbers'] = phonenumbers
 
             return connections

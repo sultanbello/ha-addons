@@ -97,12 +97,20 @@ class SocketListener:
 
 				self.update_sensor( 'sensor.signal_message_received', 'on', message['envelope'])
 
-				if self.google_label != '' and message['envelope']['sourceNumber'] in self.contacts.connections['phonenumbers']:
-					# Check if auto reply is on
+				if(
+					self.google_label != '' and 
+					'phonenumbers' in self.contacts.connections and 
+					message['envelope']['sourceNumber'] in self.contacts.connections['phonenumbers'] and 
 					self.get_sensor(self.auto_reply)
+				):
+					# Send a message back
+					# personal languague set, and there is a message in that languague
+					if 'languague' in details and details['languague'] in self.messages[languague]:
+						languague   = details['languague']
+					else:
+						languague   = self.get_languague(details['country'])
 
-					# find contact by phonenumber
-					nr	= message['envelope']['sourceNumber']
+					self.messages[languague]
 		except Exception as e:
 			self.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
 		
@@ -151,10 +159,14 @@ class SocketListener:
 				if self.sensor != response:
 					with open(self.sensor_path, "w") as f:
 						json.dump(response, f)
+
+				return self.sensor.get('state')
 			else:
 				self.logger.error(f"Updating sensor {id} failed\n\nResponse: {response}\n\nRequest:{id}")
 		except Exception as e:
 			self.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
+
+		return False
 
 
 SocketListener()
