@@ -50,7 +50,7 @@ class SocketListener:
 			self.logger.info(f"Log level is {self.log_level}")
 
 			self.sensor		= {}
-			self.auto_reply	= 'binary_sensor.signal_auto_reply'
+			self.auto_reply	= 'switch.signal_auto_reply'
 
 			# Create auto reply sensor
 			state			= 'off'
@@ -59,6 +59,7 @@ class SocketListener:
 			self.sensor_path		= '/data/sensor.json'
 			if os.path.exists(self.sensor_path):
 				self.sensor = json.load(self.sensor_path)
+				self.logger.debug(f"Red {self.sensor} from {self.sensor_path}")
 				state		= self.sensor.get('state')
 				attributes	= self.sensor.get('attributes')
 
@@ -75,7 +76,7 @@ class SocketListener:
 			self.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
 
 	def on_open(self, ws):
-		self.logger.info('Opened Connection')
+		self.logger.info('Opened Connection To Signal Rest Api')
 
 	def on_close(self, ws, close_status_code, close_msg):
 		self.logger.info("### closed: {close_msg} ###")
@@ -141,11 +142,11 @@ class SocketListener:
 				self.logger.error(f"Updating sensor {name} failed\n\nResponse: {response}\n\nRequest:{data}")
 		except Exception as e:
 			self.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
-
+	
 	def get_sensor(self, id):
 		try:
 			url     = f"http://supervisor/core/api/states/sensor.{id}"
-
+			
 			headers = {
 				"Authorization": f"Bearer {self.token}",
 				"content-type": "application/json",
@@ -168,5 +169,33 @@ class SocketListener:
 
 		return False
 
+			
+ def send_message(self, number, msg):
+		if self.parent.debug:
+			self.parent.logger.debug(f"I would have sent '{msg}' via signal to {number} if debug was disabled")
+			return True
+			
+		try:
+			headers = {
+				'Content-Type': 'application/json',
+			}
+			
+			data    = {
+				"number": self.number,
+				'message': msg,
+				'recipients': [number]
+			}
+			
+			response    = requests.post(f'{self.url}/v2/send', json=data, headers=headers)
+			
+			if response.ok:
+				self.parent.logger.info(f'Send Signal Message Succesfully. Timestamp { response.json()["timestamp"] }') 
+				return response.json()['timestamp']
+				
+			self.parent.logger.error(f'Send Signal message failed. Error is {response.json()["error"]} ')
+			
+			return False
+		except Exception as e:
+			self.parent.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
 
 SocketListener()
