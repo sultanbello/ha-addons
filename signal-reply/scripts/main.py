@@ -104,6 +104,8 @@ class SocketListener:
 						self.logger.debug(f"Sender has the {self.google_label} label or no label set")
 						# find contact by phonenumber
 						nr	= message['envelope']['sourceNumber']
+						
+						self.send_message(nr, self.messages('en'))
 		except Exception as e:
 			self.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
 		
@@ -163,13 +165,17 @@ class SocketListener:
 			return True
 			
 		try:
+			headers = {
+				'Content-Type': 'application/json',
+			}
+			
 			data    = {
 				"number": self.number,
 				'message': msg,
 				'recipients': [number]
 			}
 			
-			response    = requests.post(f'{self.url}/v2/send', json=data, headers=self.headers)
+			response    = requests.post(f'{self.url}/v2/send', json=data, headers=headers)
 			
 			if response.ok:
 				self.parent.logger.info(f'Send Signal Message Succesfully. Timestamp { response.json()["timestamp"] }') 
