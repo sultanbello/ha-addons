@@ -136,11 +136,11 @@ class SocketListener:
 				self.logger.error(f"Updating sensor {name} failed\n\nResponse: {response}\n\nRequest:{data}")
 		except Exception as e:
 			self.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
-
- def get_sensor(self, id):
+	
+	def get_sensor(self, id):
 		try:
 			url     = f"http://supervisor/core/api/states/sensor.{id}"
-
+			
 			headers = {
 				"Authorization": f"Bearer {self.token}",
 				"content-type": "application/json",
