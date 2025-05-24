@@ -175,7 +175,6 @@ class SocketListener:
 				self.parent.logger.info(f'Send Signal Message Succesfully. Timestamp { response.json()["timestamp"] }') 
     return response.json()['timestamp']
 
-            
    self.parent.logger.error(f'Send Signal message failed. Error is {response.json()["error"]} ')
 
    return False
