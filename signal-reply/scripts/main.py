@@ -59,6 +59,7 @@ class SocketListener:
 			self.sensor_path		= '/data/sensor.json'
 			if os.path.exists(self.sensor_path):
 				self.sensor = json.load(self.sensor_path)
+				self.logger.debug(f"Red {self.sensor} from {self.sensor_path}")
 				state		= self.sensor.get('state')
 				attributes	= self.sensor.get('attributes')
 
@@ -75,7 +76,7 @@ class SocketListener:
 			self.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
 
 	def on_open(self, ws):
-		self.logger.info('Opened Connection')
+		self.logger.info('Opened Connection To Signal Rest Api')
 
 	def on_close(self, ws, close_status_code, close_msg):
 		self.logger.info("### closed: {close_msg} ###")
@@ -97,12 +98,12 @@ class SocketListener:
 
 				self.update_sensor( 'sensor.signal_message_received', 'on', message['envelope'])
 
-				if self.google_label != '' and message['envelope']['sourceNumber'] in self.contacts.connections['phonenumbers']:
-					# Check if auto reply is on
-					self.get_sensor(self.auto_reply)
-
-					# find contact by phonenumber
-					nr	= message['envelope']['sourceNumber']
+    # Check if auto reply is on
+				if self.get_sensor(self.auto_reply):
+					if self.google_label == '' or message['envelope']['sourceNumber'] in self.contacts.connections['phonenumbers']:
+						self.logger.debug(f"Sender has the {self.google_label} label or no label set")
+						# find contact by phonenumber
+						nr	= message['envelope']['sourceNumber']
 		except Exception as e:
 			self.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
 		
