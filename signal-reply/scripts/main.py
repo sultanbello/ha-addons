@@ -135,7 +135,7 @@ class SocketListener:
 		except Exception as e:
 			self.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
 
-	def get_sensor(self, id):
+ def get_sensor(self, id):
 		try:
 			url     = f"http://supervisor/core/api/states/sensor.{id}"
 
@@ -156,6 +156,30 @@ class SocketListener:
 				self.logger.error(f"Updating sensor {id} failed\n\nResponse: {response}\n\nRequest:{id}")
 		except Exception as e:
 			self.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
+			
+ def send_message(self, number, msg):
+		if self.parent.debug:
+			self.parent.logger.debug(f"I would have sent '{msg}' via signal to {number} if debug was disabled")
+			return True
+        
+  try:
+	  data    = {
+				"number": self.number,
+				'message': msg,
+    'recipients': [number],
+   }
+   
+			response    = requests.post(f'{self.url}/v2/send', json=data, headers=self.headers)
 
+   if response.ok:
+				self.parent.logger.info(f'Send Signal Message Succesfully. Timestamp { response.json()["timestamp"] }') 
+    return response.json()['timestamp']
+
+            
+   self.parent.logger.error(f'Send Signal message failed. Error is {response.json()["error"]} ')
+
+   return False
+	 except Exception as e:
+	  self.parent.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
 
 SocketListener()
