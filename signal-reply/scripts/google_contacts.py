@@ -174,16 +174,15 @@ class Contacts:
                             if 'addresses' in contact:
                                 data['country']    = contact.get('addresses')[0].get('countryCode')
 
-                                data['languague']  = self.get_languague(data['country'])
-
+                            # personal languague set, and there is a message in that languague
+                            if 'languague' in contact and contact['languague'] in self.messages[languague]:
+                                data['languague']   = contact['languague']
+                            else:
+                                data['languague']   = self.get_languague(data['country'])
+                            
                             for nr in contact['phoneNumbers']:
                                 phonenumbers[nr.get('canonicalForm')]    = data
 
-                            # personal languague set, and there is a message in that languague
-                        if 'languague' in contact and contact['languague'] in self.messages[languague]:
-                            languague   = contact['languague']
-                        else:
-                            languague   = self.get_languague(data['country'])
 
             self.connections['phonenumbers'] = phonenumbers
 
