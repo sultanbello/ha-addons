@@ -50,7 +50,7 @@ class SocketListener:
 			self.logger.info(f"Log level is {self.log_level}")
 
 			self.sensor		= {}
-			self.auto_reply	= 'binary_sensor.signal_auto_reply'
+			self.auto_reply	= 'switch.signal_auto_reply'
 
 			# Create auto reply sensor
 			state			= 'off'
