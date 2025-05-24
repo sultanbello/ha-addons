@@ -98,20 +98,27 @@ class SocketListener:
 
 				self.update_sensor( 'sensor.signal_message_received', 'on', message['envelope'])
 
-				if(
-					self.google_label != '' and 
-					'phonenumbers' in self.contacts.connections and 
-					message['envelope']['sourceNumber'] in self.contacts.connections['phonenumbers'] and 
-					self.get_sensor(self.auto_reply)
-				):
-					# Send a message back
-					# personal languague set, and there is a message in that languague
-					if 'languague' in details and details['languague'] in self.messages[languague]:
-						languague   = details['languague']
-					else:
-						languague   = self.get_languague(details['country'])
+				if self.get_sensor(self.auto_reply):
+					# find contact by phonenumber
+					nr	= message['envelope']['sourceNumber']
 
-					self.messages[languague]
+					if(
+						self.google_label == '' or 
+						(
+							'phonenumbers' in self.contacts.connections and 
+							nr in self.contacts.connections['phonenumbers']
+						)
+					):
+						details		= self.contacts.connections['phonenumbers'][nr]
+
+						# Send a message back
+						# personal languague set, and there is a message in that languague
+						if 'languague' in details and details['languague'] in self.messages[languague]:
+							languague   = details['languague']
+						else:
+							languague   = 'en'
+						
+						self.send_message(nr, self.messages(languague))
 		except Exception as e:
 			self.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
 		
@@ -169,8 +176,7 @@ class SocketListener:
 
 		return False
 
-			
- def send_message(self, number, msg):
+	def send_message(self, number, msg):
 		if self.parent.debug:
 			self.parent.logger.debug(f"I would have sent '{msg}' via signal to {number} if debug was disabled")
 			return True
