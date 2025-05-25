@@ -102,7 +102,7 @@ class SocketListener:
 					# find contact by phonenumber
 					nr	= message['envelope']['sourceNumber']
 					
-					if 'quote' in message['envelope']['dataMessage']:
+					if 'quote' in message['envelope']['dataMessage'] and message['envelope']['dataMessage']['quote']['authorNumber'] == self.number:
 						self.logger.debug(f"Message is a response to '{message['envelope']['dataMessage']['quote']}' with timestamp {message['envelope']['dataMessage']['quote']['id']}")
 
 					if(
