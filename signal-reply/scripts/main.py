@@ -171,12 +171,13 @@ class SocketListener:
 			self.logger.debug(f"url: {url}")
 			self.logger.debug(f"response: {response}")
 			if response.ok:
-				self.logger.debug(response)
+				json_response = response.json()
+				self.logger.debug(json_response)
 				
 				# only update if needed
-				if self.sensor != response:
+				if self.sensor != json.parse(json_response):
 					with open(self.sensor_path, "w") as f:
-						json.dump(response, f)
+						json.dump(json_response, f)
 
 				return self.sensor.get('state') == 'on'
 			else:
