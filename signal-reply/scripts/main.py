@@ -101,6 +101,9 @@ class SocketListener:
 				if self.get_sensor(self.auto_reply):
 					# find contact by phonenumber
 					nr	= message['envelope']['sourceNumber']
+					
+					if 'quote' in message['envelope']['dataMessage']:
+						self.logger.debug(f"Message is a response to '{message['envelope']['dataMessage']['quote']}' with timestamp {message['envelope']['dataMessage']['quote']['id']}")
 
 					if(
 						self.google_label == '' or 
