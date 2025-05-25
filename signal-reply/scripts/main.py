@@ -58,10 +58,11 @@ class SocketListener:
 
 			self.sensor_path		= '/data/sensor.json'
 			if os.path.exists(self.sensor_path):
-				self.sensor = json.load(self.sensor_path)
-				self.logger.debug(f"Red {self.sensor} from {self.sensor_path}")
-				state		= self.sensor.get('state')
-				attributes	= self.sensor.get('attributes')
+				with open(self.sensor_path, "r") as f:
+					self.sensor = json.load(f)
+					self.logger.debug(f"Red {self.sensor} from {self.sensor_path}")
+					state		= self.sensor.get('state')
+					attributes	= self.sensor.get('attributes')
 
 			self.update_sensor(self.auto_reply, state, attributes)
 
