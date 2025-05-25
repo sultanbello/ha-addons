@@ -181,7 +181,7 @@ class SocketListener:
 				# only update if needed
 				if self.sensor != json_response:
 					with open(self.sensor_path, "w") as f:
-						json.dumps(json_response, f)
+						json.dump(json_response, f)
 
 				return self.sensor.get('state') == 'on'
 			else:
