@@ -1,4 +1,4 @@
-# SIgnal Messenger Listener
+# Signal Messenger Listener
 
 An addon to listen to incoming signal messages 
 
