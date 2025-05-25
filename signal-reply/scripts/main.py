@@ -180,6 +180,8 @@ class SocketListener:
 				
 				# only update if needed
 				if self.sensor != json_response:
+					self.sensor = json_response
+					
 					with open(self.sensor_path, "w") as f:
 						json.dump(json_response, f)
 
