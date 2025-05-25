@@ -179,7 +179,7 @@ class SocketListener:
 				self.logger.debug(json_response)
 				
 				# only update if needed
-				if self.sensor != json.load(json_response):
+				if self.sensor != json_response:
 					with open(self.sensor_path, "w") as f:
 						f.write(json_response)
 
