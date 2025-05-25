@@ -106,7 +106,7 @@ class SocketListener:
 					# find contact by phonenumber
 					nr	= message['envelope']['sourceNumber']
 					
-					if 'quote' in message['envelope']['dataMessage'] and message['envelope']['dataMessage']['quote']['authorNumber'] == self.number:
+					if 'quote' in message['envelope']['dataMessage'] and message['envelope']['dataMessage']['quote']['authorNumber'] == self.signal_number:
 						self.logger.debug(f"Message is a response to '{message['envelope']['dataMessage']['quote']}' with timestamp {message['envelope']['dataMessage']['quote']['id']}")
 
 					if(
@@ -204,7 +204,7 @@ class SocketListener:
 			}
 			
 			data    = {
-				"number": self.number,
+				"number": self.signal_number,
 				'message': msg,
 				'recipients': [number]
 			}
