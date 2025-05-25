@@ -178,7 +178,7 @@ class SocketListener:
 					with open(self.sensor_path, "w") as f:
 						json.dump(response, f)
 
-				return self.sensor.get('state')
+				return self.sensor.get('state') == 'on'
 			else:
 				self.logger.error(f"Updating sensor {id} failed\n\nResponse: {response}\n\nRequest:{id}")
 		except Exception as e:
