@@ -1,4 +1,4 @@
-# Signal Listener Addons
+# Signal Listener Addon
 
 ## Initial Installation
 Make sure you have [The Signal addon](https://github.com/haberda/signal-addon/tree/main) installed and set to json-rpc mode
