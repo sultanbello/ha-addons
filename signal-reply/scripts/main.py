@@ -143,16 +143,20 @@ class SocketListener:
 			}
 
 			response    = requests.post(url, json=data, headers=headers)
+
+			self.logger.debug(f"url: {url}")
+			self.logger.debug(f"data: {data}")
+			self.logger.debug(f"response: {response}")
 			if response.ok:
 				self.logger.info(f"Updated sensor {name}")
 			else:
-				self.logger.error(f"Updating sensor {name} failed\n\nResponse: {response}\n\nRequest:{data}")
+				self.logger.error(f"Updating sensor {name} failed\n\nResponse: {response}\n\nRequest:{url} - {data}")
 		except Exception as e:
 			self.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
 	
 	def get_sensor(self, id):
 		try:
-			url     = f"http://supervisor/core/api/states/sensor.{id}"
+			url     = f"http://supervisor/core/api/states/{id}"
 			
 			headers = {
 				"Authorization": f"Bearer {self.token}",
@@ -160,6 +164,9 @@ class SocketListener:
 			}
 
 			response    = requests.get(url,  headers=headers)
+
+			self.logger.debug(f"url: {url}")
+			self.logger.debug(f"response: {response}")
 			if response.ok:
 				self.logger.debug(response)
 				
