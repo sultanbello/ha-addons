@@ -128,7 +128,7 @@ class SocketListener:
 
 						# Send a message back
 						# personal languague set, and there is a message in that languague
-						if 'languague' in details and details['languague'] in self.messages[languague]:
+						if 'languague' in details and details['languague'] in self.messages:
 							languague   = details['languague']
 						else:
 							languague   = 'en'
