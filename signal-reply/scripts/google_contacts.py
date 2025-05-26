@@ -15,7 +15,7 @@ class Contacts:
         try:
             self.parent     = parent
 
-            self.creds          = self.auth()
+            self.creds      = self.auth()
 
             # Fetch a list of country - languagues
             self.country_languagues()
@@ -34,15 +34,6 @@ class Contacts:
             self.get_contacts()
         except Exception as e:
             self.parent.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
-    
-    def link(uri, label=None):
-        if label is None:
-            label = uri
-        
-        parameters = ''
-        escape_mask = '\033]8;{};{}\033\\{}\033]8;;\033\\'
-        
-        return escape_mask.format(parameters, uri, label)
 
     def auth(self):
         try:
@@ -55,6 +46,10 @@ class Contacts:
             creds               = None
             token_file	        = '/share/google/token.pickle'
             credentials_file	= '/share/google/credentials.json'
+            
+            if self.parent.local:
+                token_file	        = os.path.dirname(os.path.realpath(__file__))+'\\data\\token.pickle'
+                credentials_file	= os.path.dirname(os.path.realpath(__file__))+'\\data\\credentials.json' 
 
             # credentials do not exist yet
             file = Path(credentials_file)
@@ -147,10 +142,8 @@ class Contacts:
             self.parent.logger.info(f"Getting Google contacts belonging to the label '{self.parent.google_label}'")
 
             # Call the People API
-            fields  = 'names,memberships,locales,phoneNumbers,addresses,userDefined'
+            fields  = 'names,locales,phoneNumbers,addresses,userDefined'
             results = self.service.people().getBatchGet(resourceNames=self.members, personFields=fields).execute()["responses"]
-
-            self.parent.logger.debug(results)
 
             # Store for future use
             self.connections['time']        = time.time()
@@ -160,33 +153,26 @@ class Contacts:
             #self.parent.logger.debug(connections)
             for result in results:
                 contact = result.get('person', [])
-
-                self.parent.logger.debug(f"Processing {contact}")
                 
-                if 'phoneNumbers' in contact and 'memberships' in contact:
-                    for membership in contact['memberships']:
-                        if membership.get('contactGroupMembership').get('contactGroupId')   == self.parent.google_label:
-                            self.parent.logger.debug(f"Adding {contact.get('names')}")
-                            
-                            data    = {}
-                            if 'names' in contact:
-                                data['name']    = contact.get('names')[0]['givenName']
+                if 'phoneNumbers' in contact:                    
+                    data    = {}
+                    if 'names' in contact:
+                        data['name']    = contact.get('names')[0]['givenName']
 
-                            if 'addresses' in contact:
-                                data['country']    = contact.get('addresses')[0].get('countryCode')
+                    if 'addresses' in contact:
+                        data['country']    = contact.get('addresses')[0].get('countryCode')
 
-                            # personal languague set, and there is a message in that languague
-                            if 'languague' in contact and contact['languague'] in self.messages['languague']:
-                                data['languague']   = contact['languague']
-                            else:
-                                data['languague']   = self.get_languague(data.get('country'))
-                            
-                            for nr in contact['phoneNumbers']:
-                                phonenumbers[nr.get('canonicalForm')]    = data
+                    # personal languague set, and there is a message in that languague
+                    if 'languague' in contact and contact['languague'] in self.messages['languague']:
+                        data['languague']   = contact['languague']
+                    else:
+                        data['languague']   = self.get_languague(data.get('country'))
+                    
+                    for nr in contact['phoneNumbers']:
+                        phonenumbers[nr.get('canonicalForm')]    = data
 
 
             self.connections['phonenumbers'] = phonenumbers
-            self.parent.logger.debug(self.connections)
 
         except Exception as e:
             self.parent.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
@@ -249,11 +235,11 @@ class Contacts:
                 
                 # we should only come here if we do not have a message in the languague needed
                 self.parent.logger.warning(f"Could not find a message in any of the languagues for country {country_code}.\nDefaulting to English")
-                return 'EN'
+                return 'en'
             
             # we should only come here if we do not have a message in the languague needed
-            self.parent.logger.error(f"Invalid country {country_code}.\nDefaulting to English languague")
-            return 'EN'
+            self.parent.logger.error(f"Invalid country {country_code}. Defaulting to English languague")
+            return 'en'
         except Exception as e:
             self.parent.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
         

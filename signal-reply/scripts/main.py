@@ -17,7 +17,9 @@ class SocketListener:
 			self.token 		= os.getenv('SUPERVISOR_TOKEN')
 
 			file_path		= '/data/options.json'
+			self.local		= False
 			if not os.path.exists(file_path):
+				self.local	= True
 				file_path	= os.path.dirname(os.path.realpath(__file__))+file_path
 					
 			# Get Options
@@ -57,6 +59,10 @@ class SocketListener:
 			attributes		= {}
 
 			self.sensor_path		= '/data/sensor.json'
+
+			if self.local:
+				self.sensor_path	= os.path.dirname(os.path.realpath(__file__))+self.sensor_path
+		
 			if os.path.exists(self.sensor_path):
 				with open(self.sensor_path, "r") as f:
 					try:
@@ -94,17 +100,13 @@ class SocketListener:
 				
 				if 'groupInfo' in message['envelope']['dataMessage']:
 					self.logger.debug(f"Message is posted in the '{message['envelope']['dataMessage']['groupInfo']['groupName']}' group with id {message['envelope']['dataMessage']['groupInfo']['groupId']}")
+					return
 
 				self.logger.debug(f"Timestamp is {message['envelope']['dataMessage']['timestamp']}")
 				
-				if 'quote' in message['envelope']['dataMessage']:
-					self.logger.debug(f"Message is a response to '{message['envelope']['dataMessage']['quote']['text']}' with timestamp {message['envelope']['dataMessage']['quote']['id']}")
-
 				self.update_sensor( 'sensor.signal_message_received', 'on', message['envelope'])
 				
 				self.get_sensor(self.auto_reply)
-				
-				self.logger.debug(self.sensor)
 				
 				if self.sensor.get('state') == 'on':
 					self.logger.info('Auto reply is on')
@@ -141,11 +143,10 @@ class SocketListener:
 							else:
 								languague	= list(self.contacts.messages.keys())[0]
 
-							message	= self.contacts.messages[languague]
+							message	= self.contacts.messages[languague][0]
 						
 						self.send_message(nr, message)
-					else:
-						self.logger.debug(self.contacts.connections)
+
 		except Exception as e:
 			self.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
 		
@@ -169,11 +170,11 @@ class SocketListener:
 				"content-type": "application/json",
 			}
 
+			if self.local:
+				return True
+
 			response    = requests.post(url, json=data, headers=headers)
 
-			self.logger.debug(f"url: {url}")
-			self.logger.debug(f"data: {data}")
-			self.logger.debug(f"response: {response}")
 			if response.ok:
 				self.logger.info(f"Updated sensor {name}")
 			else:
@@ -183,6 +184,9 @@ class SocketListener:
 	
 	def get_sensor(self, id):
 		try:
+			if self.local:
+				return self.sensor
+			
 			url     = f"http://supervisor/core/api/states/{id}"
 			
 			headers = {
@@ -213,12 +217,12 @@ class SocketListener:
 
 		return False
 
-	def send_message(self, number, msg):
-		if self.parent.debug:
-			self.parent.logger.debug(f"I would have sent '{msg}' via signal to {number} if debug was disabled")
-			return True
-			
+	def send_message(self, number, msg):			
 		try:
+			if self.debug:
+				self.logger.debug(f"I would have sent '{msg}' via signal to {number} if debug was disabled")
+				return True
+		
 			headers = {
 				'Content-Type': 'application/json',
 			}
@@ -232,13 +236,13 @@ class SocketListener:
 			response    = requests.post(f'{self.url}/v2/send', json=data, headers=headers)
 			
 			if response.ok:
-				self.parent.logger.info(f'Send Signal Message Succesfully. Timestamp { response.json()["timestamp"] }') 
+				self.logger.info(f'Send Signal Message Succesfully. Timestamp { response.json()["timestamp"] }') 
 				return response.json()['timestamp']
 				
-			self.parent.logger.error(f'Send Signal message failed. Error is {response.json()["error"]} ')
+			self.logger.error(f'Send Signal message failed. Error is {response.json()["error"]} ')
 			
 			return False
 		except Exception as e:
-			self.parent.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
+			self.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
 
 SocketListener()
