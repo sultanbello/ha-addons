@@ -144,6 +144,10 @@ class SocketListener:
 								languague	= list(self.contacts.messages.keys())[0]
 
 							message	= self.contacts.messages[languague][0]
+
+							# Process placeholders
+							for key, value in details.items():
+								message	= message.replace(f'%{key}%', value)
 						
 						self.send_message(nr, message)
 

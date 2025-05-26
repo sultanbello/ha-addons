@@ -157,7 +157,8 @@ class Contacts:
                 if 'phoneNumbers' in contact:                    
                     data    = {}
                     if 'names' in contact:
-                        data['name']    = contact.get('names')[0]['givenName']
+                        data['name']        = contact.get('names')[0].get('displayName')
+                        data['firstname']   = contact.get('names')[0].get('givenName')
 
                     if 'addresses' in contact:
                         data['country']    = contact.get('addresses')[0].get('countryCode')

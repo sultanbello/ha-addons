@@ -29,7 +29,7 @@ configuration:
       A list of language and messages. The message to be sent will be picked randomly\n
         Example
         - languague: EN
-          message: To try to message me today: I won't answer
+          message: Hi %firstname%,\nDon't try to message me today: I won't answer
 
   google_label:
     name: Google Contact Label
