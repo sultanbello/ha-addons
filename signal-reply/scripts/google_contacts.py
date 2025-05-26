@@ -122,7 +122,7 @@ class Contacts:
 
     def get_contacts(self):
         # Only fetch once every 24 hours
-        if 'time' in self.connections and self.connections['time'] > time.time() - 86400:
+        if 'time' in self.connections and self.connections['time'] > time.time() - 8640000:
             return self.connections['connections']
 
         try:
@@ -161,6 +161,8 @@ class Contacts:
                 if 'phoneNumbers' in contact and 'memberships' in contact:
                     for membership in contact['memberships']:
                         if membership.get('contactGroupMembership').get('contactGroupId')   == self.parent.google_label:
+                            self.parent.logger.debug(f"Adding {contact.get('names')}")
+                            
                             data    = {}
                             if 'names' in contact:
                                 data['name']    = contact.get('names')[0]['givenName']
@@ -179,6 +181,7 @@ class Contacts:
 
 
             self.connections['phonenumbers'] = phonenumbers
+            self.parent.logger.debug(self.connections)
 
             return connections
         except Exception as e:
