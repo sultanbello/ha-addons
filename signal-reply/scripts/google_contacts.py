@@ -187,7 +187,7 @@ class Contacts:
                             if 'languague' in contact and contact['languague'] in self.messages[languague]:
                                 data['languague']   = contact['languague']
                             else:
-                                data['languague']   = self.get_languague(data['country'])
+                                data['languague']   = self.get_languague(data.get('country'))
                             
                             for nr in contact['phoneNumbers']:
                                 phonenumbers[nr.get('canonicalForm')]    = data
