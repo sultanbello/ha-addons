@@ -223,6 +223,8 @@ class SocketListener:
 				self.logger.debug(f"I would have sent '{msg}' via signal to {number} if debug was disabled")
 				return True
 		
+			url    = f"http://homeassistant.local:{self.signal_port}"
+			
 			headers = {
 				'Content-Type': 'application/json',
 			}
