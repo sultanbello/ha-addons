@@ -166,7 +166,11 @@ class Contacts:
             self.connections['time']        = time.time()
 
             phonenumbers            = {}
+            
+            self.parent.logger.debug(connections)
             for contact in connections:
+                self.parent.logger.debug(f"Processing {contact}")
+                
                 if 'phoneNumbers' in contact and 'memberships' in contact:
                     for membership in contact['memberships']:
                         if membership.get('contactGroupMembership').get('contactGroupId')   == self.parent.google_label:
