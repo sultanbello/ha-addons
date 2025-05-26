@@ -1,6 +1,6 @@
 name: Signal Messenger Receiver
 url: https://github.com/Tsjippy/ha-addons/tree/main/signal-reply
-version: 1.0.41
+version: 1.0.42
 slug: signal_receiver
 arch:
 arch:

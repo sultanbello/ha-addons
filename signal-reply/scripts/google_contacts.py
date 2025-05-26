@@ -14,26 +14,26 @@ class Contacts:
     def __init__(self, parent):
         try:
             self.parent     = parent
+
+            self.creds          = self.auth()
+
+            # Fetch a list of country - languagues
+            self.country_languagues()
+
+            self.messages   = {}
+            for message in self.parent.messages:
+                # add an empty array if the current languague is not there yet
+                if not message['languague'].lower() in self.messages:
+                    self.messages[message['languague'].lower()] = []
+
+                # Add the message to the languague array
+                self.messages[message['languague'].lower()].append(message['message'])
+
+            self.connections    = {}
+
+            self.get_contacts()
         except Exception as e:
             self.parent.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
-
-        self.creds          = self.auth()
-
-        # Fetch a list of country - languagues
-        self.country_languagues()
-
-        self.messages   = {}
-        for message in self.parent.messages:
-            # add an empty array if the current languague is not there yet
-            if not message['languague'].lower() in self.messages:
-                self.messages[message['languague'].lower()] = []
-
-            # Add the message to the languague array
-            self.messages[message['languague'].lower()].append(message['message'])
-
-        self.connections    = {}
-
-        self.get_contacts()
     
     def link(uri, label=None):
         if label is None:
@@ -84,11 +84,11 @@ class Contacts:
             # created automatically when the authorization flow completes for the first
             # time.
             if os.path.exists(token_file):
-                self.parent.logger.debug(f"Tokenfile {token_file} does exist")
+                #self.parent.logger.debug(f"Tokenfile {token_file} does exist")
                 with open(token_file, 'rb') as token:
                     creds = pickle.load(token)
 
-                self.parent.logger.debug(f"Creds: {creds.to_json()}")
+                #self.parent.logger.debug(f"Creds: {creds.to_json()}")
             else:
                 self.parent.logger.debug(f"Token file {token_file} does not exist")
 
@@ -138,10 +138,13 @@ class Contacts:
             return False
 
         # Get Google Labels
-        self.get_labels()
+        result  = self.get_labels()
+
+        if not result:
+            return False
 
         try:
-            self.parent.logger.info("Getting Google contacts belonging with the label '{self.parent.google_label}'")
+            self.parent.logger.info(f"Getting Google contacts belonging to the label '{self.parent.google_label}'")
 
             # Call the People API
             fields  = 'names,memberships,locales,phoneNumbers,addresses,userDefined'
@@ -183,28 +186,36 @@ class Contacts:
             self.connections['phonenumbers'] = phonenumbers
             self.parent.logger.debug(self.connections)
 
-            return connections
         except Exception as e:
             self.parent.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
 
     def get_labels(self):
         if self.parent.google_label == '':
+            self.parent.logger.debug(f'No label set')
             return False
         
-        results = self.service.contactGroups().list(pageSize=1000).execute()
-        contact_groups = results.get('contactGroups', [])
+        results     = self.service.contactGroups().list(pageSize=1000).execute()
+        labels      = results.get('contactGroups', [])
 
-        if not contact_groups:
+        if not labels:
             self.parent.logger.warning('No contact labels found.')
 
             return False
         else:
             # Find the requested group
-            for group in contact_groups:
+            for label in labels:
                 # This is the group we want
-                if group.get('name') == self.parent.google_label:
+                if label.get('name') == self.parent.google_label:
                     # Get the members of this group
-                    self.members = self.service.contactGroups().get(resourceName=group.get('resourceName'), maxMembers=1000).execute()['memberResourceNames']
+                    self.members = self.service.contactGroups().get(resourceName=label.get('resourceName'), maxMembers=1000).execute()['memberResourceNames']
+
+                    self.parent.logger.debug(f'Label "{self.parent.google_label}" found')
+                    
+                    return self.members
+                
+        self.parent.logger.error(f'Label "{self.parent.google_label}" not found!')
+
+        return False
 
     def country_languagues(self):
         try:
