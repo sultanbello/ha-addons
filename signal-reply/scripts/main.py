@@ -101,8 +101,14 @@ class SocketListener:
 					self.logger.debug(f"Message is a response to '{message['envelope']['dataMessage']['quote']['text']}' with timestamp {message['envelope']['dataMessage']['quote']['id']}")
 
 				self.update_sensor( 'sensor.signal_message_received', 'on', message['envelope'])
-
-				if self.get_sensor(self.auto_reply):
+				
+				self.get_sensor(self.auto_reply)
+				
+				self.logger.debug(self.sensor)
+				
+				if self.sensor.get('state') == 'on':
+					self.logger.info('Auto reply is on')
+					
 					# find contact by phonenumber
 					nr	= message['envelope']['sourceNumber']
 					
@@ -116,6 +122,8 @@ class SocketListener:
 							nr in self.contacts.connections['phonenumbers']
 						)
 					):
+						self.logger.debug(f'Preparing reply to {nr}')
+						
 						details		= self.contacts.connections['phonenumbers'][nr]
 
 						# Send a message back
@@ -126,6 +134,8 @@ class SocketListener:
 							languague   = 'en'
 						
 						self.send_message(nr, self.messages(languague))
+					else:
+						self.logger.debug(self.contacts.connections)
 		except Exception as e:
 			self.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
 		
@@ -185,7 +195,7 @@ class SocketListener:
 					with open(self.sensor_path, "w") as f:
 						json.dump(json_response, f)
 
-				return self.sensor.get('state') == 'on'
+				return self.sensor
 			else:
 				self.logger.error(f"Updating sensor {id} failed\n\nResponse: {response}\n\nRequest:{id}")
 		except Exception as e:
