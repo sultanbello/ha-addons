@@ -128,12 +128,14 @@ class SocketListener:
 
 						# Send a message back
 						# personal languague set, and there is a message in that languague
-						if 'languague' in details and details['languague'] in self.messages:
+						if 'languague' in details and details['languague'] in self.contacts.messages:
 							languague   = details['languague']
-						else:
+						elif 'en' in self.contacts.messages:
 							languague   = 'en'
+						else:
+							languague	= list(self.contacts.messages.keys())[0]
 						
-						self.send_message(nr, self.messages[languague])
+						self.send_message(nr, self.contacts.messages[languague])
 					else:
 						self.logger.debug(self.contacts.connections)
 		except Exception as e:
