@@ -133,7 +133,7 @@ class SocketListener:
 						else:
 							languague   = 'en'
 						
-						self.send_message(nr, self.messages(languague))
+						self.send_message(nr, self.messages[languague])
 					else:
 						self.logger.debug(self.contacts.connections)
 		except Exception as e:
