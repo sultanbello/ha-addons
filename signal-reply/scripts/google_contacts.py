@@ -169,7 +169,7 @@ class Contacts:
             
             #self.parent.logger.debug(connections)
             for contact in connections:
-                self.parent.logger.debug(f"Processing {contact}")
+                #self.parent.logger.debug(f"Processing {contact}")
                 
                 if 'phoneNumbers' in contact and 'memberships' in contact:
                     for membership in contact['memberships']:
