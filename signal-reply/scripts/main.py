@@ -219,6 +219,8 @@ class SocketListener:
 			return True
 			
 		try:
+			url    = f"http://homeassistant.local:{self.signal_port}"
+			
 			headers = {
 				'Content-Type': 'application/json',
 			}
