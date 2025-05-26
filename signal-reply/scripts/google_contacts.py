@@ -44,8 +44,8 @@ class Contacts:
             ]
 
             creds               = None
-            token_file	        = '/share/google/token.pickle'
-            credentials_file	= '/share/google/credentials.json'
+            token_file	        = '/data/token.pickle'
+            credentials_file	= '/data/credentials.json'
             
             if self.parent.local:
                 token_file	        = os.path.dirname(os.path.realpath(__file__))+'\\data\\token.pickle'
