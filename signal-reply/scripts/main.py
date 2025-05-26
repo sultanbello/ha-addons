@@ -123,19 +123,27 @@ class SocketListener:
 						)
 					):
 						self.logger.debug(f'Preparing reply to {nr}')
-						
-						details		= self.contacts.connections['phonenumbers'][nr]
 
-						# Send a message back
-						# personal languague set, and there is a message in that languague
-						if 'languague' in details and details['languague'] in self.contacts.messages:
-							languague   = details['languague']
-						elif 'en' in self.contacts.messages:
-							languague   = 'en'
-						else:
-							languague	= list(self.contacts.messages.keys())[0]
+						# get the first message from the list
+						message	=	self.messages[0]
 						
-						self.send_message(nr, self.contacts.messages[languague])
+						# Determine the languague based on the contact from Google
+						if self.google_label != '':
+							languague	= list(self.contacts.messages.keys())[0]
+
+							details		= self.contacts.connections['phonenumbers'][nr]
+
+							# There is a message in the required languague
+							if 'languague' in details and details['languague'] in self.contacts.messages:
+								languague   = details['languague']
+							elif 'en' in self.contacts.messages:
+								languague   = 'en'
+							else:
+								languague	= list(self.contacts.messages.keys())[0]
+
+							message	= self.contacts.messages[languague]
+						
+						self.send_message(nr, message)
 					else:
 						self.logger.debug(self.contacts.connections)
 		except Exception as e:

@@ -1,10 +1,10 @@
 configuration:
   signal_number:
-    name: signal_number
+    name: Signal Number
     description: The Signal Messenger number you want to listen to
 
-  log_level:
-    name: log_level
+  log level:
+    name: Log Level
     description: Log level detail. Debug will give most detailed info and will not actually send messages.
 
   signal_port:
@@ -30,4 +30,10 @@ configuration:
         Example
         - languague: EN
           message: To try to message me today: I won't answer
+
+  google_label:
+    name: Google Contact Label
+    description: >
+      The name of the label a contact should have before we auto reply.
+      Leave empty to reply to all
 

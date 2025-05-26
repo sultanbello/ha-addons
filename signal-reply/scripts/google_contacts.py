@@ -122,6 +122,8 @@ class Contacts:
                 with open(token_file, 'wb') as token:
                     pickle.dump(creds, token)
 
+            self.service = build('people', 'v1', credentials = creds)
+
             return creds
         except Exception as e:
             self.auth_running = False
@@ -129,36 +131,21 @@ class Contacts:
 
     def get_contacts(self):
         # Only fetch once every 24 hours
-        if 'time' in self.connections and self.connections['time'] > time.time() - 8640000:
-            return self.connections['connections']
+        #if 'time' in self.connections and self.connections['time'] > time.time() - 86400:
+            #return self.connections['connections']
+
+        if self.parent.google_label == '':
+            return False
+
+        # Get Google Labels
+        self.get_labels()
 
         try:
-            self.parent.logger.info("Getting first 1000 Google contacts")
-
-            service = build('people', 'v1', credentials = self.creds)
+            self.parent.logger.info("Getting Google contacts belonging with the label '{self.parent.google_label}'")
 
             # Call the People API
-            fields  = 'names,memberships,locales,phoneNumbers,addresses,userDefined' 
-            results = service.people().connections().list(
-                resourceName    = 'people/me',
-                pageSize        = 1000,
-                personFields    = fields
-            ).execute()
-
-            connections = results.get('connections', [])
-            
-            # We can only fetch 1000 contacts per query, keep going till we have them all
-            while 'nextPageToken' in results:
-                self.parent.logger.info("Fetching next page")
-                pageToken   = results['nextPageToken']
-                results     = service.people().connections().list(
-                    resourceName    = 'people/me',
-                    pageToken       = pageToken,
-                    pageSize        = 1000,
-                    personFields    = fields
-                ).execute()
-                
-                connections = connections + results.get('connections', [])
+            fields  = 'names,memberships,locales,phoneNumbers,addresses,userDefined'
+            results = self.service.people().getBatchGet(resourceNames=self.members, personFields=fields).execute()["responses"]
 
             # Store for future use
             self.connections['time']        = time.time()
@@ -166,7 +153,9 @@ class Contacts:
             phonenumbers            = {}
             
             #self.parent.logger.debug(connections)
-            for contact in connections:
+            for result in results:
+                contact = result.get('person', [])
+
                 #self.parent.logger.debug(f"Processing {contact}")
                 
                 if 'phoneNumbers' in contact and 'memberships' in contact:
@@ -182,7 +171,7 @@ class Contacts:
                                 data['country']    = contact.get('addresses')[0].get('countryCode')
 
                             # personal languague set, and there is a message in that languague
-                            if 'languague' in contact and contact['languague'] in self.messages[languague]:
+                            if 'languague' in contact and contact['languague'] in self.messages['languague']:
                                 data['languague']   = contact['languague']
                             else:
                                 data['languague']   = self.get_languague(data.get('country'))
@@ -197,6 +186,25 @@ class Contacts:
             return connections
         except Exception as e:
             self.parent.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
+
+    def get_labels(self):
+        if self.parent.google_label == '':
+            return False
+        
+        results = self.service.contactGroups().list(pageSize=1000).execute()
+        contact_groups = results.get('contactGroups', [])
+
+        if not contact_groups:
+            self.parent.logger.warning('No contact labels found.')
+
+            return False
+        else:
+            # Find the requested group
+            for group in contact_groups:
+                # This is the group we want
+                if group.get('name') == self.parent.google_label:
+                    # Get the members of this group
+                    self.members = self.service.contactGroups().get(resourceName=group.get('resourceName'), maxMembers=1000).execute()['memberResourceNames']
 
     def country_languagues(self):
         try:
