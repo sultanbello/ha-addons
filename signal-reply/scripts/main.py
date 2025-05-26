@@ -37,9 +37,6 @@ class SocketListener:
 			self.logger             = logger.Logger(self)
 			self.logger.info("")
 
-			if self.google_label != '':
-				self.contacts			= google_contacts.Contacts(self)
-
 			if self.log_level == 'debug':
 				self.debug  = True
 			else:
@@ -48,6 +45,9 @@ class SocketListener:
 			self.logger.debug("Debug is Enabled")
 
 			self.logger.info(f"Log level is {self.log_level}")
+
+			if self.google_label != '':
+				self.contacts			= google_contacts.Contacts(self)
 
 			self.sensor		= {}
 			self.auto_reply	= 'switch.signal_auto_reply'

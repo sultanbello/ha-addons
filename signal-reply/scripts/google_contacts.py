@@ -150,6 +150,8 @@ class Contacts:
             fields  = 'names,memberships,locales,phoneNumbers,addresses,userDefined'
             results = self.service.people().getBatchGet(resourceNames=self.members, personFields=fields).execute()["responses"]
 
+            self.parent.logger.debug(results)
+
             # Store for future use
             self.connections['time']        = time.time()
 
@@ -159,7 +161,7 @@ class Contacts:
             for result in results:
                 contact = result.get('person', [])
 
-                #self.parent.logger.debug(f"Processing {contact}")
+                self.parent.logger.debug(f"Processing {contact}")
                 
                 if 'phoneNumbers' in contact and 'memberships' in contact:
                     for membership in contact['memberships']:
@@ -205,7 +207,7 @@ class Contacts:
             # Find the requested group
             for label in labels:
                 # This is the group we want
-                if label.get('name') == self.parent.google_label:
+                if label.get('name').lower() == self.parent.google_label.lower():
                     # Get the members of this group
                     self.members = self.service.contactGroups().get(resourceName=label.get('resourceName'), maxMembers=1000).execute()['memberResourceNames']
 
