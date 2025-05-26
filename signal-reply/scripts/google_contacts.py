@@ -42,18 +42,12 @@ class Contacts:
         try:
             # If modifying these scopes, delete the file token.json.
             SCOPES      = [
-                'https://www.googleapis.com/auth/contacts', 
-                'https://www.googleapis.com/auth/gmail.send'
+                'https://www.googleapis.com/auth/contacts'
             ]
 
             creds               = None
-            token_file          = '/data/token.pickle'
-            credentials_file    = '/data/credentials.json'
-
-            file_path		= '/data/options.json'
-            if not os.path.exists(file_path):
-                token_file	        = os.path.dirname(os.path.realpath(__file__))+token_file
-                credentials_file	= os.path.dirname(os.path.realpath(__file__))+credentials_file
+            token_file	        = '/share/google/token.pickle'
+            credentials_file	= '/share/google/credentials.json'
 
             # credentials do not exist yet
             file = Path(credentials_file)
