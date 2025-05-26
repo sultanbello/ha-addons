@@ -223,7 +223,7 @@ class SocketListener:
 				self.logger.debug(f"I would have sent '{msg}' via signal to {number} if debug was disabled")
 				return True
 		
-			url    = f"http://homeassistant.local:{self.signal_port}"
+			url    = f"http://homeassistant.local:{self.signal_port}/v2/send"
 			
 			headers = {
 				'Content-Type': 'application/json',
@@ -235,7 +235,7 @@ class SocketListener:
 				'recipients': [number]
 			}
 			
-			response    = requests.post(f'{self.url}/v2/send', json=data, headers=headers)
+			response    = requests.post(url, json=data, headers=headers)
 			
 			if response.ok:
 				self.logger.info(f'Send Signal Message Succesfully. Timestamp { response.json()["timestamp"] }') 
