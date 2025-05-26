@@ -116,6 +116,7 @@ class SocketListener:
 					
 					if 'quote' in message['envelope']['dataMessage'] and message['envelope']['dataMessage']['quote']['authorNumber'] == self.signal_number:
 						self.logger.debug(f"Message is a response to '{message['envelope']['dataMessage']['quote']}' with timestamp {message['envelope']['dataMessage']['quote']['id']}")
+						return
 
 					if(
 						self.google_label == '' or 
