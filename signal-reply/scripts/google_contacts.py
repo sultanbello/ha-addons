@@ -34,9 +34,6 @@ class Contacts:
         self.connections    = {}
 
         self.get_contacts()
-
-    def connect(self):
-        self.gmail_service  = build('gmail', 'v1', credentials=self.creds)
     
     def link(uri, label=None):
         if label is None:
@@ -51,7 +48,8 @@ class Contacts:
         try:
             # If modifying these scopes, delete the file token.json.
             SCOPES      = [
-                'https://www.googleapis.com/auth/contacts'
+                'https://www.googleapis.com/auth/contacts', 
+                'https://www.googleapis.com/auth/gmail.send'
             ]
 
             creds               = None
