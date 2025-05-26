@@ -125,7 +125,7 @@ class SocketListener:
 						self.logger.debug(f'Preparing reply to {nr}')
 
 						# get the first message from the list
-						message	=	self.messages[0]
+						message	=	self.messages[0]['message']
 						
 						# Determine the languague based on the contact from Google
 						if self.google_label != '':
