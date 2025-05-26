@@ -37,6 +37,15 @@ class Contacts:
 
     def connect(self):
         self.gmail_service  = build('gmail', 'v1', credentials=self.creds)
+    
+    def link(uri, label=None):
+        if label is None:
+            label = uri
+        
+        parameters = ''
+        escape_mask = '\033]8;{};{}\033\\{}\033]8;;\033\\'
+        
+        return escape_mask.format(parameters, uri, label)
 
     def auth(self):
         try:
