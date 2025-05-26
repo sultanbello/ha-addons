@@ -98,18 +98,18 @@ class SocketListener:
 			message	= json.loads(message)
 			
 			if "dataMessage" in message['envelope'] and message['envelope']['dataMessage']['message'] != None:
-				self.logger.debug(f"Received '{message['envelope']['dataMessage']['message']}' from {message['envelope']['sourceName']} ({message['envelope']['sourceNumber']})")
-				
 				if 'groupInfo' in message['envelope']['dataMessage']:
 					self.logger.debug(f"Message is posted in the '{message['envelope']['dataMessage']['groupInfo']['groupName']}' group with id {message['envelope']['dataMessage']['groupInfo']['groupId']}")
 					return
 				
+				self.logger.info(f"Received '{message['envelope']['dataMessage']['message']}' from {message['envelope']['sourceName']} ({message['envelope']['sourceNumber']})")
+								
 				self.update_sensor( 'sensor.signal_message_received', 'on', message['envelope'])
 				
 				self.get_sensor(self.auto_reply)
 				
 				if self.sensor.get('state') == 'on':
-					self.logger.info('Auto reply is on')
+					self.logger.debug('Auto reply is on')
 					
 					# find contact by phonenumber
 					nr	= message['envelope']['sourceNumber']
@@ -189,7 +189,7 @@ class SocketListener:
 			response    = requests.post(url, json=data, headers=headers)
 
 			if response.ok:
-				self.logger.info(f"Updated sensor {name}")
+				self.logger.debug(f"Updated sensor {name}")
 			else:
 				self.logger.error(f"Updating sensor {name} failed\n\nResponse: {response}\n\nRequest:{url} - {data}")
 		except Exception as e:
