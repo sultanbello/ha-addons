@@ -167,7 +167,7 @@ class Contacts:
 
             phonenumbers            = {}
             
-            self.parent.logger.debug(connections)
+            #self.parent.logger.debug(connections)
             for contact in connections:
                 self.parent.logger.debug(f"Processing {contact}")
                 
