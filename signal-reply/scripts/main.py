@@ -9,6 +9,7 @@ import requests
 import logger
 import google_contacts
 import sys
+import time
 
 class SocketListener:
 
@@ -49,10 +50,11 @@ class SocketListener:
 			self.logger.info(f"Log level is {self.log_level}")
 
 			if self.google_label != '':
-				self.contacts			= google_contacts.Contacts(self)
+				self.contacts	= google_contacts.Contacts(self)
 
-			self.sensor		= {}
-			self.auto_reply	= 'switch.signal_auto_reply'
+			self.sensor			= {}
+			self.auto_reply		= 'switch.signal_auto_reply'
+			self.latest_replies	= {}
 
 			# Create auto reply sensor
 			state			= 'off'
@@ -101,8 +103,6 @@ class SocketListener:
 				if 'groupInfo' in message['envelope']['dataMessage']:
 					self.logger.debug(f"Message is posted in the '{message['envelope']['dataMessage']['groupInfo']['groupName']}' group with id {message['envelope']['dataMessage']['groupInfo']['groupId']}")
 					return
-
-				self.logger.debug(f"Timestamp is {message['envelope']['dataMessage']['timestamp']}")
 				
 				self.update_sensor( 'sensor.signal_message_received', 'on', message['envelope'])
 				
@@ -113,7 +113,12 @@ class SocketListener:
 					
 					# find contact by phonenumber
 					nr	= message['envelope']['sourceNumber']
+
+					# only reply once an hour
+					if nr in self.latest_replies and self.latest_replies[nr] > time.time() - 3600:
+						return
 					
+					# do not reply to replies
 					if 'quote' in message['envelope']['dataMessage'] and message['envelope']['dataMessage']['quote']['authorNumber'] == self.signal_number:
 						self.logger.debug(f"Message is a response to '{message['envelope']['dataMessage']['quote']}' with timestamp {message['envelope']['dataMessage']['quote']['id']}")
 						return
@@ -151,6 +156,9 @@ class SocketListener:
 								message	= message.replace(f'%{key}%', value)
 						
 						self.send_message(nr, message)
+
+						# store latest reply
+						self.latest_replies[nr]	= time.time()
 
 		except Exception as e:
 			self.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
