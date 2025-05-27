@@ -138,14 +138,8 @@ class Contacts:
             self.parent.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
 
     def link(url: str, text: str = None, parameters: dict = None) -> str:
-        if text is None:
-            text = url
-        if parameters is None:
-            parameters = {}
-        kvs = ":".join("{}={}".format(k, v) for k, v in parameters.items())
-        template = "\x1b]8;{};{}\x1b\\{}\x1b]8;;\x1b\\"
-        result = template.format(parameters, url, text)
-        
+        result = f"<a href='{url}' {parameters}> {text}</a>"
+
         return result
         
     def get_contacts(self):
