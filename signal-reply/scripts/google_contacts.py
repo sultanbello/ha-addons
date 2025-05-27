@@ -32,10 +32,6 @@ class Contacts:
 
             self.connections    = {}
 
-            print(self.link('https://simnigeria.org/forms/reimbursement-request/'))
-
-            self.parent.logger.info(self.link('https://simnigeria.org/forms/reimbursement-request/'))
-
             self.get_contacts()
         except Exception as e:
             self.parent.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
@@ -141,15 +137,16 @@ class Contacts:
             self.auth_running = False
             self.parent.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
 
-    def link(self, uri, label=None):
-        if label is None: 
-            label = uri
-        parameters = ''
-    
-        # OSC 8 ; params ; URI ST <name> OSC 8 ;; ST 
-        escape_mask = '\033]8;{};{}\033\\{}\033]8;;\033\\'
-    
-        return escape_mask.format(parameters, uri, label)
+    def link(url: str, text: str = None, parameters: dict = None) -> str:
+        if text is None:
+            text = url
+        if parameters is None:
+            parameters = {}
+        kvs = ":".join("{}={}".format(k, v) for k, v in parameters.items())
+        template = "\x1b]8;{};{}\x1b\\{}\x1b]8;;\x1b\\"
+        result = template.format(parameters, url, text)
+        
+        return result
         
     def get_contacts(self):
         try:
