@@ -49,8 +49,6 @@ class SocketListener:
 
 			self.logger.info(f"Log level is {self.log_level}")
 
-			self.logger.info(f"<a href='http://example.com'>This is a link</a>" )
-
 			if self.google_label != '':
 				self.contacts	= google_contacts.Contacts(self)
 
