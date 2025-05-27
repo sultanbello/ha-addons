@@ -32,6 +32,10 @@ class Contacts:
 
             self.connections    = {}
 
+            print(self.link('https://simnigeria.org/forms/reimbursement-request/'))
+
+            self.parent.logger.info(self.link('https://simnigeria.org/forms/reimbursement-request/'))
+
             self.get_contacts()
         except Exception as e:
             self.parent.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
