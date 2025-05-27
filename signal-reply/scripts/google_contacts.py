@@ -1,6 +1,7 @@
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from google.auth.transport.requests import Request
+from google.api_core import exceptions
 import os
 import pickle
 import sys
@@ -44,8 +45,8 @@ class Contacts:
             ]
 
             creds               = None
-            token_file	        = '/share/google/token.pickle'
-            credentials_file	= '/share/google/credentials.json'
+            token_file	        = '/data/token.pickle'
+            credentials_file	= '/data/credentials.json'
             
             if self.parent.local:
                 token_file	        = os.path.dirname(os.path.realpath(__file__))+'\\data\\token.pickle'
@@ -93,8 +94,20 @@ class Contacts:
 
                 if creds and creds.expired and creds.refresh_token:
                     self.parent.logger.debug(f"Refreshing token")
-
-                    creds.refresh(Request())
+                    try:
+                        creds.refresh(Request())
+                    except exceptions.RetryError as e:
+                        # Handles errors when retries have been exhausted
+                        self.parent.logger.error(f"Retry error: {e}")
+                        time.sleep(10)
+                        return self.auth()
+                        
+                    except exceptions.GoogleAPICallError as e:
+                        # Handles any other API errors
+                        self.parent.logger.error(f"An API error occurred: {e}")
+                    except Exception as e:
+                        # Handles any other exceptions
+                        self.parent.logger.error(f"An unexpected error occurred: {e}")
                 else:
                     self.parent.logger.debug(f'Listening for token on port {self.parent.port}')
                     self.parent.logger.info('########################')
@@ -125,20 +138,20 @@ class Contacts:
             self.parent.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
 
     def get_contacts(self):
-        # Only fetch once every 24 hours
-        #if 'time' in self.connections and self.connections['time'] > time.time() - 86400:
-            #return self.connections['connections']
-
-        if self.parent.google_label == '':
-            return False
-
-        # Get Google Labels
-        result  = self.get_labels()
-
-        if not result:
-            return False
-
         try:
+            # Only fetch once every 24 hours
+            #if 'time' in self.connections and self.connections['time'] > time.time() - 86400:
+                #return self.connections['connections']
+    
+            if self.parent.google_label == '':
+                return False
+    
+            # Get Google Labels
+            result  = self.get_labels()
+    
+            if not result:
+                return False
+
             self.parent.logger.info(f"Getting Google contacts belonging to the label '{self.parent.google_label}'")
 
             # Call the People API
