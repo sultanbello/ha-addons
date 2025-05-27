@@ -100,8 +100,7 @@ class Contacts:
                         # Handles errors when retries have been exhausted
                         self.parent.logger.error(f"Retry error: {e}")
                         time.sleep(10)
-                        self.auth()
-                        return
+                        return self.auth()
                         
                     except exceptions.GoogleAPICallError as e:
                         # Handles any other API errors
