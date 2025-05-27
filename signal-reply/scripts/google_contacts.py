@@ -139,20 +139,20 @@ class Contacts:
             self.parent.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
 
     def get_contacts(self):
-        # Only fetch once every 24 hours
-        #if 'time' in self.connections and self.connections['time'] > time.time() - 86400:
-            #return self.connections['connections']
-
-        if self.parent.google_label == '':
-            return False
-
-        # Get Google Labels
-        result  = self.get_labels()
-
-        if not result:
-            return False
-
         try:
+            # Only fetch once every 24 hours
+            #if 'time' in self.connections and self.connections['time'] > time.time() - 86400:
+                #return self.connections['connections']
+    
+            if self.parent.google_label == '':
+                return False
+    
+            # Get Google Labels
+            result  = self.get_labels()
+    
+            if not result:
+                return False
+
             self.parent.logger.info(f"Getting Google contacts belonging to the label '{self.parent.google_label}'")
 
             # Call the People API
