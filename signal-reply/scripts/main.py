@@ -115,7 +115,7 @@ class SocketListener:
 					nr	= message['envelope']['sourceNumber']
 
 					# only reply once an hour
-					if nr in self.latest_replies and self.latest_replies[nr] > time.time() - 3600:
+					if nr in self.latest_replies and self.latest_replies[nr] > time.time() - 86400:
 						return
 					
 					# do not reply to replies
