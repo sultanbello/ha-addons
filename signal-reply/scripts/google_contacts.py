@@ -257,7 +257,7 @@ class Contacts:
                 return 'en'
             
             # we should only come here if we do not have a message in the languague needed
-            self.parent.logger.error(f"Invalid country {country_code} for user {data.get('name')} ({data.get('url', '')}). Defaulting to English languague")
+            self.parent.logger.warning(f"Invalid country {country_code} for user {data.get('name')} ({data.get('url', '')}). Defaulting to English languague")
             return 'en'
         except Exception as e:
             self.parent.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
