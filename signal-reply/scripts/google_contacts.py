@@ -137,6 +137,16 @@ class Contacts:
             self.auth_running = False
             self.parent.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
 
+    def link(self, uri, label=None):
+        if label is None: 
+            label = uri
+        parameters = ''
+    
+        # OSC 8 ; params ; URI ST <name> OSC 8 ;; ST 
+        escape_mask = '\033]8;{};{}\033\\{}\033]8;;\033\\'
+    
+        return escape_mask.format(parameters, uri, label)
+        
     def get_contacts(self):
         try:
             # Only fetch once every 24 hours
@@ -187,7 +197,6 @@ class Contacts:
                     
                     for nr in contact['phoneNumbers']:
                         phonenumbers[nr.get('canonicalForm')]    = data
-
 
             self.connections['phonenumbers'] = phonenumbers
 
@@ -257,7 +266,7 @@ class Contacts:
                 return 'en'
             
             # we should only come here if we do not have a message in the languague needed
-            self.parent.logger.warning(f"Invalid country {country_code} for user {data.get('name')} ({data.get('url', '')}). Defaulting to English languague")
+            self.parent.logger.warning(f"Invalid country {country_code} for user {data.get('name')} ({self.link(data.get('url', ''))}). Defaulting to English languague")
             return 'en'
         except Exception as e:
             self.parent.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
