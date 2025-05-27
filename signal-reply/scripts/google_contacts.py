@@ -169,6 +169,9 @@ class Contacts:
                 
                 if 'phoneNumbers' in contact:                    
                     data    = {}
+
+                    data['url']             = f"https://contacts.google.com/{contact.get('resourceName', '').replace('people', 'person')}"
+
                     if 'names' in contact:
                         data['name']        = contact.get('names')[0].get('displayName')
                         data['firstname']   = contact.get('names')[0].get('givenName')
@@ -254,7 +257,7 @@ class Contacts:
                 return 'en'
             
             # we should only come here if we do not have a message in the languague needed
-            self.parent.logger.error(f"Invalid country {country_code} for user {data.get('name')}. Defaulting to English languague")
+            self.parent.logger.error(f"Invalid country {country_code} for user {data.get('name')} ({data.get('url', '')}). Defaulting to English languague")
             return 'en'
         except Exception as e:
             self.parent.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
