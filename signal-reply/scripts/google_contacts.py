@@ -167,7 +167,7 @@ class Contacts:
                     if 'languague' in contact and contact['languague'] in self.messages['languague']:
                         data['languague']   = contact['languague']
                     else:
-                        data['languague']   = self.get_languague(data.get('country'))
+                        data['languague']   = self.get_languague(data)
                     
                     for nr in contact['phoneNumbers']:
                         phonenumbers[nr.get('canonicalForm')]    = data
@@ -223,8 +223,10 @@ class Contacts:
         except Exception as e:
             self.parent.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
 
-    def get_languague(self, country_code):
+    def get_languague(self, data):
         try:
+            country_code    = data.get('country')
+
             if country_code in self.languagues:
                 # all the official languagues of this country
                 languagues  = self.languagues.get(country_code)
@@ -239,7 +241,7 @@ class Contacts:
                 return 'en'
             
             # we should only come here if we do not have a message in the languague needed
-            self.parent.logger.error(f"Invalid country {country_code}. Defaulting to English languague")
+            self.parent.logger.error(f"Invalid country {country_code} for user {data.get('name')}. Defaulting to English languague")
             return 'en'
         except Exception as e:
             self.parent.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
