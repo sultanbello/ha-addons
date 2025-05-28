@@ -10,6 +10,7 @@ from pathlib import Path
 import time
 import urllib
 import lxml.etree
+import math
 
 class Contacts:
     def __init__(self, parent):
@@ -138,13 +139,13 @@ class Contacts:
             self.parent.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
 
     def get_contacts(self):
-        try:
+        try:    
+            if self.parent.google_label == '':
+                return False
+            
             # Only fetch once every 24 hours
             if 'time' in self.connections and self.connections['time'] > time.time() - 86400:
                 return self.connections['connections']
-    
-            if self.parent.google_label == '':
-                return False
     
             # Get Google Labels
             result  = self.get_labels()
@@ -156,7 +157,11 @@ class Contacts:
 
             # Call the People API
             fields  = 'names,locales,phoneNumbers,addresses,userDefined'
-            results = self.service.people().getBatchGet(resourceNames=self.members, personFields=fields).execute()["responses"]
+
+            results = []
+            # Loop over all the sections of max 200 members on self.members as the maximum for getBatchGet is 200
+            for recourceNames in self.members:
+                results = results + self.service.people().getBatchGet(resourceNames=recourceNames, personFields=fields).execute()["responses"]
 
             # Store for future use
             self.connections['time']        = time.time()
@@ -211,7 +216,10 @@ class Contacts:
                 # This is the group we want
                 if label.get('name').lower() == self.parent.google_label.lower():
                     # Get the members of this group
-                    self.members = self.service.contactGroups().get(resourceName=label.get('resourceName'), maxMembers=1000).execute()['memberResourceNames']
+                    self.members    = self.service.contactGroups().get(resourceName=label.get('resourceName'), maxMembers=10000).execute()['memberResourceNames']
+
+                    # Split into portions of 200, the max of getBatchGet
+                    self.members    = self.split(self.members, math.ceil(len(self.members)/200))
 
                     self.parent.logger.debug(f'Label "{self.parent.google_label}" found')
                     
@@ -221,6 +229,9 @@ class Contacts:
 
         return False
 
+    def split(self, arr, count):
+        return [arr[i::count] for i in range(count)]
+    
     def country_languagues(self):
         try:
             url         = "https://raw.githubusercontent.com/unicode-org/cldr/master/common/supplemental/supplementalData.xml"
