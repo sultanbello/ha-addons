@@ -159,6 +159,10 @@ class SocketListener:
 
 						# store latest reply
 						self.latest_replies[nr]	= time.time()
+						
+						# Update Google Contacts if needed
+						if self.google_label != '':
+							self.contacts.get_contacts()
 
 		except Exception as e:
 			self.logger.error(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
