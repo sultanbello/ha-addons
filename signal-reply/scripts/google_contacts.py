@@ -140,8 +140,8 @@ class Contacts:
     def get_contacts(self):
         try:
             # Only fetch once every 24 hours
-            #if 'time' in self.connections and self.connections['time'] > time.time() - 86400:
-                #return self.connections['connections']
+            if 'time' in self.connections and self.connections['time'] > time.time() - 86400:
+                return self.connections['connections']
     
             if self.parent.google_label == '':
                 return False
