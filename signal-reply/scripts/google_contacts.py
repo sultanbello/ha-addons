@@ -145,7 +145,7 @@ class Contacts:
             
             # Only fetch once every 24 hours
             if 'time' in self.connections and self.connections['time'] > time.time() - 86400:
-                return self.connections['connections']
+                return self.connections
     
             # Get Google Labels
             result  = self.get_labels()
