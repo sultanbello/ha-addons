@@ -6,22 +6,19 @@ import json
 import mqtt
 import sensors
 from datetime import datetime
-import atexit
 import signal
-
-def signal_handler(sig, frame):
-    print('Received signal:', sig)
-    print('Cleaning up...')
-    sys.exit(0)
-
-signal.signal(signal.SIGTERM, signal_handler)
+import os
 
 class DeviceNotFoundError(Exception):
     pass
 
 class JunctekMonitor:
     def __init__(self):
-        self.charging            = False
+        self.should_quit        = False
+
+        signal.signal(signal.SIGTERM, self.signal_handler)
+
+        self.charging           = False
 
         self.params = {
             "voltage":          "c0",       
@@ -42,25 +39,19 @@ class JunctekMonitor:
         self.params_keys         = list(self.params.keys())
         self.params_values       = list(self.params.values())
 
-        if len(sys.argv) == 2:
-            running_local       = sys.argv[1]
-        else:
-            running_local       = False
-
-        if not running_local:
-            # Get Options
-            with open("/data/options.json", mode="r") as data_file:
-                config = json.load(data_file)
-
+        file_path		= '/data/options.json'
+        self.local		= False
+        if not os.path.exists(file_path):
+            self.local	= True
+            file_path	= os.path.dirname(os.path.realpath(__file__))+file_path
+					
+        # Get Options
+        with open(file_path, mode="r") as data_file:
+            config = json.load(data_file)
             self.log_level           = config.get('log_level')
             self.mac_address         = config.get('macaddress').upper()
-            self.battery_capacity    = config.get('battery capacity')
-            self.battery_voltage     = config.get('voltage')
-        else:
-            self.log_level           = 'debug'
-            self.mac_address         = '38:3b:26:79:6f:c5'.upper() #38:3b:26:79:6f:c5
-            self.battery_capacity    = 400
-            self.battery_voltage     = 48
+            self.battery_capacity    = int(config.get('battery capacity'))
+            self.battery_voltage     = int(config.get('voltage'))
 
         self.logger                  = logger.Logger(self)
 
@@ -71,9 +62,16 @@ class JunctekMonitor:
 
         self.MqqtToHa               = mqtt.MqqtToHa(self)
 
-        self.stop_event          = asyncio.Event()
-        self.disconnect_event    = asyncio.Event()
-        self.device              = None
+        self.stop_event             = asyncio.Event()
+        self.disconnect_event       = asyncio.Event()
+        self.device                 = None
+
+    def signal_handler(self, sig, frame):
+        self.logger.warning('Received signal:', sig)
+        self.logger.warning('Cleaning up...')
+        
+        # Set the shutdown flag
+        self.should_quit    = True
 
     async def discover(self):
         try:
@@ -245,7 +243,7 @@ class JunctekMonitor:
         except Exception as e:
             self.logger.error(f" {str(e)} on line {sys.exc_info()[-1].tb_lineno}")
 
-        while True:
+        while not self.should_quit:
             self.logger.info("Starting Listener")
             try:
                 while self.device == None:
@@ -274,14 +272,9 @@ class JunctekMonitor:
 
             await asyncio.sleep(5)
 
-    def on_finish(self):
-        self.logger.debug(f"Exiting")
-
 if __name__ == "__main__":
     try:
         junctekMonitor  = JunctekMonitor()
-
-        atexit.register(junctekMonitor.on_finish)
 
         if junctekMonitor.mac_address == '':
             junctekMonitor.logger.debug("Starting discovery")
@@ -289,6 +282,8 @@ if __name__ == "__main__":
         else:
             junctekMonitor.logger.debug("Starting connection")
             asyncio.run(junctekMonitor.main())
+
+            junctekMonitor.logger.info("Finished")
     except KeyboardInterrupt:
         junctekMonitor.logger.debug("ctrl+c pressed")
     except Exception as e:
