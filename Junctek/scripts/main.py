@@ -7,7 +7,6 @@ import mqtt
 import sensors
 from datetime import datetime
 import atexit
-import time
 import signal
 
 def signal_handler(sig, frame):
