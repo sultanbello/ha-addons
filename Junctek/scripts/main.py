@@ -7,6 +7,15 @@ import mqtt
 import sensors
 from datetime import datetime
 import atexit
+import time
+import signal
+
+def signal_handler(sig, frame):
+    print('Received signal:', sig)
+    print('Cleaning up...')
+    sys.exit(0)
+
+signal.signal(signal.SIGTERM, signal_handler)
 
 class DeviceNotFoundError(Exception):
     pass
@@ -259,7 +268,7 @@ class JunctekMonitor:
                 self.logger.error(f"Error: {e}")
                 #continue  # continue in error case 
             except TimeoutError as e:
-                self.logger.debug("Timeout {e}")
+                self.logger.debug(f"Timeout {e}")
             except Exception as e:
                 if str(e) != '':
                     self.logger.error(f" {str(e)} on line {sys.exc_info()[-1].tb_lineno}")

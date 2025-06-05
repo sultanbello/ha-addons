@@ -20,7 +20,7 @@ fi
 
 bashio::log.info "Starting Script..."
 
-python3 -u scripts/main.py
+exec python3 -u scripts/main.py
 
 bashio::log.info Script finished
 

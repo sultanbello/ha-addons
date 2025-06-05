@@ -1,6 +1,6 @@
 name: "Junctek Battery Monitor"
 description: "Reads your Junctek Battery Monitor Values via BLE"
-version: "1.0.55"
+version: "1.0.56"
 slug: "junctek"
 init: false
 arch:
