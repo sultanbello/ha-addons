@@ -3,21 +3,17 @@ FROM $BUILD_FROM
 
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 
-#install node 14 and npm
-RUN apt-get update && apt-get install -y curl gnupg2 git && apk add --update nodejs npm
-
 #install chromiun
 RUN apt-get install -y chromium ffmpeg git
 
 # Copy root filesystem
-COPY rootfs /
+#COPY rootfs /
 
 WORKDIR /app
 
-RUN git clone --branch "v2.4.1" --depth=1 \
-        "https://github.com/gajosu/ha-whatsapp-web-rest-api.git" /app
+# Copy data for add-on
+COPY run.sh /
 
-# install production dependencies
-RUN npm install
+RUN chmod a+x /run.sh
 
-RUN npm run build
+CMD [ "/run.sh" ]
