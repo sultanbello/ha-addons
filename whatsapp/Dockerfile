@@ -1,13 +1,10 @@
-# alpine image
-# ARG BUILD_FROM
-
-# FROM $BUILD_FROM
-FROM ghcr.io/hassio-addons/debian-base:7.8.3
+ARG BUILD_FROM
+FROM $BUILD_FROM
 
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 
 #install node 14 and npm
-RUN apt-get update && apt-get install -y curl gnupg2 && curl -sL https://deb.nodesource.com/setup_18.x | bash - && apt-get install -y nodejs git
+RUN apt-get update && apt-get install -y curl gnupg2 git && apk add --update nodejs npm
 
 #install chromiun
 RUN apt-get install -y chromium ffmpeg git
