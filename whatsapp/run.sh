@@ -1,11 +1,14 @@
 #!/usr/bin/with-contenv bashio
 
-bashio::log.info "Installing curl"
+bashio::log.info "Refreshing data"
 
 apt-get update
 
 bashio::log.info "Installing curl"
 apt-get install -y curl gnupg2 git 
+
+bashio::log.info "Installing chromium"
+apt-get install -y chromium ffmpeg git
 
 bashio::log.info "Installing nodejs"
 apk add --update nodejs npm
