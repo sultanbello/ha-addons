@@ -3,7 +3,7 @@
 bashio::log.info "Refreshing data"
 
 bashio::log.info "Installing curl"
-apk add --update curl gnupg2 git 
+apk add --update curl gnupg git 
 
 bashio::log.info "Installing chromium"
 apk add --update chromium ffmpeg git
