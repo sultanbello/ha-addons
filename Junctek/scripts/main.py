@@ -208,12 +208,13 @@ class JunctekMonitor:
 
     def scanner_callback(self, device, advertisement_data):
         try:
+            name    = advertisement_data.local_name
             if device.address.upper() == self.mac_address:
-                self.logger.info(f"Found device\nAddress: {device.address}\nName: {advertisement_data.local_name}\nRssi: {advertisement_data.rssi}")
+                self.logger.info(f"Found device\nAddress: {device.address}\nName: {name}\nRssi: {advertisement_data.rssi}")
                 self.device = device
                 self.stop_event.set()
             else:
-                self.logger.debug(f"{device.address} is not: {self.mac_address}")
+                self.logger.debug(f"{name} with address '{device.address}' is not: {self.mac_address}")
         except Exception as e:
             self.logger.error(f" {str(e)} on line {sys.exc_info()[-1].tb_lineno}")
 
