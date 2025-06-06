@@ -15,10 +15,13 @@ class DeviceNotFoundError(Exception):
 class JunctekMonitor:
     def __init__(self):
         self.should_quit        = False
+        self.found              = []
+        self.charging           = False
+        file_path		        = '/data/options.json'
+        self.local		        = False
+        self.device             = None
 
         signal.signal(signal.SIGTERM, self.signal_handler)
-
-        self.charging           = False
 
         self.params = {
             "voltage":          "c0",       
@@ -39,8 +42,6 @@ class JunctekMonitor:
         self.params_keys         = list(self.params.keys())
         self.params_values       = list(self.params.values())
 
-        file_path		= '/data/options.json'
-        self.local		= False
         if not os.path.exists(file_path):
             self.local	= True
             file_path	= os.path.dirname(os.path.realpath(__file__))+file_path
@@ -64,7 +65,7 @@ class JunctekMonitor:
 
         self.stop_event             = asyncio.Event()
         self.disconnect_event       = asyncio.Event()
-        self.device                 = None
+        
 
     def signal_handler(self, sig, frame):
         self.logger.warning(f'Received signal: {sig}')
@@ -209,12 +210,23 @@ class JunctekMonitor:
     def scanner_callback(self, device, advertisement_data):
         try:
             name    = advertisement_data.local_name
+
             if device.address.upper() == self.mac_address:
                 self.logger.info(f"Found device\nAddress: {device.address}\nName: {name}\nRssi: {advertisement_data.rssi}")
                 self.device = device
                 self.stop_event.set()
+            elif not device.address in self.found:
+                self.found.append(device.address)
+
+                if name == None:
+                    self.logger.info(f"Found '{device.address}'")
+                else:
+                    self.logger.info(f"Found '{name}' with address '{device.address}'")
             else:
-                self.logger.debug(f"{name} with address '{device.address}' is not: {self.mac_address}")
+                if name == None:
+                    self.logger.debug(f"'{device.address}' is not: {self.mac_address}")
+                else:
+                    self.logger.debug(f"{name} with address '{device.address}' is not: {self.mac_address}")
         except Exception as e:
             self.logger.error(f" {str(e)} on line {sys.exc_info()[-1].tb_lineno}")
 
