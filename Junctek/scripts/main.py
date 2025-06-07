@@ -68,7 +68,7 @@ class JunctekMonitor:
         
 
     def signal_handler(self, sig, frame):
-        self.logger.warning(f'Received signal: {sig}')
+        self.logger.warning(f'Received signal {sig}')
         self.logger.warning('Cleaning up...')
         
         # Set the shutdown flag
