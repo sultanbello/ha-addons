@@ -4,7 +4,7 @@ configuration:
     description: The bluetooth mac address of your Junctek device
   battery capacity:
     name: Battery Capacity
-    description: The capacity of your batteries in Ampere hour
+    description: The capacity of your batteries in Ampere hour, us to calculate the SOC
   voltage:
     name: Voltage
     description: The battery voltage
