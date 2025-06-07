@@ -270,6 +270,8 @@ class JunctekMonitor:
                     
                     read_characteristic_uuid = "0000fff1-0000-1000-8000-00805f9b34fb"
                     
+                    self.logger.debig(f"read_characteristic_uuid is {read_characteristic_uuid}")
+                    
                     await client.start_notify(read_characteristic_uuid, self.process_data)
 
                     # Wait till disconnected
