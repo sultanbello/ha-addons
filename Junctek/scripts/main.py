@@ -234,11 +234,17 @@ class JunctekMonitor:
         try:
             self.logger.debug(f"Disconnected {client}")
             self.disconnect_event.set()
+            self.stop_event.clear()
+            self.device = None
         except Exception as e:
             self.logger.error(f" {str(e)} on line {sys.exc_info()[-1].tb_lineno}")
-        
-    async def main(self):
+
+    async def connect(self):
         try:
+            # Do not run if already connected
+            if self.device != None:
+                return
+            
             async with BleakScanner(self.scanner_callback) as scanner:
                 # Important! Wait for an event to trigger stop, otherwise scanner
                 # will stop immediately.
@@ -256,7 +262,10 @@ class JunctekMonitor:
         except Exception as e:
             self.logger.error(f" {str(e)} on line {sys.exc_info()[-1].tb_lineno}")
 
+    async def main(self):
         while not self.should_quit:
+            await  self.connect()
+
             self.logger.info("Starting Listener")
             try:
                 while self.device == None:
