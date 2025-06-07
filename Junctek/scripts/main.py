@@ -252,13 +252,6 @@ class JunctekMonitor:
                 self.logger.info(f"Connected to {self.device}")
         
             # scanner stops when block exits
-        
-            #target_name_prefix = "BTG"
-            read_characteristic_uuid = "0000fff1-0000-1000-8000-00805f9b34fb"
-            #send a message to get all the measurement values 
-            #send_characteristic_uuid = "0000fff2-0000-1000-8000-00805f9b34fb"
-            #message = ":R50=1,2,1,\n"
-            #interval_seconds = 60
         except Exception as e:
             self.logger.error(f" {str(e)} on line {sys.exc_info()[-1].tb_lineno}")
 
@@ -274,6 +267,9 @@ class JunctekMonitor:
 
                 async with BleakClient(self.device, disconnected_callback=self.disconnected_callback) as client:
                     self.logger.info(f"Connected to {self.device.name}")
+                    
+                    read_characteristic_uuid = "0000fff1-0000-1000-8000-00805f9b34fb"
+                    
                     await client.start_notify(read_characteristic_uuid, self.process_data)
 
                     # Wait till disconnected
