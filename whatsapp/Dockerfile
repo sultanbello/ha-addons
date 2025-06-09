@@ -9,10 +9,7 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 WORKDIR /app
 RUN apt-get update
 RUN apt-get upgrade -y
-RUN apt-get curl gnupg git
-RUN apt-get chromium
-RUN apt-get ffmpeg git
-RUN apt-get nodejs npm
+RUN apt-get install curl gnupg git chromium ffmpeg git nodejs npm
 RUN npm i whatsapp-web.js
 
 # Copy data for add-on
