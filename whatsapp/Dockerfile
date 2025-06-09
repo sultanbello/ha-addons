@@ -11,7 +11,7 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 RUN apt-get update
 RUN apt-get upgrade -y
 RUN apt-get install -y curl gnupg git chromium-bsu ffmpeg git nodejs npm
-RUN npm i whatsapp-web.js
+#RUN npm i whatsapp-web.js
 
 WORKDIR /app
 RUN git clone --branch "v2.4.1" --depth=1 \
