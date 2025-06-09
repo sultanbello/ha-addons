@@ -7,7 +7,8 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 #COPY rootfs /
 
 WORKDIR /app
-
+ENV CHROME_BIN="/usr/bin/chromium-browser" \
+    PUPPETEER_SKIP_CHROMIUM_DOWNLOAD="true"
 RUN apk add --update curl gnupg git
 RUN apk add --no-cache chromium
 ENV PUPPETEER_EXECUTABLE_PATH /usr/bin/chromium-browser
