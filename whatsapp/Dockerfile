@@ -8,7 +8,15 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 
 #install node 14 and npm
 RUN apt-get update && apt-get install -y curl gnupg
-RUN curl -sL https://deb.nodesource.com/setup_18.x | bash - 
+#RUN curl -sL https://deb.nodesource.com/setup_18.x | bash - 
+#Node installation
+RUN apt -y install nodejs npm
+
+# Node package manager
+RUN npm install -g n
+
+# Upgrade to latest stable version
+RUN n stable
 RUN apt-get install -y nodejs git
 
 #install chromiun
