@@ -8,12 +8,12 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 # Copy root filesystem
 #COPY rootfs /
 
-WORKDIR /app
 RUN apt-get update
 RUN apt-get upgrade -y
 RUN apt-get install -y curl gnupg git chromium-bsu ffmpeg git nodejs npm
 RUN npm i whatsapp-web.js
 
+WORKDIR /app
 RUN git clone --branch "v2.4.1" --depth=1 \
         "https://github.com/gajosu/ha-whatsapp-web-rest-api.git" /app
 
