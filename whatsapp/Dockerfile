@@ -8,8 +8,8 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 
 WORKDIR /app
 
-RUN apk add --update curl gnupg git 
-RUN apk add --update chromium ffmpeg git
+RUN apk add --update curl gnupg git
+RUN apk add --update chromium@community ffmpeg git
 RUN apk add --update nodejs npm
 RUN npm i whatsapp-web.js
 
