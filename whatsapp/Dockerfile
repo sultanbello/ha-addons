@@ -1,23 +1,22 @@
-# Use the official Node.js Alpine image as the base image
-FROM node:20-alpine
+#ARG BUILD_FROM
+#FROM $BUILD_FROM
 
-# Set the working directory
-WORKDIR /usr/src/app
+FROM ghcr.io/hassio-addons/debian-base:7.8.3
 
-# Install Chromium
-ENV CHROME_BIN="/usr/bin/chromium-browser" \
-    PUPPETEER_SKIP_CHROMIUM_DOWNLOAD="true" \
-    NODE_ENV="production"
-RUN set -x \
-    && apk update \
-    && apk upgrade \
-    && apk add --no-cache \
-    udev \
-    ttf-freefont \
-    chromium
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 
-# Copy package.json and package-lock.json to the working directory
-COPY package*.json ./
+# Copy root filesystem
+#COPY rootfs /
 
-# Install the dependencies
-RUN npm ci --only=production --ignore-scripts
+WORKDIR /app
+RUN apt-get update
+RUN apt-get upgrade -y
+RUN apt-get install -y curl gnupg git chromium-bsu ffmpeg git nodejs npm
+RUN npm i whatsapp-web.js
+
+# Copy data for add-on
+COPY run.sh /
+
+RUN chmod a+x /run.sh
+
+CMD [ "/run.sh" ]
