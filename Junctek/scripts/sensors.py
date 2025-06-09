@@ -82,7 +82,7 @@ sensors = {
     },
     'last_message': {
         'name': 'Last Message',
-        "state": "measurement",
+        "state": None,
         'type': 'timestamp',
         'icon': 'mdi:clock-check'
     },
