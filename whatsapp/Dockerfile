@@ -6,7 +6,7 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 # Copy root filesystem
 #COPY rootfs /
 
-WORKDIR /app
+WORKDIR /data/app
 
 # Copy data for add-on
 COPY run.sh /
