@@ -1,4 +1,4 @@
-ARG BUILD_FROM="alpine"
+ARG BUILD_FROM
 FROM $BUILD_FROM
 
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
@@ -7,17 +7,12 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 #COPY rootfs /
 
 WORKDIR /app
-RUN apk update && apk upgrade && \
-    echo @edge http://nl.alpinelinux.org/alpine/edge/community >> /etc/apk/repositories && \
-    echo @edge http://nl.alpinelinux.org/alpine/edge/main >> /etc/apk/repositories && \
-    apk add --no-cache chromium
-ENV CHROME_BIN="/usr/bin/chromium-browser" \
-    PUPPETEER_SKIP_CHROMIUM_DOWNLOAD="true"
-RUN apk add --update curl gnupg git
-RUN apk add --no-cache chromium@edge
-ENV PUPPETEER_EXECUTABLE_PATH="/usr/bin/chromium-browser"
-RUN apk add --update ffmpeg git
-RUN apk add --update nodejs npm
+RUN apt-get update
+RUN apt-get upgrade -y
+RUN apt-get curl gnupg git
+RUN apt-get chromium
+RUN apt-get ffmpeg git
+RUN apt-get nodejs npm
 RUN npm i whatsapp-web.js
 
 # Copy data for add-on
