@@ -12,18 +12,8 @@ bashio::log.info "Refreshing data"
     bashio::log.info "Installing nodejs"
     apk add --update nodejs npm
 
-    bashio::log.info "Fetching rest api"
-    git clone --branch "v2.4.1" --depth=1 "https://github.com/gajosu/ha-whatsapp-web-rest-api.git" /data/app
+    npm i whatsapp-web.js
 
-    # install production dependencies
-    bashio::log.info "Installing rest api"
-    npm install
-
-    npm audit fix --force 
-
-    npm update
-
-    npm run build
     echo "pip done" > /data/pip
 #fi
 
