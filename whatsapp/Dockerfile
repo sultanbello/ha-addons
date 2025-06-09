@@ -8,10 +8,9 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 
 WORKDIR /app
 
-RUN apt-get update
-RUN apt-get install curl gnupg -y
-RUN curl -sL https://deb.nodesource.com/setup_14.x | bash -
-RUN apt-get install nodejs npm -y
+RUN  apk add --update curl gnupg git 
+RUN apk add --update chromium ffmpeg git
+RUN apk add --update nodejs npm
 RUN npm i whatsapp-web.js
 
 # Copy data for add-on
