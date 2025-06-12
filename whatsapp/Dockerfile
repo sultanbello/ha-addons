@@ -10,17 +10,17 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 RUN apt-get update && apt-get install -y curl gnupg
 
 #Node installation
-RUN apt -y install nodejs npm
+RUN apt -y install nodejs npm git
 
 # Node package manager
 RUN npm install -g n
 
 # Upgrade to latest stable version
-RUN n stable
+RUN npm stable
 RUN apt-get install -y nodejs git
 
 #install chromiun
-#RUN apt-get install -y chromium ffmpeg git
+RUN apt-get install -y chromium ffmpeg git
 
 # Copy root filesystem
 COPY rootfs /
