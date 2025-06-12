@@ -16,7 +16,6 @@ RUN apt -y install nodejs npm git
 RUN npm install -g n
 
 # Upgrade to latest stable version
-RUN npm stable
 RUN apt-get install -y nodejs git
 
 #install chromiun
