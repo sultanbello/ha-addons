@@ -22,7 +22,7 @@ RUN apt-get install -y nodejs git
 RUN apt-get install -y chromium ffmpeg git
 
 # Copy root filesystem
-COPY rootfs /
+#COPY rootfs /
 
 WORKDIR /app
 
@@ -33,3 +33,10 @@ RUN git clone --branch "v2.4.1" --depth=1 \
 RUN npm install
 
 RUN npm run build
+
+# Copy data for add-on
+COPY run.sh /
+
+RUN chmod a+x /run.sh
+
+CMD [ "/run.sh" ]
