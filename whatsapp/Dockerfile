@@ -4,7 +4,7 @@
 # FROM $BUILD_FROM
 FROM ghcr.io/hassio-addons/debian-base:7.8.3
 
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+#ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 
 #install node 14 and npm
 RUN apt-get update && apt-get install -y curl gnupg
