@@ -22,7 +22,7 @@ configuration:
   messages:
     name: messages
     description: >
-      A list of language and messages. The message to be sent will be picked randomly\n
+      A list of language and messages. The message to be sent will be picked randomly\nUse '\n' for new lines
         Example
         - languague: EN
           message: Happy Birthday

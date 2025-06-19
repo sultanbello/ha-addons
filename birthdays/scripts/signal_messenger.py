@@ -52,7 +52,7 @@ class Signal:
         try:
             data    = {
                 "number": self.number,
-                'message': msg,
+                'message': f"{msg}",
                 'recipients': [number],
             }
             response    = requests.post(f'{self.url}/v2/send', json=data, headers=self.headers)

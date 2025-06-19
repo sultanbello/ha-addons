@@ -128,7 +128,7 @@ class Whatsapp:
                 return True
         
             post    = {
-                'msg':       msg
+                'msg': f"{msg}"
             }
 
             return self.make_request(url, post)
