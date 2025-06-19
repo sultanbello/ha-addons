@@ -61,8 +61,19 @@ class Signal:
                 self.parent.logger.info(f'Send Signal Message Succesfully. Timestamp { response.json()["timestamp"] }') 
                 return response.json()['timestamp']
 
-            
-            self.parent.logger.error(f'Send Signal message failed. Error is {response.json()["error"]} ')
+            # Something went wrong and was ment for a group
+            if number[0][0] != '+':
+                error       = response.json()["error"]
+
+                response    = requests.get(f'{self.url}/v1/groups/{self.number}', headers=self.headers)
+
+                groups  = ''
+                if response.ok:
+                    for group in response.json():
+                        groups +=   f"Name: {group['name']} Id: {group['id']}\n"
+                self.parent.logger.error(f'Send Signal message failed. Error is {error} Do you have the right group id?\nGroup ids:{groups}')
+            else:
+                self.parent.logger.error(f'Send Signal message failed. Error is {response.json()["error"]} ')
 
             return False
         except Exception as e:
