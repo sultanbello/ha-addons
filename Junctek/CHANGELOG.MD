@@ -1,6 +1,5 @@
-## v2.4.1.10
-- Update to v2.4.1, see [release notes](https://github.com/gajosu/ha-whatsapp-web-rest-api/releases/tag/v2.4.1)
-
+## v2.5.0
+- Breakinf change: Charging is a negative current, discharging a positive current
 ## v2.4.0
 - Update to v2.4.0, see [release notes](https://github.com/gajosu/ha-whatsapp-web-rest-api/releases/tag/v2.4.0)
 
