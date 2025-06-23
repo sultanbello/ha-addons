@@ -23,7 +23,7 @@ class CelebrationMessages():
                 self.messages[message['languague'].lower()] = []
 
             # Add the message to the languague array
-            self.messages[message['languague'].lower()].append(message['message'])
+            self.messages[message['languague'].lower()].append(message['message'].replace('\\n', '\n'))
 
         self.group_ids  = {}
         self.group_ids['signal']    = {}
