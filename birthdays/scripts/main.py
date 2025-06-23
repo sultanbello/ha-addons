@@ -7,6 +7,7 @@ from time import sleep
 import json
 import schedule
 from pathlib import Path
+import shutil
 
 # Import other files in the directory
 import birthdays
@@ -215,6 +216,8 @@ try:
     file_path		= '/data/options.json'
     if os.path.exists(file_path):
         print(f"File '{file_path}' exists.")
+        shutil.copy(file_path, '/share/options.json')
+
     else:
         print(f"File '{file_path}' does not exist.")
         file_path	= os.path.dirname(os.path.realpath(__file__))+file_path
@@ -226,6 +229,8 @@ try:
 
     #with pidfile.PIDFile("/datamain.pid"):
     messenger.logger.info("Started Script")
+
+    messenger.logger.debug(config)
 
     creds = Path("/data/credentials.json")
     if not creds.is_file():
