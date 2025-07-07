@@ -180,41 +180,38 @@ def get_sensor_data():
     messenger.send(False)
 
 try:
-    if len(sys.argv) == 2:
-        running_local       = sys.argv[1]
-    else:
-        import pidfile
-        running_local       = False
-
-    TOKEN   = os.getenv('SUPERVISOR_TOKEN')
-
-    url     = "http://supervisor/addons"
-    headers = {
-        "Authorization": f"Bearer {TOKEN}",
-        "content-type": "application/json",
-    }
-    response    = requests.get(url, headers=headers)
-
-    available   = {}
-    if response.ok:
-        addons  = response.json()['data']['addons']
-
-        for addon in addons:
-            if addon['slug'] == '06c15c6e_whatsapp' or addon['slug'] == '1315902c_signal_messenger':
-                name_slug               = addon['slug'].split('_')[1]
-                available[name_slug]    = addon['state']
-
-                if name_slug == 'whatsapp':
-                    print("Importing whatsapp.py")
-                    whatsapp            = __import__(name_slug)
-                else:
-                    print("Importing signal_messenger.py")
-                    signal_messenger    = __import__('signal_messenger')
-
     # Get Options
     file_path		= '/data/options.json'
+    available       = {}
+
+    # Running inside addon
     if os.path.exists(file_path):
-        print(f"File '{file_path}' exists.")
+        print(f"Running inside addon container.")
+        import pidfile
+
+        TOKEN   = os.getenv('SUPERVISOR_TOKEN')
+
+        url     = "http://supervisor/addons"
+        headers = {
+            "Authorization": f"Bearer {TOKEN}",
+            "content-type": "application/json",
+        }
+        response    = requests.get(url, headers=headers)
+
+        if response.ok:
+            addons  = response.json()['data']['addons']
+
+            for addon in addons:
+                if addon['slug'] == '06c15c6e_whatsapp' or addon['slug'] == '1315902c_signal_messenger':
+                    name_slug               = addon['slug'].split('_')[1]
+                    available[name_slug]    = addon['state']
+
+                    if name_slug == 'whatsapp':
+                        print("Importing whatsapp.py")
+                        whatsapp            = __import__(name_slug)
+                    else:
+                        print("Importing signal_messenger.py")
+                        signal_messenger    = __import__('signal_messenger')
 
     else:
         print(f"File '{file_path}' does not exist.")
@@ -251,8 +248,8 @@ try:
     while True:
         schedule.run_pending()
         sleep(1)
-except pidfile.AlreadyRunningError:
-    messenger.logger.error("Already running")
+#except pidfile.AlreadyRunningError:
+#    messenger.logger.error("Already running")
 except Exception as e:
     print(f"{str(e)} on line {sys.exc_info()[-1].tb_lineno}")
 

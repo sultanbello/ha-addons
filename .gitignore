@@ -17,3 +17,4 @@ signal-reply/scripts/data/token.pickle
 signal-reply/scripts/__pycache__/google_contacts.cpython-313.pyc
 Junctek/scripts/data/options.json
 Junctek/scripts/__pycache__/sensors.cpython-313.pyc
+birthdays/scripts/data/token.pickle

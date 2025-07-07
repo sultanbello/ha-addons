@@ -34,8 +34,15 @@ class Gmail:
             Path("/share/google").mkdir(parents=True, exist_ok=True)
 
             creds               = None
-            token_file          = '/data/token.pickle'
-            credentials_file    = '/data/credentials.json'
+            dir                 = Path("/data")
+            if dir.is_dir():
+                prefix          = ''
+            else:
+                # Local path
+                prefix          = os.path.dirname(os.path.realpath(__file__))
+                
+            token_file          = f'{prefix}/data/token.pickle'
+            credentials_file    = f'{prefix}/data/credentials.json'
 
             # credentials do not exist yet
             file = Path(credentials_file)

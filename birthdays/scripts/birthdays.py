@@ -66,8 +66,8 @@ class CelebrationMessages():
                     details['age']          = self.now.year - details['birthyear']
 
             # Country
-            if addresses and addresses[0].get("countryCode") != None:
-                details['country'] = (addresses[0].get("countryCode")).upper()
+            if addresses and addresses[0].get("country") != None:
+                details['country'] = (addresses[0].get("country")).upper()
             else:
                 # this person has a birthday but no country set
                 if 'name' in details and 'birthday' in details:
