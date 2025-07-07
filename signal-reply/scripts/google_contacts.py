@@ -17,6 +17,8 @@ class Contacts:
         try:
             self.parent     = parent
 
+            self.authorized = False
+
             self.creds      = self.auth()
 
             # Fetch a list of country - languagues
@@ -91,12 +93,15 @@ class Contacts:
 
             # If there are no (valid) credentials available, let the user log in.
             if not creds or not creds.valid:
+                self.authorized = False
+
                 self.parent.logger.debug(f"Creds are not valid")
 
                 if creds and creds.expired and creds.refresh_token:
                     self.parent.logger.debug(f"Refreshing token")
                     try:
                         creds.refresh(Request())
+                        self.authorized = True
                     except exceptions.RetryError as e:
                         # Handles errors when retries have been exhausted
                         self.parent.logger.error(f"Retry error: {e}")
@@ -116,12 +121,18 @@ class Contacts:
 
                     try:
                         creds   = flow.run_local_server(bind_addr="0.0.0.0", open_browser=False, port=self.parent.port, timeout_seconds=600)
+                    except TimeoutError:
+                        self.parent.logger.error("Authentication timed out. Please try again.")
+                        return
                     except Exception as e:
                         self.parent.logger.error(e)
                         self.parent.logger.error("Please restart this addon and try again")
+                        return
             
                     self.parent.logger.info('########################')
                     self.parent.logger.info('')
+
+                self.authorized = True
 
                 self.parent.logger.debug(f"Creds refresh token: {creds.refresh_token}")
 
@@ -130,6 +141,8 @@ class Contacts:
                 # Save the credentials for the next run
                 with open(token_file, 'wb') as token:
                     pickle.dump(creds, token)
+            else:
+                self.authorized = True
 
             self.service = build('people', 'v1', credentials = creds)
 
@@ -140,7 +153,7 @@ class Contacts:
 
     def get_contacts(self):
         try:    
-            if self.parent.google_label == '':
+            if self.parent.google_label == '' or not self.authorized :
                 return False
             
             # Only fetch once every 24 hours

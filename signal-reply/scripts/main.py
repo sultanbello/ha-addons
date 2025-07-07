@@ -125,6 +125,7 @@ class SocketListener:
 
 					if(
 						self.google_label == '' or 
+						not 'phonenumbers' in self.contacts.connections or
 						(
 							'phonenumbers' in self.contacts.connections and 
 							nr in self.contacts.connections['phonenumbers']
